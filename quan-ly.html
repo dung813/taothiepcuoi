@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Quản lý thiệp – Thiệp Hồng</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&family=Great+Vibes&family=Dancing+Script:wght@500&family=Parisienne&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+<style>
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:30px}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px}
+.kpi small{color:var(--muted)}.kpi b{display:block;font-family:var(--f-head);font-size:2rem;color:var(--rose-d)}
+.panel2{background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px;margin-bottom:24px}
+.panel2 h3{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px;font-size:1.3rem}
+.tbl{width:100%;border-collapse:collapse;font-size:.92rem}
+.tbl th,.tbl td{padding:10px;border-bottom:1px solid var(--line);text-align:left}
+.tbl th{color:var(--muted);font-weight:600;font-size:.8rem;text-transform:uppercase;letter-spacing:.05em}
+.pill{padding:3px 10px;border-radius:999px;font-size:.78rem;font-weight:600}
+.pill.yes{background:#e3f4e7;color:#2d7a43}.pill.no{background:#fbe4e4;color:#b33}
+@media(max-width:760px){.kpis{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<section class="page-hero"><div class="container"><div class="crumbs"><a href="index.html">Trang chủ</a> / <a href="thiep-da-tao.html">Thiệp đã tạo</a> / Quản lý</div>
+<h1 id="ttl">Quản lý thiệp</h1><div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:16px" id="acts"></div></div></section>
+<section class="container" style="padding-top:30px">
+  <div class="kpis" id="kpis"></div>
+  <div class="panel2"><h3>Khách xác nhận tham dự <button class="btn btn-outline btn-sm" id="csv">⬇ Xuất CSV</button></h3><div class="table-wrap"><table class="tbl" id="rsvpT"></table></div></div>
+  <div class="panel2"><h3>Lời chúc</h3><div id="wishL"></div></div>
+  <p class="hint" style="color:var(--muted);font-size:.85rem">Lưu ý: bản tĩnh này lưu phản hồi trong trình duyệt. Để nhận phản hồi từ mọi khách mời, hãy kết nối backend (Firebase, Supabase…) tại <code>TH.guestbook</code> trong <code>assets/js/invite.js</code>.</p>
+</section>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/common.js"></script>
+<script src="assets/js/invite.js"></script>
+<script>
+(function(){
+  TH.initPage();
+  const $ = TH.$, esc = TH.esc, id = TH.qs('id'), D = id && TH.invites.get(id);
+  if (!D) { $('#ttl').textContent = 'Không tìm thấy thiệp'; $('#kpis').innerHTML = '<a class="btn btn-primary" href="thiep-da-tao.html">Về danh sách thiệp</a>'; return; }
+  $('#ttl').textContent = `${D.groom.nick} & ${D.bride.nick}`;
+  $('#acts').innerHTML = `<a class="btn btn-primary btn-sm" href="editor.html?id=${id}">✏️ Chỉnh sửa</a><a class="btn btn-outline btn-sm" target="_blank" href="thiep.html?id=${id}">👁 Xem thiệp</a><button class="btn btn-outline btn-sm" id="share">🔗 Chia sẻ</button><button class="btn btn-ghost btn-sm" id="del" style="color:#b33">🗑 Xoá</button>`;
+  $('#share').onclick = () => TH.shareDialog(id, D);
+  $('#del').onclick = () => { if (confirm('Xoá thiệp này? Không thể hoàn tác.')) { TH.invites.remove(id); TH.store.del('gb_'+id); location.href = 'thiep-da-tao.html'; } };
+
+  const render = () => {
+    const gb = TH.guestbook.get(id), yes = gb.rsvp.filter(r=>r.attend==='yes');
+    const people = yes.reduce((s,r)=>s + (+r.count||1), 0);
+    const days = Math.ceil((new Date(D.date) - Date.now())/864e5);
+    $('#kpis').innerHTML = [['Lượt xem', gb.views],['Xác nhận đến', yes.length],['Tổng số người', people],['Còn lại', days > 0 ? days + ' ngày' : 'Đã diễn ra']]
+      .map(([l,v])=>`<div class="kpi"><small>${l}</small><b>${v}</b></div>`).join('');
+    $('#rsvpT').innerHTML = gb.rsvp.length ? `<tr><th>Tên</th><th>Điện thoại</th><th>Trạng thái</th><th>Số người</th><th>Khách</th><th>Thời gian</th></tr>` +
+      gb.rsvp.map(r=>`<tr><td>${esc(r.name)}</td><td>${esc(r.phone||'')}</td><td><span class="pill ${r.attend}">${r.attend==='yes'?'Sẽ đến':'Không đến'}</span></td><td>${r.attend==='yes'?esc(r.count):'-'}</td><td>${r.side==='bride'?'Nhà gái':'Nhà trai'}</td><td>${new Date(r.at).toLocaleString('vi-VN')}</td></tr>`).join('')
+      : '<tr><td style="color:var(--muted)">Chưa có khách xác nhận.</td></tr>';
+    $('#wishL').innerHTML = gb.wishes.length ? gb.wishes.map((w,i)=>`<div class="mock-row"><span class="avatar">${esc(w.name.slice(0,2).toUpperCase())}</span><div style="flex:1"><b>${esc(w.name)}</b><br><span style="color:var(--muted)">${esc(w.msg)}</span></div><button class="btn btn-ghost btn-sm" data-del="${i}">Ẩn</button></div>`).join('')
+      : '<p style="color:var(--muted)">Chưa có lời chúc.</p>';
+  };
+  $('#wishL').onclick = e => { const b = e.target.closest('[data-del]'); if (!b) return; const gb = TH.guestbook.get(id); gb.wishes.splice(+b.dataset.del,1); TH.guestbook.put(id, gb); render(); };
+  $('#csv').onclick = () => {
+    const rows = [['Tên','Điện thoại','Tham dự','Số người','Khách','Thời gian'], ...TH.guestbook.get(id).rsvp.map(r=>[r.name,r.phone||'',r.attend==='yes'?'Có':'Không',r.count,r.side==='bride'?'Nhà gái':'Nhà trai',new Date(r.at).toLocaleString('vi-VN')])];
+    const csv = '﻿' + rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download = `khach-moi-${id}.csv`; a.click();
+  };
+  render();
+})();
+</script>
+</body>
+</html>
