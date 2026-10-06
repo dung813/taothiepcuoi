@@ -335,11 +335,33 @@ body.inv.senior,body.inv.senior.dark{--t-bg:#fffdf8!important;--t-fg:#111!import
 /* ---- Tự động chạy nội dung + thanh tiến trình ---- */
 .read-progress{position:fixed;top:0;left:50%;translate:-50% 0;width:min(520px,100%);height:3px;z-index:270;background:rgba(0,0,0,.1);pointer-events:none}
 .read-progress i{display:block;height:100%;width:0;background:var(--t-accent);border-radius:0 3px 3px 0;box-shadow:0 0 8px var(--t-accent)}
-.autoplay{position:fixed;left:max(16px,calc(50% - 244px));bottom:80px;z-index:250;display:flex;align-items:center;gap:8px;height:44px;padding:0 14px 0 4px;border:none;border-radius:999px;background:#fff;color:#2b2226;font:600 .8rem var(--f-body);box-shadow:0 8px 20px rgba(0,0,0,.22);cursor:pointer;transition:background .25s,color .25s}
-.autoplay .ic{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:var(--t-accent);color:#fff;font-size:.8rem;letter-spacing:-.1em}
-.autoplay.on{background:var(--t-accent);color:#fff}
-.autoplay.on .ic{background:#fff;color:var(--t-accent);animation:glow 2s infinite}
-.preview-mode .autoplay,.preview-mode .read-progress{display:none}
+/* Cụm Tự động chạy + tốc độ: ghim góc dưới trái, trên nút nhạc */
+.autoplay-wrap{position:fixed;left:max(16px,calc(50% - 244px));bottom:80px;z-index:250;display:flex;align-items:center;gap:6px}
+.autoplay{position:relative;display:flex;align-items:center;gap:8px;height:44px;padding:0 14px 0 4px;border:none;border-radius:999px;background:#fff;color:#2b2226;font:600 .8rem var(--f-body);cursor:pointer;
+  box-shadow:0 8px 20px rgba(0,0,0,.22);transition:background .25s,color .25s;animation:apBreathe 2.8s ease-in-out infinite}
+.autoplay .ic{position:relative;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:var(--t-accent);color:#fff;font-size:.85rem}
+/* Nhịp thở + quầng vàng kim lan toả định kỳ */
+@keyframes apBreathe{
+  0%,100%{transform:scale(1);box-shadow:0 8px 20px rgba(0,0,0,.22),0 0 0 0 rgba(212,175,55,.55)}
+  50%{transform:scale(1.045);box-shadow:0 8px 22px rgba(0,0,0,.22),0 0 0 12px rgba(212,175,55,0),0 0 22px 4px rgba(240,200,90,.55)}}
+.autoplay:hover{animation-play-state:paused;transform:translateY(-1px)}
+/* Đang chạy: nút đổi màu, viền vàng kim xoay quanh icon ⏸ */
+.playing .autoplay{background:var(--t-accent);color:#fff;animation:none;box-shadow:0 8px 20px rgba(0,0,0,.22),0 0 16px rgba(240,200,90,.45)}
+.playing .autoplay .ic{background:#fff;color:var(--t-accent)}
+.playing .autoplay .ic::before{content:"";position:absolute;inset:-4px;border-radius:50%;
+  background:conic-gradient(from 0deg,#f6d77a,#c9a227 30%,transparent 55%,#f6d77a 85%);
+  -webkit-mask:radial-gradient(circle,transparent 60%,#000 61%);mask:radial-gradient(circle,transparent 60%,#000 61%);animation:apSpin 1.6s linear infinite}
+@keyframes apSpin{to{transform:rotate(360deg)}}
+/* Nút tốc độ dạng badge */
+.speed-btn{height:32px;min-width:42px;padding:0 10px;border-radius:999px;border:1.5px solid rgba(212,175,55,.7);background:rgba(255,255,255,.92);backdrop-filter:blur(6px);
+  color:#8a6a12;font:800 .78rem var(--f-body);letter-spacing:.02em;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.18);transition:background .2s,color .2s,transform .2s}
+.speed-btn:hover{background:#d4af37;color:#fff}
+.speed-btn.bump{animation:spBump .35s ease}
+@keyframes spBump{50%{transform:scale(1.18)}}
+.speed-btn:focus-visible,.autoplay:focus-visible{outline:2px solid #d4af37;outline-offset:3px}
+@media (max-width:380px){.autoplay .lb{display:none}.autoplay{padding:0 4px}}
+@media (prefers-reduced-motion:reduce){.autoplay,.playing .autoplay .ic::before{animation:none}}
+.preview-mode .autoplay-wrap,.preview-mode .read-progress{display:none}
 
 /* ---- RSVP: câu hỏi nối tiếp ---- */
 .rsvp-branch{border:0;padding:0;margin:0;display:grid;gap:12px;min-width:0;animation:fadeUp .35s ease}

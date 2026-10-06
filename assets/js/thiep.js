@@ -67,7 +67,10 @@ function render(){
   </div>
   <button class="speak-btn" id="speakBtn" aria-label="Đọc thiệp thành tiếng">🔊 Đọc thiệp thành tiếng</button>
   <div class="read-progress" aria-hidden="true"><i id="progBar"></i></div>
-  <button class="autoplay" id="autoBtn" aria-pressed="false" aria-label="Tự động chạy nội dung thiệp"><span class="ic">▶</span><span class="lb">Tự động chạy</span></button>`;
+  <div class="autoplay-wrap" role="group" aria-label="Tự động chạy nội dung">
+    <button class="autoplay" id="autoBtn" aria-pressed="false" aria-label="Tự động chạy nội dung thiệp"><span class="ic">▶</span><span class="lb">Tự động chạy</span></button>
+    <button class="speed-btn" id="speedBtn" aria-label="Tốc độ cuộn: ${SPEEDS[speedIdx]}x — bấm để đổi" title="Đổi tốc độ cuộn (1x · 2x · 4x)">${SPEEDS[speedIdx]}x</button>
+  </div>`;
 
   /* Giai đoạn 1 — trước ngày cưới: thiệp đầy đủ */
   const beforeView = () => `
@@ -319,6 +322,18 @@ function openRide(v){
    khách chạm / lăn chuột / bấm phím cuộn thì tự tạm dừng. */
 const tour = {on:false, raf:0, timer:0, y:0, last:0, hold:0, stops:[], next:0};
 const TOUR_DWELL = 1800, TOUR_EASE = 600;
+/* Tốc độ 1x · 2x · 4x (nhớ lựa chọn của khách); thời gian dừng ở mỗi phần cũng rút ngắn theo */
+const SPEEDS = [1, 2, 4];
+let speedIdx = Math.max(0, SPEEDS.indexOf(+TH.store.get('tourSpeed', 1)));
+const SPEED_NAME = {1:'Chậm, vừa mắt', 2:'Nhanh', 4:'Lướt nhanh'};
+function cycleSpeed(){
+  speedIdx = (speedIdx + 1) % SPEEDS.length;
+  const x = SPEEDS[speedIdx], b = $('#speedBtn');
+  TH.store.set('tourSpeed', x);
+  b.textContent = x + 'x'; b.setAttribute('aria-label', `Tốc độ cuộn: ${x}x — bấm để đổi`);
+  b.classList.remove('bump'); void b.offsetWidth; b.classList.add('bump');
+  TH.toast(`Tốc độ ${x}x · ${SPEED_NAME[x]}`);
+}
 const scrollMax = () => Math.max(0, document.documentElement.scrollHeight - innerHeight);
 function tourStops(){
   const ys = $$('#app > section, #app > footer').map(s => Math.max(0, Math.round(s.getBoundingClientRect().top + scrollY - 56)));
@@ -327,8 +342,9 @@ function tourStops(){
 function setTourUI(on, label){
   const b = $('#autoBtn'); if (!b) return;
   b.classList.toggle('on', on); b.setAttribute('aria-pressed', on);
-  $('.ic', b).textContent = on ? '❚❚' : '▶';
+  $('.ic', b).textContent = on ? '⏸' : '▶';
   $('.lb', b).textContent = label || (on ? 'Tạm dừng' : 'Tự động chạy');
+  b.closest('.autoplay-wrap')?.classList.toggle('playing', on);
 }
 function tourStart(){
   if (tour.on || tour.timer) return;
@@ -356,10 +372,10 @@ function tourTick(now){
   const dt = Math.min(64, now - tour.last); tour.last = now;
   if (now >= tour.hold) {
     const ease = Math.min(1, (now - tour.hold) / TOUR_EASE);            // tăng tốc nhẹ sau mỗi lần dừng
-    tour.y = Math.min(scrollMax(), tour.y + (senior ? 40 : 55) * ease * dt / 1000);
+    tour.y = Math.min(scrollMax(), tour.y + (senior ? 40 : 55) * SPEEDS[speedIdx] * ease * dt / 1000);
     const stop = tour.stops[tour.next];
     if (stop != null && tour.y >= stop) {
-      tour.y = stop; tour.hold = now + TOUR_DWELL;
+      tour.y = stop; tour.hold = now + TOUR_DWELL / Math.sqrt(SPEEDS[speedIdx]);
       tour.stops = tourStops(); tour.next = tour.stops.findIndex(s => s > tour.y + 2);  // ảnh tải xong có thể làm lệch vị trí
       if (tour.next < 0) tour.next = tour.stops.length;
     }
@@ -374,7 +390,7 @@ function updateProgress(){
 /* Khách tự tương tác → tạm dừng (bỏ qua chính nút tự động chạy) */
 const userTakeover = e => {
   if (!tour.on && !tour.timer) return;
-  if (e.target?.closest?.('#autoBtn')) return;
+  if (e.target?.closest?.('#autoBtn, #speedBtn')) return;
   tourStop(); TH.toast('Đã tạm dừng — bạn tự do xem nhé');
 };
 ['wheel', 'touchstart', 'pointerdown'].forEach(t => addEventListener(t, userTakeover, {passive:true}));
@@ -660,6 +676,7 @@ function bind(photos){
 
   // Tự động chạy nội dung
   $('#autoBtn').onclick = () => tour.on || tour.timer ? tourStop() : tourStart();
+  $('#speedBtn').onclick = cycleSpeed;
   updateProgress();
 
   // Album kỷ niệm (sau ngày cưới)
