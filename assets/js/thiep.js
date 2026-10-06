@@ -82,7 +82,7 @@ function render(){
 
   <section class="t-hero${isPreview ? '' : ' intro'}" id="hero"><div class="bg" style="background-image:url('${esc(D.cover || photos[0] || '')}')"></div><div class="flash"></div>
     <div class="in">${guest ? `<div class="guest-pill">Thân mời <b>${esc(guest)}</b>${table ? ` · Bàn ${esc(table)}` : ''}</div>` : ''}<div class="t-sub kick" style="margin-bottom:10px">We're getting married</div>
-    <div class="names"><span class="nm g">${esc(D.groom.nick)}</span><span class="amp">&amp;</span><span class="nm b">${esc(D.bride.nick)}</span></div><div class="date">${dateStr}</div></div><div class="scroll"></div></section>
+    <div class="names"><span class="nm g">${esc(D.groom.nick)}</span><span class="amp">&amp;</span><span class="nm b">${esc(D.bride.nick)}</span></div><div class="date">${dateStr}</div>${o.countdown !== false ? `<div class="hero-cd" id="cdHero" aria-label="Đếm ngược đến ngày cưới">${["Ngày","Giờ","Phút","Giây"].map(l => `<div><b>0</b><small>${l}</small></div>`).join("")}</div>` : ""}</div><div class="scroll"></div></section>
 
   <section class="sec-couple">
     <div class="couple-photo reveal left" style="background-image:url('${esc(photos[1] || D.cover || photos[0] || '')}')" aria-hidden="true"></div>
@@ -103,7 +103,7 @@ function render(){
     </div>
   </section>
 
-  ${o.countdown !== false ? `<section style="padding-top:20px"><h2 class="t-title reveal">Đếm ngược</h2><div class="t-sub reveal">Đến ngày chung đôi</div>
+  ${o.countdown !== false ? `<section class="sec-countdown" style="padding-top:20px"><h2 class="t-title reveal">Đếm ngược</h2><div class="t-sub reveal">Đến ngày chung đôi</div>
     <div class="countdown reveal zoom" id="cd"><div><b>0</b><small>Ngày</small></div><div><b>0</b><small>Giờ</small></div><div><b>0</b><small>Phút</small></div><div><b>0</b><small>Giây</small></div></div></section>` : ''}
 
   ${o.calendar !== false && !isNaN(wd) ? `<section style="padding-top:10px"><div class="card cal reveal">${calendar(wd)}</div></section>` : ''}
@@ -207,14 +207,16 @@ function calendar(d){
 }
 
 function startCountdown(){
-  clearInterval(cdTimer); const el = $('#cd'); if (!el) return;
-  const target = new Date(D.date).getTime(), b = $$('b', el);
+  clearInterval(cdTimer);
+  const el = $('#cd'), boxes = [el, $('#cdHero')].filter(Boolean);   // #cdHero: đếm ngược trong ảnh bìa (bản máy tính)
+  if (!boxes.length) return;
+  const target = new Date(D.date).getTime(), bs = boxes.map(x => $$('b', x));
   const tick = () => { let s = Math.max(0, Math.floor((target - Date.now())/1000));
     const v = [Math.floor(s/86400), Math.floor(s%86400/3600), Math.floor(s%3600/60), s%60];
-    v.forEach((x,i)=> b[i].textContent = pad(x));
+    bs.forEach(b => v.forEach((x,i)=> b[i].textContent = pad(x)));
     if (s === 0) { clearInterval(cdTimer);
       const msg = new Date().toDateString() === new Date(target).toDateString() ? '💍 Hôm nay là ngày trọng đại!' : '💍 Hai bạn đã chính thức về chung một nhà!';
-      el.insertAdjacentHTML('afterend',`<p style="margin-top:14px">${msg}</p>`); } };
+      boxes.forEach(x => x.insertAdjacentHTML('afterend',`<p class="cd-msg" style="margin-top:14px">${msg}</p>`)); } };
   tick(); cdTimer = setInterval(tick, 1000);
 }
 

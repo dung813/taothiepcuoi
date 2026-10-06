@@ -475,3 +475,106 @@ html:has(body.inv){background:#fbf3ef}
 body.inv{box-shadow:0 24px 90px rgba(80,40,52,.28)}
 .inv-backdrop{position:fixed;inset:-60px;z-index:-1;background:#fbf3ef center/cover no-repeat;filter:blur(30px) saturate(1.15);pointer-events:none}
 .inv-backdrop::after{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(253,243,244,.78),rgba(251,236,207,.66))}
+
+/* ============ Thanh dock đáy màn hình: Nhạc (trái) · Tự động chạy + tốc độ (giữa) · Quà (phải) ============ */
+.fab{width:44px;height:44px;font-size:1.15rem}
+.fab-music{bottom:20px;left:max(16px,calc(50% - 244px))}
+.fab-gift{bottom:20px;right:max(16px,calc(50% - 244px))}
+.fab-wish{bottom:76px;right:max(16px,calc(50% - 244px));width:40px;height:40px;font-size:1rem}
+.autoplay-wrap{left:50%;bottom:20px;translate:-50% 0;gap:4px;padding:3px;border-radius:999px;
+  background:rgba(255,255,255,.85);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.9);
+  box-shadow:0 6px 18px rgba(0,0,0,.18);animation:apBreathe 2.8s ease-in-out infinite}
+.autoplay-wrap .autoplay{height:38px;padding:0 12px 0 3px;background:transparent;box-shadow:none;animation:none;font-size:.78rem}
+.autoplay-wrap .autoplay .ic{width:32px;height:32px;font-size:.78rem}
+.autoplay-wrap .speed-btn{height:30px;min-width:38px;padding:0 8px;box-shadow:none;margin-right:2px}
+.autoplay-wrap.playing{animation:none;box-shadow:0 6px 18px rgba(0,0,0,.2),0 0 16px rgba(240,200,90,.45)}
+.autoplay-wrap.playing .autoplay{background:var(--t-accent);color:#fff;box-shadow:none}
+.autoplay-wrap:hover{animation-play-state:paused}
+/* Nút đọc thiệp (chế độ chữ lớn) nằm ngay trên thanh dock */
+.speak-btn{bottom:72px}
+@media (max-width:380px){.autoplay-wrap .autoplay{padding:0 3px}}
+
+/* ============ Máy tính / tablet ngang (≥1024px): bố cục tràn màn hình ============
+   Dưới 1024px giữ nguyên thiệp 1 cột (điện thoại cuộn dọc, tablet đứng là cột giữa có nền mờ). */
+.hero-cd{display:none}
+@media (min-width:1024px){
+  html:has(body.inv){background:var(--t-bg)}
+  body.inv{max-width:none;box-shadow:none}
+  .inv-backdrop{display:none}
+  .inv section{padding:110px max(56px,calc(50% - 560px))}
+  .confetti{max-width:none}
+
+  /* Mở đầu: chia đôi 100vh — ảnh cưới bên trái, tên + ngày + đếm ngược bên phải */
+  .inv .t-hero{min-height:100vh;flex-direction:row;align-items:stretch;justify-content:flex-end}
+  .inv .t-hero .bg{right:50%;background-position:center}
+  .inv .t-hero::after{display:none}
+  .inv .t-hero .in{width:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 64px;color:var(--t-fg);background:var(--t-bg);text-align:center}
+  .inv .t-hero .names{font-size:clamp(3.8rem,5.6vw,5.8rem);color:var(--t-accent);text-shadow:none}
+  .inv .t-hero .names .nm,.inv .t-hero .names .amp{display:block}
+  .inv .t-hero .date{color:var(--t-fg)}
+  .inv .t-hero .guest-pill{background:var(--t-card);border-color:var(--t-line);color:var(--t-fg)}
+  .inv .t-hero .scroll{left:75%;border-color:var(--t-accent)}
+  .inv .t-hero .scroll::after{background:var(--t-accent)}
+  .hero-top.inv .t-hero .in{padding:80px 64px}
+  .hero-cd{display:grid;grid-template-columns:repeat(4,76px);gap:10px;margin-top:34px}
+  .hero-cd div{padding:12px 0;border-radius:14px;background:var(--t-card);border:1px solid var(--t-line)}
+  .hero-cd b{display:block;font-family:var(--f-head);font-size:1.7rem;color:var(--t-accent);line-height:1.1}
+  .hero-cd small{font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;opacity:.7}
+  .t-hero.intro .hero-cd{opacity:0}
+  .t-hero.intro.play .hero-cd{animation:fadeUp 1s ease 3.6s forwards}
+  .sec-countdown{display:none}
+
+  /* Gia đình & lời mời: Nhà trai | 囍 | Nhà gái */
+  .sec-couple .couple-info{max-width:900px;margin:0 auto}
+  .sec-couple .couple:first-of-type{grid-template-columns:1fr 140px 1fr;gap:24px}
+  .sec-couple .couple>span::before{content:"囍";display:grid;place-items:center;width:120px;height:120px;margin:0 auto;border-radius:50%;
+    font-size:3.6rem;line-height:1;color:var(--t-accent);border:2px solid var(--t-accent);box-shadow:inset 0 0 0 6px var(--t-bg),inset 0 0 0 7px var(--t-accent)}
+  .sec-couple .couple .p small{font-size:1rem;line-height:1.8}
+  .sec-couple .couple .p .role{font-size:.8rem}
+  .sec-couple .couple .p b{font-size:2.6rem}
+
+  /* Lịch trình (trái) | bản đồ + nút đi nhanh (phải) */
+  .inv section.sec-events{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);grid-template-rows:auto auto auto 1fr;gap:0 40px;align-items:start}
+  .sec-events>h2,.sec-events>.t-sub{grid-column:1/-1}
+  .sec-events .events{grid-column:1;grid-row:3/span 2}
+  .sec-events .event{text-align:left}
+  .sec-events .event .acts{justify-content:flex-start}
+  .sec-events>iframe{grid-column:2;grid-row:3;height:420px!important;margin-top:0!important}
+  .sec-events .quick-go{grid-column:2;grid-row:4;margin-top:18px;position:sticky;top:90px}
+
+  /* Album: lưới tạp chí 4 cột */
+  .sec-album .album{grid-template-columns:repeat(4,1fr);grid-auto-rows:220px;grid-auto-flow:dense;gap:12px}
+  .sec-album .album img,.sec-album .album img:nth-child(3n+1){grid-column:auto;aspect-ratio:auto;height:100%}
+  .sec-album .album img:first-child{grid-column:span 2;grid-row:span 2}
+
+  .sec-story .timeline{max-width:760px;margin:0 auto}
+  .cal{max-width:420px}
+
+  /* RSVP, lời chúc, niềm vui, mừng cưới: khối card giữa trang tối đa 900px */
+  .t-form,.wishes,.cheer-card,.board,#giftSec>p{max-width:900px;margin-inline:auto}
+  .t-form.card{padding:36px 40px}
+  #rsvp{grid-template-columns:1fr 1fr;column-gap:16px}
+  #rsvp>*{grid-column:1/-1}
+  #rsvp>input[name=name],#rsvp>input[name=phone]{grid-column:auto}
+  .wishes{max-height:520px;grid-template-columns:1fr 1fr}
+  .rsvp-gift{grid-template-columns:1fr 1fr}
+
+  /* Thanh trên & thanh dock trải theo mép màn hình */
+  .t-topbar{width:100%;padding:14px 24px}
+  .ticker{max-width:640px;margin:0 auto}
+  .read-progress{width:100%}
+  .fab-music{left:24px}.fab-gift,.fab-wish{right:24px}
+  .fab-music,.fab-gift{bottom:22px}
+  .autoplay-wrap{bottom:22px}
+
+  /* Vé mời & thư cảm ơn */
+  .inv section.tk-wrap{padding:96px max(24px,calc(50% - 240px)) 120px}
+  .ty-letter{max-width:760px;margin-inline:auto}
+  .album-all{grid-template-columns:repeat(4,1fr);gap:12px}
+
+  /* Chữ lớn: vẫn 1 cột cho dễ đọc */
+  .senior.inv .sec-couple .couple:first-of-type{grid-template-columns:1fr}
+  .senior.inv .sec-couple .couple>span{display:block}
+  .senior.inv #rsvp{grid-template-columns:1fr}
+  .senior.inv #rsvp>input{grid-column:1/-1}
+}
