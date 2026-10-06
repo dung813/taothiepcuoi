@@ -3,9 +3,15 @@
 const TH = window.TH, $ = TH.$, $$ = TH.$$, esc = TH.esc;
 const P = new URLSearchParams(location.search);
 const isPreview = P.has('preview');
-const guest = P.get('to');
+/* Cá nhân hoá theo khách: ?guest=Huy&table=08 (giữ ?to= cho link cũ) */
+const guest = (P.get('guest') || P.get('to') || '').trim();
+const table = (P.get('table') || '').trim();
+const isDemo = !P.get('id') && !location.hash.startsWith('#d=');
 let id = P.get('id') || (P.get('demo') ? 'demo-' + P.get('demo') : 'demo');
 let D, music = null, audioEl = null, cdTimer = null, petalsOn = false;
+/* ?senior=1 trên link: mở sẵn chế độ chữ lớn (tiện gửi cho ông bà, bố mẹ) */
+let senior = P.has('senior') ? P.get('senior') !== '0' : !!TH.store.get('senior', false), wishPhoto = '';
+document.body.classList.toggle('senior', senior);
 
 /* ---------- Nạp dữ liệu ---------- */
 function load(){
@@ -15,7 +21,10 @@ function load(){
   if (local) return local;
   const tpl = P.get('demo') || 'hong-pastel';
   /* Link từ thẻ "Thiệp khách hàng" truyền tên riêng (g/b) → giữ dữ liệu chung; còn lại dùng đúng cặp đôi của mẫu */
-  const d = P.get('g') || P.get('b') ? TH.defaultInvite(tpl) : TH.sampleInvite(tpl);
+  const c = TH.findTemplate(tpl).couple || {};
+  const own = (P.get('g') || P.get('b')) && !(P.get('g') === c.groom && P.get('b') === c.bride);
+  const d = own ? TH.defaultInvite(tpl) : TH.sampleInvite(tpl);
+  if (!own) return d;
   if (P.get('g')) { d.groom.nick = P.get('g'); d.groom.name = P.get('g'); }
   if (P.get('b')) { d.bride.nick = P.get('b'); d.bride.name = P.get('b'); }
   if (P.get('d')) { d.date = P.get('d') + 'T11:00'; d.events.forEach(e => e.time = P.get('d') + e.time.slice(10)); }
@@ -43,8 +52,21 @@ function render(){
   const wd = new Date(D.date);
   const dateStr = isNaN(wd) ? '' : `${pad(wd.getDate())} . ${pad(wd.getMonth()+1)} . ${wd.getFullYear()}`;
   const photos = (D.photos||[]).filter(Boolean);
+  // Ảnh bìa gốc của mẫu có bảng tên ở giữa → đưa chữ lên trên để không đè lên bảng (ảnh bìa tự tải lên thì giữ bố cục thường)
+  b.classList.toggle('hero-top', t.heroPos === 'top' && (D.cover || photos[0]) === (t.photos||[])[0]);
 
-  $('#app').innerHTML = `
+  const v = venue(), stage = currentStage();
+  b.dataset.stage = stage;
+
+  const top = `
+  <div class="t-topbar">
+    ${o.wishes !== false ? '<div class="ticker" id="ticker" aria-label="Hoạt động mới của khách mời"><div class="ticker-track"></div></div>' : '<span></span>'}
+    <button class="senior-btn" id="seniorBtn" aria-pressed="${senior}">${senior ? '👓 Chế độ thường' : '👓 Chữ lớn'}</button>
+  </div>
+  <button class="speak-btn" id="speakBtn" aria-label="Đọc thiệp thành tiếng">🔊 Đọc thiệp thành tiếng</button>`;
+
+  /* Giai đoạn 1 — trước ngày cưới: thiệp đầy đủ */
+  const beforeView = () => `
   ${o.envelope !== false && !isPreview ? `<div class="envelope-wrap" id="env">
     <div class="env-sparkles" aria-hidden="true">${Array.from({length:14},(_,i)=>`<i style="--x:${(i*37)%100}%;--y:${(i*61+13)%100}%;--d:${(i%5)*.6}s;--s:${.6+(i%3)*.35}"></i>`).join('')}</div>
     <div class="env-guest"><small>Thân gửi</small><div>${esc(guest || 'Quý khách')}</div></div>
@@ -52,7 +74,7 @@ function render(){
     <button class="t-btn" id="openEnv">💌 Mở thiệp</button></div>` : ''}
 
   <section class="t-hero${isPreview ? '' : ' intro'}" id="hero"><div class="bg" style="background-image:url('${esc(D.cover || photos[0] || '')}')"></div><div class="flash"></div>
-    <div class="in"><div class="t-sub kick" style="margin-bottom:10px">We're getting married</div>
+    <div class="in">${guest ? `<div class="guest-pill">Thân mời <b>${esc(guest)}</b>${table ? ` · Bàn ${esc(table)}` : ''}</div>` : ''}<div class="t-sub kick" style="margin-bottom:10px">We're getting married</div>
     <div class="names"><span class="nm g">${esc(D.groom.nick)}</span><span class="amp">&amp;</span><span class="nm b">${esc(D.bride.nick)}</span></div><div class="date">${dateStr}</div></div><div class="scroll"></div></section>
 
   <section>
@@ -67,7 +89,7 @@ function render(){
       <div class="amp">&amp;</div>
       <div class="p"><div class="role">Cô dâu</div><b>${esc(D.bride.nick)}</b><small>${esc(D.bride.name)}</small></div>
     </div>
-    ${guest ? `<div class="guest-line reveal"><small style="letter-spacing:.2em;text-transform:uppercase;font-size:.7rem;opacity:.7">Kính mời</small><b>${esc(guest)}</b></div>` : ''}
+    ${guest ? `<div class="guest-line reveal"><small style="letter-spacing:.2em;text-transform:uppercase;font-size:.7rem;opacity:.7">Kính mời</small><b>${esc(guest)}</b>${table ? `<span class="guest-table">🎟 Bàn số ${esc(table)}</span>` : ''}</div>` : ''}
     <p class="reveal" style="margin-top:24px;opacity:.85;line-height:1.8">${esc(D.message)}</p>
   </section>
 
@@ -81,6 +103,12 @@ function render(){
       <h3>${esc(e.title)}</h3><div class="when">${fmtTime(e.time)}</div><div class="where"><b>${esc(e.place)}</b><br>${esc(e.address)}</div>
       <div class="acts"><a class="t-btn" target="_blank" href="${esc(mapUrl(e))}">📍 Chỉ đường</a><a class="t-btn ghost" target="_blank" href="${esc(gcal(e))}">📅 Lưu lịch</a></div></div>`).join('')}</div>
     ${(D.events||[]).length ? `<iframe class="reveal" title="Bản đồ" loading="lazy" style="width:100%;height:240px;border:0;border-radius:18px;margin-top:18px" src="https://maps.google.com/maps?q=${encodeURIComponent(D.events[D.events.length-1].address||'')}&z=15&output=embed"></iframe>` : ''}
+    ${v ? `<div class="quick-go card reveal" id="quickGo"><div class="qg-head">Đi đến <b>${esc(v.title)}</b><small>${esc(v.place)} · ${esc(v.address)}</small></div>
+      <div class="qg-btns">
+        <a class="qg" target="_blank" rel="noopener" href="${esc(dirUrl(v))}"><i>🗺️</i><span>Mở Google Maps</span></a>
+        <button type="button" class="qg" id="rideBtn"><i>🚕</i><span>Đặt xe đến tiệc</span></button>
+        <button type="button" class="qg" id="parkBtn"><i>🅿️</i><span>Bãi đỗ &amp; gửi xe</span></button>
+      </div></div>` : ''}
   </section>
 
   ${o.story !== false && (D.story||[]).length ? `<section><h2 class="t-title reveal">Chuyện tình yêu</h2><div class="t-sub reveal">Our love story</div>
@@ -90,18 +118,49 @@ function render(){
     <div class="album">${photos.map((p,i)=>`<img class="reveal zoom" loading="lazy" src="${esc(p)}" data-i="${i}" alt="Ảnh cưới ${i+1}">`).join('')}</div></section>` : ''}
 
   ${o.rsvp !== false ? `<section><h2 class="t-title reveal">Xác nhận tham dự</h2><div class="t-sub reveal">Vui lòng phản hồi trước ngày cưới</div>
-    <form class="t-form card reveal" id="rsvp">
+    <form class="t-form card reveal" id="rsvp" novalidate>
       <input name="name" placeholder="Họ tên của bạn *" required value="${esc(guest||'')}">
-      <input name="phone" placeholder="Số điện thoại">
-      <div class="radio-row"><label><input type="radio" name="attend" value="yes" checked><span>Sẽ đến 🎉</span></label><label><input type="radio" name="attend" value="no"><span>Rất tiếc 😢</span></label></div>
-      <select name="count"><option value="1">Đi 1 người</option><option value="2">Đi 2 người</option><option value="3">Đi 3 người</option><option value="4">Đi 4+ người</option></select>
+      <input name="phone" type="tel" inputmode="tel" placeholder="Số điện thoại">
       <select name="side"><option value="groom">Khách nhà trai</option><option value="bride">Khách nhà gái</option></select>
+      <div class="radio-row" role="radiogroup" aria-label="Bạn có tham dự không?"><label><input type="radio" name="attend" value="yes" required><span>Sẽ tham dự 🎉</span></label><label><input type="radio" name="attend" value="no"><span>Không tham dự 😢</span></label></div>
+      <fieldset class="rsvp-branch" data-when="yes" hidden disabled>
+        <div class="steppers">
+          ${stepper('adults', 'Người lớn', 1, 1, 20)}
+          ${stepper('kids', 'Trẻ em', 0, 0, 10)}
+        </div>
+        <p class="rsvp-label">Chế độ ăn uống</p>
+        <label class="chk"><input type="checkbox" name="veg" value="1"><span>🥗 Ăn chay</span></label>
+        <div class="rsvp-sub" data-show="veg" hidden>${stepper('vegCount', 'Số suất chay', 1, 1, 30)}</div>
+        <label class="chk"><input type="checkbox" name="allergy" value="1"><span>⚠️ Dị ứng thực phẩm</span></label>
+        <div class="rsvp-sub" data-show="allergy" hidden><textarea name="allergyNote" placeholder="Ví dụ: dị ứng hải sản (tôm, cua), đậu phộng…" maxlength="200"></textarea></div>
+      </fieldset>
+      <fieldset class="rsvp-branch" data-when="no" hidden disabled>
+        <textarea name="msg" placeholder="Gửi lời chúc mừng từ xa đến cô dâu chú rể 💌" maxlength="500"></textarea>
+        ${o.gift !== false && (D.gift?.groom?.acc || D.gift?.bride?.acc) ? `<p class="rsvp-label">Mừng cưới từ xa</p><div class="gift-grid rsvp-gift" id="rsvpGift"></div>` : ''}
+      </fieldset>
+      <p class="rsvp-err" id="rsvpErr" role="alert" hidden></p>
       <button class="t-btn" style="justify-content:center">Gửi xác nhận</button></form></section>` : ''}
 
   ${o.wishes !== false ? `<section id="wishSec"><h2 class="t-title reveal">Sổ lời chúc</h2><div class="t-sub reveal">Gửi yêu thương đến cô dâu chú rể</div>
-    <form class="t-form card reveal" id="wishForm"><input name="name" placeholder="Tên của bạn *" required value="${esc(guest||'')}"><textarea name="msg" placeholder="Lời chúc của bạn *" required></textarea>
-    <div style="display:flex;gap:6px;flex-wrap:wrap" id="quick">${['Trăm năm hạnh phúc 💕','Chúc hai bạn mãi yêu thương','Sớm có em bé nhé 👶'].map(q=>`<button type="button" class="t-btn ghost" style="padding:6px 12px;font-size:.78rem">${q}</button>`).join('')}</div>
-    <button class="t-btn" style="justify-content:center">Gửi lời chúc</button></form><div class="wishes" id="wishes"></div></section>` : ''}
+    <form class="t-form card reveal" id="wishForm"><input name="name" placeholder="Tên của bạn *" required value="${esc(myName())}"><textarea name="msg" placeholder="Lời chúc của bạn *" required></textarea>
+    <div class="wish-tools">
+      <button type="button" class="t-btn ghost sm" id="suggestBtn">✨ Gợi ý lời chúc</button>
+      <label class="t-btn ghost sm" for="wishPhoto">📷 Đính kèm ảnh</label><input type="file" id="wishPhoto" accept="image/*" hidden>
+    </div>
+    <div class="photo-prev" id="photoPrev" hidden><img alt="Ảnh đính kèm"><button type="button" aria-label="Bỏ ảnh">×</button></div>
+    <div class="quick" id="quick">${['Trăm năm hạnh phúc 💕','Chúc hai bạn mãi yêu thương','Sớm có em bé nhé 👶'].map(q=>`<button type="button" class="t-btn ghost sm">${q}</button>`).join('')}</div>
+    <button class="t-btn" style="justify-content:center">Gửi lời chúc</button></form><div class="wishes" id="wishes"></div></section>
+
+  <section id="cheerSec" style="padding-top:10px"><h2 class="t-title reveal">Gửi niềm vui</h2><div class="t-sub reveal">Chạm để chung vui cùng cô dâu chú rể</div>
+    <div class="card reveal cheer-card">
+      <input class="cheer-name" id="cheerName" placeholder="Tên của bạn (để lên bảng vàng)" value="${esc(myName())}">
+      <div class="cheer-btns">
+        <button type="button" class="cheer heart" id="cheerHeart"><i>💖</i><span>Bắn tim</span><small id="cntHeart">0</small></button>
+        <button type="button" class="cheer fire" id="cheerFire"><i>🎆</i><span>Bắn pháo hoa</span><small id="cntFire">0</small></button>
+      </div>
+    </div>
+    <div class="card reveal board"><h3>🏆 Bảng vàng khách mời</h3><small class="board-sub">Top 5 tương tác nhiều nhất · Lời chúc +3 · Xác nhận dự +2 · Tim/Pháo hoa +1</small><ol id="board"></ol></div>
+  </section>` : ''}
 
   ${o.gift !== false ? `<section id="giftSec"><h2 class="t-title reveal">Hộp mừng cưới</h2><div class="t-sub reveal">Gửi quà yêu thương</div>
     <p class="reveal" style="opacity:.8;margin-bottom:18px">Sự hiện diện của bạn là món quà quý giá nhất. Nếu không thể đến chung vui, bạn có thể gửi lời chúc qua hộp mừng cưới.</p>
@@ -109,18 +168,23 @@ function render(){
 
   <footer class="t-foot"><div class="t-script reveal">Thank you!</div><p class="reveal" style="opacity:.8">Rất hân hạnh được đón tiếp quý khách</p>
     <div class="t-script reveal" style="font-size:2rem;margin-top:10px">${esc(D.groom.nick)} &amp; ${esc(D.bride.nick)}</div>
-    <div class="t-brand">Thiệp được tạo bởi <a href="index.html" target="_blank">Thiệp Hồng</a> · <a href="mau-thiep.html" target="_blank">Tạo thiệp miễn phí</a></div></footer>
+    <div class="t-brand">Thiệp được tạo bởi <a href="index.html" target="_blank">Thiệp Hồng</a> · <a href="mau-thiep.html" target="_blank">Tạo thiệp miễn phí</a></div>
+    ${stageSwitch(stage)}</footer>`;
 
+  $('#app').innerHTML = top + (stage === 'today' ? ticketView(v) : stage === 'after' ? thanksView(photos, dateStr) : beforeView()) + `
   <button class="fab fab-music" id="musicBtn" aria-label="Nhạc nền">🎵</button>
-  ${o.wishes !== false ? '<button class="fab fab-wish" id="wishBtn" aria-label="Gửi lời chúc">💬</button>' : ''}
+  ${o.wishes !== false && stage === 'before' ? '<button class="fab fab-wish" id="wishBtn" aria-label="Gửi lời chúc">💬</button>' : ''}
   ${o.gift !== false ? '<button class="fab fab-gift" id="giftBtn" aria-label="Mừng cưới">🎁</button>' : ''}
   <div class="lightbox" id="lb"><button class="lb-x">×</button><button class="lb-prev">‹</button><img alt=""><button class="lb-next">›</button><span class="lb-n"></span></div>`;
 
   bind(photos);
+  if (stage === 'today') drawTicketQr();
   TH.reveal();
   startCountdown();
   renderWishes();
-  if (o.petals !== false && !petalsOn && !isPreview) { petalsOn = true; TH.petals(16, [accent, '#ffffff', t.fg].map(c=>c+'')); }
+  renderSocial();
+  // Ngày cưới: tắt cánh hoa rơi để không che mã QR check-in
+  if (o.petals !== false && !petalsOn && !isPreview && stage !== 'today') { petalsOn = true; TH.petals(16, [accent, '#ffffff', t.fg].map(c=>c+'')); }
 }
 
 function calendar(d){
@@ -150,7 +214,259 @@ function renderWishes(){
   if (!list.length) list = [
     {name:'Ngọc Lan', msg:'Chúc hai bạn trăm năm hạnh phúc, mãi yêu thương nhau như ngày đầu!', at:Date.now()-36e5*5},
     {name:'Thanh Hải', msg:'Hẹn gặp ở tiệc cưới nhé. Chúc mừng hai bạn! 🎉', at:Date.now()-36e5*20}];
-  box.innerHTML = list.map(w=>`<div class="wish"><small>${new Date(w.at).toLocaleDateString('vi-VN')}</small><b>${esc(w.name)}</b><p>${esc(w.msg)}</p></div>`).join('');
+  box.innerHTML = list.map(w=>`<div class="wish"><small>${new Date(w.at).toLocaleDateString('vi-VN')}</small><b>${esc(w.name)}</b><p>${esc(w.msg)}</p>${w.photo && /^data:image\//.test(w.photo) ? `<img src="${esc(w.photo)}" alt="Ảnh của ${esc(w.name)}" loading="lazy">` : ''}</div>`).join('');
+}
+
+/* ---------- Địa điểm tiệc, đọc thiệp, hoạt động của khách ---------- */
+function venue(){
+  const ev = (D.events||[]).filter(e => e.title && (e.address || e.place));
+  return ev.find(e => /tiệc/i.test(e.title)) || ev[ev.length-1] || null;
+}
+const dirUrl = e => 'https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(e.lat && e.lng ? `${e.lat},${e.lng}` : [e.place, e.address].filter(Boolean).join(', '));
+const myName = () => guest || TH.store.get('guestname', '') || '';
+const rememberName = n => { n = (n||'').trim(); if (n) TH.store.set('guestname', n); return n; };
+
+function speechText(){
+  const say = s => { const d = new Date(s); if (isNaN(d)) return '';
+    return `lúc ${d.getHours()} giờ${d.getMinutes() ? ' ' + d.getMinutes() + ' phút' : ''}, ${DOW[d.getDay()]}, ngày ${d.getDate()} tháng ${d.getMonth()+1} năm ${d.getFullYear()}`; };
+  const g = D.groom, b = D.bride, out = [];
+  out.push(guest ? `Kính gửi ${guest}.` : 'Kính gửi quý khách.');
+  if (table) out.push(`Bàn tiệc của quý khách là bàn số ${table}.`);
+  const v = venue(); if (v?.hall) out.push(`Tiệc cưới tổ chức tại ${v.hall}, ${v.place}.`);
+  out.push(`Trân trọng báo tin lễ thành hôn của chú rể ${g.name || g.nick} và cô dâu ${b.name || b.nick}.`);
+  if (g.father || g.mother) out.push(`Nhà trai: ${[g.father, g.mother].filter(Boolean).join(' và ')}.`);
+  if (b.father || b.mother) out.push(`Nhà gái: ${[b.father, b.mother].filter(Boolean).join(' và ')}.`);
+  (D.events||[]).filter(e => e.title).forEach(e => out.push(`${e.title}: ${say(e.time)}, tại ${e.place}${e.address ? ', địa chỉ ' + e.address : ''}.`));
+  out.push('Sự hiện diện của quý khách là niềm vinh hạnh cho gia đình chúng tôi. Xin chân thành cảm ơn.');
+  return out.join(' ');
+}
+
+/* Khách mẫu cho thiệp demo / thiệp chưa có tương tác, để bảng vàng và thanh thông báo không trống */
+const SAMPLE_ACTS = [
+  {name:'Ngọc Lan', type:'wish'}, {name:'Ngọc Lan', type:'heart'}, {name:'Ngọc Lan', type:'fire'}, {name:'Ngọc Lan', type:'heart'},
+  {name:'Thanh Hải', type:'wish'}, {name:'Thanh Hải', type:'rsvp'}, {name:'Thanh Hải', type:'fire'},
+  {name:'Minh Tú', type:'rsvp'}, {name:'Minh Tú', type:'heart'}, {name:'Minh Tú', type:'heart'}, {name:'Minh Tú', type:'heart'},
+  {name:'Bảo Châu', type:'fire'}, {name:'Bảo Châu', type:'fire'}, {name:'Bảo Châu', type:'heart'},
+  {name:'Gia Bảo', type:'heart'}, {name:'Gia Bảo', type:'rsvp'}, {name:'Hoài An', type:'heart'}
+].map((a, i) => ({...a, at: Date.now() - (i + 1) * 36e5}));
+function activity(){
+  const gb = TH.guestbook.get(id);
+  const real = [
+    ...gb.wishes.map(w => ({name:w.name, type:'wish', at:w.at})),
+    ...gb.rsvp.filter(r => r.attend === 'yes').map(r => ({name:r.name, type:'rsvp', at:r.at})),
+    ...gb.cheers.map(c => ({name:c.name, type:c.kind, at:c.at}))
+  ];
+  const acts = real.length && !id.startsWith('demo') ? real : [...real, ...SAMPLE_ACTS];
+  return acts.filter(a => a.name).sort((x, y) => y.at - x.at);
+}
+const ACT_TEXT = {wish:'vừa gửi lời chúc 💌', rsvp:'sẽ đến dự tiệc 🥂', heart:'vừa bắn tim 💖', fire:'vừa bắn pháo hoa mừng cưới 🎆'};
+const ACT_PTS = {wish:3, rsvp:2, heart:1, fire:1};
+
+function renderSocial(){
+  const acts = activity();
+  const tk = $('#ticker .ticker-track');
+  if (tk) { const items = acts.slice(0, 12).map(a => `<span><b>${esc(a.name)}</b> ${ACT_TEXT[a.type]||''}</span>`).join('');
+    tk.innerHTML = items + items; tk.style.animationDuration = Math.max(18, acts.slice(0,12).length * 5) + 's'; }
+  const board = $('#board');
+  if (board) { const by = {};
+    acts.forEach(a => { const k = a.name.trim().toLowerCase(); const r = by[k] = by[k] || {name:a.name.trim(), pts:0, wish:0, heart:0, fire:0, rsvp:0}; r.pts += ACT_PTS[a.type]||0; r[a.type]++; });
+    const top = Object.values(by).sort((x, y) => y.pts - x.pts).slice(0, 5), me = myName().toLowerCase();
+    board.innerHTML = top.map((r, i) => `<li class="${r.name.toLowerCase() === me ? 'me' : ''}"><span class="rk">${['🥇','🥈','🥉','4','5'][i]}</span><span class="nm">${esc(r.name)}</span>
+      <span class="st">${r.wish ? '💌'+r.wish : ''} ${r.heart ? '💖'+r.heart : ''} ${r.fire ? '🎆'+r.fire : ''} ${r.rsvp ? '🥂' : ''}</span><b>${r.pts}</b></li>`).join('') || '<li class="empty">Hãy là người đầu tiên lên bảng vàng!</li>'; }
+  const cnt = k => acts.filter(a => a.type === k).length;
+  if ($('#cntHeart')) { $('#cntHeart').textContent = cnt('heart'); $('#cntFire').textContent = cnt('fire'); }
+}
+
+let cheerLock = 0;
+function cheer(kind){
+  const accent = getComputedStyle(document.body).getPropertyValue('--t-accent').trim() || '#e35d74';
+  kind === 'heart' ? TH.FX.hearts([accent, '#ff8fab', '#ffb3c6', '#ffffff']) : TH.FX.fireworks([accent, '#ffd166', '#ffffff', '#f4b6c2', '#c9a45c']);
+  if (isPreview || Date.now() < cheerLock) return; // giãn nhịp ghi điểm để tránh bấm liên tục
+  cheerLock = Date.now() + 1200;
+  const name = rememberName($('#cheerName')?.value) || 'Một vị khách';
+  TH.guestbook.add(id, 'cheers', {name, kind});
+  renderSocial();
+}
+
+function setSenior(on){
+  senior = on; TH.store.set('senior', on);
+  document.body.classList.toggle('senior', on);
+  const b = $('#seniorBtn'); b.setAttribute('aria-pressed', on); b.textContent = on ? '👓 Chế độ thường' : '👓 Chữ lớn';
+  if (!on) { TH.speech.stop(); $('#speakBtn').classList.remove('on'); }
+  TH.toast(on ? 'Đã bật chế độ chữ lớn, dễ đọc' : 'Đã về chế độ hiển thị thường');
+}
+
+function openRide(v){
+  const dest = {name:v.place, address:v.address, lat:v.lat, lng:v.lng};
+  if (!dest.lat) TH.geocode([v.address].filter(Boolean).join(', ')).then(p => { if (p) Object.assign(dest, p); });
+  const m = TH.modal(`<div class="ride-modal"><h3>🚕 Đặt xe đến tiệc cưới</h3>
+    <p class="ride-dest"><b>${esc(v.place)}</b><br>${esc(v.address)}</p>
+    <div class="ride-opts">${Object.entries(TH.RIDES).map(([k, r]) => `<button type="button" class="ride-opt ride-${k}" data-ride="${k}">Đặt ${esc(r.name)}</button>`).join('')}</div>
+    <button type="button" class="ride-copy" id="rideCopy">📋 Sao chép địa chỉ</button>
+    <p class="ride-note">Địa chỉ sẽ được sao chép sẵn. Nếu app chưa tự điền điểm đến, bạn chỉ cần dán vào ô “Điểm đến”.</p></div>`);
+  $$('[data-ride]', m).forEach(b => b.onclick = () => TH.rideTo(b.dataset.ride, dest));
+  $('#rideCopy', m).onclick = () => navigator.clipboard.writeText(`${v.place}, ${v.address}`).then(() => TH.toast('Đã sao chép địa chỉ'));
+}
+/* ---------- RSVP: câu hỏi nối tiếp ---------- */
+const stepper = (name, label, val, min, max) => `<div class="stepper"><span>${label}</span>
+  <div><button type="button" data-step="-1" aria-label="Bớt ${label.toLowerCase()}">−</button><input type="number" name="${name}" value="${val}" min="${min}" max="${max}" inputmode="numeric"><button type="button" data-step="1" aria-label="Thêm ${label.toLowerCase()}">+</button></div></div>`;
+function bindRsvp(rs){
+  const show = (el, on) => { el.hidden = !on; if (el.tagName === 'FIELDSET') el.disabled = !on; };
+  const sync = () => {
+    const a = rs.attend.value;
+    $$('.rsvp-branch', rs).forEach(fs => show(fs, fs.dataset.when === a));
+    $$('[data-show]', rs).forEach(el => { const on = rs[el.dataset.show].checked; el.hidden = !on; $$('input,textarea', el).forEach(i => i.disabled = !on); });
+    // Số suất chay không vượt quá tổng số người
+    const vc = rs.vegCount, total = (+rs.adults.value || 0) + (+rs.kids.value || 0);
+    vc.max = Math.max(1, total); if (+vc.value > total) vc.value = Math.max(1, total);
+    const g = $('#rsvpGift', rs);
+    if (g && a === 'no' && !g.dataset.ready) { g.dataset.ready = 1; g.innerHTML = giftCards(); mountGift(g); }
+    $('#rsvpErr').hidden = true;
+  };
+  rs.addEventListener('click', e => { const b = e.target.closest('[data-step]'); if (!b) return;
+    const inp = $('input', b.parentElement), v = (+inp.value || 0) + (+b.dataset.step);
+    inp.value = Math.min(+inp.max, Math.max(+inp.min, v)); sync(); });
+  rs.addEventListener('change', sync);
+  rs.addEventListener('input', e => e.target.type === 'number' && sync());
+  sync();
+}
+function rsvpError(rs){
+  if (!rs.elements.name.value.trim()) return 'Vui lòng nhập họ tên của bạn.'; // rs.name là thuộc tính name của chính form
+  if (!rs.attend.value) return 'Bạn vui lòng chọn "Sẽ tham dự" hoặc "Không tham dự".';
+  if (rs.attend.value === 'yes') {
+    const a = +rs.adults.value, k = +rs.kids.value;
+    if (!(a >= 1 && a <= 20)) return 'Số người lớn từ 1 đến 20.';
+    if (!(k >= 0 && k <= 10)) return 'Số trẻ em từ 0 đến 10.';
+    if (rs.allergy.checked && !rs.allergyNote.value.trim()) return 'Vui lòng ghi rõ loại thực phẩm bị dị ứng để bếp chuẩn bị.';
+  }
+  return '';
+}
+function rsvpData(rs){
+  const f = Object.fromEntries(new FormData(rs)), yes = f.attend === 'yes';
+  const out = {name:f.name.trim(), phone:(f.phone||'').trim(), side:f.side, attend:f.attend};
+  if (yes) Object.assign(out, {adults:+f.adults, kids:+f.kids, count:+f.adults + +f.kids, veg:!!f.veg, vegCount:f.veg ? +f.vegCount : 0,
+    allergy:!!f.allergy, allergyNote:f.allergy ? (f.allergyNote||'').trim() : ''});
+  else out.msg = (f.msg||'').trim();
+  return out;
+}
+
+/* ---------- Một link – ba giai đoạn ---------- */
+const STAGES = {before:'Trước cưới', today:'Ngày cưới', after:'Sau cưới'};
+const dayOf = d => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+/* ?stage=before|today|after để xem thử; mặc định tính theo giờ thực:
+   "today" kéo dài từ ngày của sự kiện đầu tiên (VD: Lễ Vu Quy) đến hết ngày tiệc cưới */
+function currentStage(){
+  const forced = P.get('stage');
+  if (STAGES[forced]) return forced;
+  if (isPreview) return 'before';
+  const times = [D.date, ...(D.events||[]).map(e => e.time)].map(x => new Date(x)).filter(x => !isNaN(x));
+  if (!times.length) return 'before';
+  const now = dayOf(new Date()), first = dayOf(new Date(Math.min(...times))), last = dayOf(new Date(Math.max(...times)));
+  return now < first ? 'before' : now > last ? 'after' : 'today';
+}
+const stageUrl = s => { const u = new URL(location.href); u.searchParams.set('stage', s); return u.pathname.split('/').pop() + u.search + u.hash; };
+/* Thanh chuyển giai đoạn: chỉ hiện trên thiệp demo để chủ thiệp xem thử */
+const stageSwitch = cur => !isDemo || isPreview ? '' : `<nav class="stage-switch" aria-label="Xem thử giai đoạn"><small>Xem thử giai đoạn</small>
+  <div>${Object.entries(STAGES).map(([k, n]) => `<a href="${esc(stageUrl(k))}" class="${k === cur ? 'on' : ''}">${n}</a>`).join('')}</div></nav>`;
+
+const fmtPhone = p => String(p).replace(/\D/g, '').replace(/^(\d{4})(\d{3})(\d+)$/, '$1 $2 $3');
+const ascii = s => String(s||'').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D');
+/* Mã vé ngắn, ổn định theo thiệp + khách + bàn (để lễ tân đối chiếu) */
+function ticketCode(){
+  let h = 5381; for (const ch of `${id}|${guest}|${table}`) h = (h * 33 + ch.charCodeAt(0)) >>> 0;
+  return h.toString(36).toUpperCase().padStart(6, '0').slice(-6);
+}
+
+/* Giai đoạn 2 — ngày cưới: vé mời điện tử */
+function ticketView(v){
+  const ev = (D.events||[]).filter(e => e.title), main = v || ev[ev.length-1] || {};
+  const start = new Date(main.time), welcome = isNaN(start) ? '' : new Date(+start - 30*6e4);
+  const hm = d => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  const hot = (D.hotlines||[]).filter(h => h.phone);
+  return `<section class="tk-wrap">
+    <div class="tk-hello reveal">${guest ? `Chào mừng <b>${esc(guest)}</b> 👋` : 'Chào mừng quý khách 👋'}<small>Hôm nay là ngày vui của ${esc(D.groom.nick)} &amp; ${esc(D.bride.nick)}</small></div>
+    <article class="ticket reveal zoom" aria-label="Vé mời điện tử">
+      <header class="tk-head"><small>Vé mời điện tử · ${esc(main.title || 'Tiệc cưới')}</small>
+        <b>${esc(D.groom.nick)} &amp; ${esc(D.bride.nick)}</b><span>${fmtTime(main.time)}</span></header>
+      <div class="tk-table">${table
+        ? `<small>Bàn của bạn</small><b>${esc(table)}</b>`
+        : `<small>Bàn tiệc</small><b class="na">—</b><em>Vui lòng báo tên tại quầy lễ tân để được hướng dẫn chỗ ngồi</em>`}</div>
+      <div class="tk-cut" aria-hidden="true"></div>
+      <div class="tk-qr"><div class="tk-qr-box" id="tkQr"></div><small>Mã check-in: <b>${ticketCode()}</b></small><em>Đưa mã này cho lễ tân khi đến sảnh</em></div>
+      <div class="tk-cut" aria-hidden="true"></div>
+      <ul class="tk-info">
+        <li><i>📍</i><p><b>${esc(main.hall || main.place || '')}</b>${main.hall ? `<br>${esc(main.place)}` : ''}<br><span>${esc(main.address || '')}</span></p></li>
+        ${welcome ? `<li><i>🕔</i><p>Đón khách từ <b>${hm(welcome)}</b> · Khai tiệc <b>${hm(start)}</b></p></li>` : ''}
+      </ul>
+      ${v ? `<div class="tk-acts"><a class="t-btn" target="_blank" rel="noopener" href="${esc(dirUrl(v))}">🧭 Dẫn đường</a>
+        <button type="button" class="t-btn ghost" id="rideBtn">🚕 Đặt xe</button><button type="button" class="t-btn ghost" id="parkBtn">🅿️ Gửi xe</button></div>` : ''}
+    </article>
+    ${ev.length > 1 ? `<div class="card tk-sched reveal"><h3>Lịch trình</h3><ol>${ev.map(e => `<li class="${e === main ? 'main' : ''}"><time>${isNaN(new Date(e.time)) ? '' : hm(new Date(e.time))}</time><div><b>${esc(e.title)}</b><small>${esc(e.place)}</small></div></li>`).join('')}</ol></div>` : ''}
+    ${hot.length ? `<div class="card tk-hot reveal"><h3>📞 Cần hỗ trợ? Gọi người nhà</h3>${hot.map(h => `<a class="tk-call" href="tel:${esc(String(h.phone).replace(/[^\d+]/g, ''))}"><span><b>${esc(h.name)}</b><small>${esc(h.role || '')}</small></span><em>${esc(fmtPhone(h.phone))}</em></a>`).join('')}</div>` : ''}
+    <a class="tk-full reveal" href="${esc(stageUrl('before'))}">Xem thiệp mời đầy đủ →</a>
+    ${stageSwitch('today')}
+  </section>`;
+}
+function drawTicketQr(){
+  const box = $('#tkQr'); if (!box) return;
+  const text = ['THIEPHONG-CHECKIN', id, ticketCode(), ascii(guest) || 'KHACH', 'BAN:' + (ascii(table) || '-')].join('|');
+  if (window.QRCode) new QRCode(box, {text, width:168, height:168, correctLevel: QRCode.CorrectLevel.M});
+  else box.textContent = ticketCode();
+}
+
+/* Giai đoạn 3 — sau ngày cưới: thư cảm ơn + album kỷ niệm */
+function thanksView(photos, dateStr){
+  const g = esc(D.groom.nick), b = esc(D.bride.nick);
+  const letter = (D.thanks || `Cảm ơn ${guest ? esc(guest) : 'bạn'} đã dành thời gian đến chung vui và gửi những lời chúc thật ấm áp trong ngày trọng đại của chúng mình.
+Sự hiện diện và tình cảm của mọi người đã làm ngày cưới trở nên trọn vẹn hơn bao giờ hết. Chúng mình xin gửi lại vài khoảnh khắc kỷ niệm, mong bạn sẽ thích.
+Hẹn gặp lại bạn ở tổ ấm nhỏ của chúng mình nhé!`).split('\n').filter(Boolean);
+  return `<section class="ty-hero"><div class="bg" style="background-image:url('${esc(D.cover || photos[0] || '')}')"></div>
+    <div class="in"><small>Thư cảm ơn từ cô dâu &amp; chú rể</small><div class="t-script ty-title">Thank you</div><p>${g} &amp; ${b}</p><span>${dateStr}</span></div></section>
+  <section><article class="card ty-letter reveal"><p class="ty-to">Gửi ${guest ? esc(guest) : 'những người thân yêu'},</p>
+    ${letter.map(p => `<p>${D.thanks ? esc(p) : p}</p>`).join('')}<p class="t-script ty-sign">${g} &amp; ${b}</p></article></section>
+  ${photos.length ? `<section id="albumAll"><h2 class="t-title reveal">Album kỷ niệm</h2><div class="t-sub reveal">${photos.length} khoảnh khắc · chạm để xem, tải về làm kỷ niệm</div>
+    <div class="album-all">${photos.map((p, i) => `<figure class="reveal zoom"><img loading="lazy" src="${esc(p)}" data-i="${i}" alt="Ảnh kỷ niệm ${i+1}">
+      <a class="dl" href="${esc(p)}" download="${esc(photoName(p, i))}" target="_blank" rel="noopener" aria-label="Tải ảnh ${i+1}">⬇</a></figure>`).join('')}</div>
+    <button type="button" class="t-btn" id="dlAll">⬇ Tải toàn bộ album (.zip)</button></section>` : ''}
+  ${D.opts?.wishes !== false ? `<section><h2 class="t-title reveal">Lời chúc đã nhận</h2><div class="t-sub reveal">Cảm ơn những lời yêu thương</div><div class="wishes" id="wishes"></div></section>` : ''}
+  <footer class="t-foot"><div class="t-script reveal">With love,</div>
+    <div class="t-script reveal" style="font-size:2rem;margin-top:6px">${g} &amp; ${b}</div>
+    <div class="t-brand">Thiệp được tạo bởi <a href="index.html" target="_blank">Thiệp Hồng</a> · <a href="mau-thiep.html" target="_blank">Tạo thiệp miễn phí</a></div>
+    ${stageSwitch('after')}</footer>`;
+}
+const photoName = (p, i) => {
+  const ext = ((String(p).match(/\.(webp|jpe?g|png|gif)(?:\?|$)/i) || [])[1] || 'jpg').toLowerCase();
+  return `${ascii(D.groom.nick)}-${ascii(D.bride.nick)}-${pad(i+1)}.${ext}`.replace(/\s+/g, '');
+};
+/* Gom toàn bộ ảnh thành 1 file .zip (JSZip tải khi cần) */
+async function downloadAll(btn){
+  const photos = (D.photos||[]).filter(Boolean), label = btn.textContent;
+  btn.disabled = true;
+  try {
+    if (!window.JSZip) await new Promise((ok, fail) => { const s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js'; s.onload = ok; s.onerror = fail; document.head.append(s); });
+    const zip = new JSZip(); let n = 0, miss = 0;
+    for (const [i, p] of photos.entries()) {
+      btn.textContent = `Đang gom ảnh ${i+1}/${photos.length}…`;
+      try { const r = await fetch(p); if (!r.ok) throw 0; zip.file(photoName(p, i), await r.blob()); n++; } catch { miss++; }
+    }
+    if (!n) throw new Error('empty');
+    btn.textContent = 'Đang nén…';
+    const url = URL.createObjectURL(await zip.generateAsync({type:'blob'}));
+    const a = Object.assign(document.createElement('a'), {href:url, download:`album-cuoi-${ascii(D.groom.nick)}-${ascii(D.bride.nick)}.zip`.replace(/\s+/g, '')});
+    document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 4000);
+    TH.toast(miss ? `Đã tải ${n} ảnh (${miss} ảnh không tải được, bạn bấm ⬇ trên từng ảnh nhé)` : `Đã tải ${n} ảnh kỷ niệm 💕`);
+  } catch { TH.toast('Chưa tải được album, bạn bấm ⬇ trên từng ảnh để lưu nhé'); }
+  btn.disabled = false; btn.textContent = label;
+}
+
+function openParking(v){
+  const lines = (v.parking || 'Vui lòng liên hệ cô dâu chú rể hoặc lễ tân sảnh tiệc để được hướng dẫn gửi xe.').split('\n').filter(Boolean);
+  const q = 'bãi giữ xe gần ' + [v.place, v.address].filter(Boolean).join(', ');
+  TH.modal(`<div class="ride-modal"><h3>🅿️ Bãi đỗ &amp; hướng dẫn gửi xe</h3>
+    <p class="ride-dest"><b>${esc(v.place)}</b><br>${esc(v.address)}</p>
+    <ul class="park-list">${lines.map(l => `<li>${esc(l)}</li>`).join('')}</ul>
+    <a class="ride-opt" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}">Xem bãi đỗ xe gần sảnh trên bản đồ</a></div>`);
 }
 
 /* ---------- Hiệu ứng mở thiệp ---------- */
@@ -200,41 +516,91 @@ function bind(photos){
   // Lightbox
   const lb = $('#lb'); let cur = 0;
   const show = i => { cur = (i + photos.length) % photos.length; $('img', lb).src = photos[cur]; $('.lb-n', lb).textContent = `${cur+1} / ${photos.length}`; lb.classList.add('open'); };
-  $$('.album img').forEach(im => im.onclick = () => show(+im.dataset.i));
+  $$('.album img, .album-all img').forEach(im => im.onclick = () => show(+im.dataset.i));
   $('.lb-x', lb).onclick = () => lb.classList.remove('open');
   $('.lb-prev', lb).onclick = () => show(cur-1); $('.lb-next', lb).onclick = () => show(cur+1);
   lb.onclick = e => { if (e.target === lb) lb.classList.remove('open'); };
   document.onkeydown = e => { if (!lb.classList.contains('open')) return; if (e.key==='Escape') lb.classList.remove('open'); if (e.key==='ArrowLeft') show(cur-1); if (e.key==='ArrowRight') show(cur+1); };
   let sx = 0; lb.ontouchstart = e => sx = e.touches[0].clientX; lb.ontouchend = e => { const dx = e.changedTouches[0].clientX - sx; if (Math.abs(dx) > 50) show(cur + (dx < 0 ? 1 : -1)); };
 
-  // RSVP
+  // RSVP: câu hỏi nối tiếp theo lựa chọn của khách
   const rs = $('#rsvp');
-  if (rs) rs.onsubmit = e => { e.preventDefault(); if (isPreview) return TH.toast('Đây là bản xem trước');
-    const f = Object.fromEntries(new FormData(rs)); TH.guestbook.add(id, 'rsvp', f);
-    rs.innerHTML = `<div style="text-align:center;padding:10px"><div style="font-size:2.4rem">${f.attend==='yes'?'🥂':'💐'}</div><b>Cảm ơn ${esc(f.name)}!</b><p style="opacity:.8;margin-top:6px">${f.attend==='yes'?'Rất mong được gặp bạn trong ngày vui.':'Cảm ơn bạn đã báo tin. Mong bạn gửi lời chúc nhé!'}</p></div>`;
+  if (rs) bindRsvp(rs);
+  if (rs) rs.onsubmit = e => { e.preventDefault();
+    const err = rsvpError(rs); $('#rsvpErr').hidden = !err; $('#rsvpErr').textContent = err || '';
+    if (err) return;
+    if (isPreview) return TH.toast('Đây là bản xem trước');
+    const f = rsvpData(rs); rememberName(f.name); TH.guestbook.add(id, 'rsvp', f);
+    if (f.attend === 'no' && f.msg) { TH.guestbook.add(id, 'wishes', {name:f.name, msg:f.msg}); renderWishes(); }
+    renderSocial();
+    const p = TH.rsvpParty(f);
+    const note = f.attend === 'yes'
+      ? `Đã ghi nhận ${p.adults} người lớn${p.kids ? ` · ${p.kids} trẻ em` : ''}${p.veg ? ` · ${p.veg} suất chay` : ''}. Rất mong được gặp bạn trong ngày vui!`
+      : f.msg ? 'Lời chúc của bạn đã được gửi tới cô dâu chú rể 💌' : 'Cảm ơn bạn đã báo tin. Mong bạn gửi lời chúc nhé!';
+    rs.innerHTML = `<div style="text-align:center;padding:10px"><div style="font-size:2.4rem">${f.attend==='yes'?'🥂':'💐'}</div><b>Cảm ơn ${esc(f.name)}!</b><p style="opacity:.8;margin-top:6px">${note}</p></div>`;
     if (f.attend === 'yes') hearts(18); };
 
   // Wishes
   const wf = $('#wishForm');
-  if (wf) { $$('#quick button').forEach(b => b.onclick = () => wf.msg.value = b.textContent);
+  if (wf) {
+    const bindQuick = () => $$('#quick button').forEach(b => b.onclick = () => { wf.msg.value = b.textContent; wf.msg.focus(); });
+    bindQuick();
+    $('#suggestBtn').onclick = async () => {
+      const btn = $('#suggestBtn'); btn.disabled = true; btn.textContent = '✨ Đang soạn…';
+      const list = await TH.suggestWishes({groom:D.groom.nick, bride:D.bride.nick});
+      $('#quick').innerHTML = list.map(s => `<button type="button" class="t-btn ghost sm suggest">${esc(s)}</button>`).join('');
+      bindQuick(); btn.disabled = false; btn.textContent = '✨ Gợi ý khác';
+    };
+    const prev = $('#photoPrev'), setPhoto = src => { wishPhoto = src; prev.hidden = !src; $('img', prev).src = src || ''; };
+    $('#wishPhoto').onchange = async e => { const file = e.target.files[0]; e.target.value = ''; if (!file) return;
+      try { setPhoto(await TH.shrinkImage(file)); } catch { TH.toast('Không đọc được ảnh này, bạn thử ảnh khác nhé'); } };
+    $('button', prev).onclick = () => setPhoto('');
     wf.onsubmit = e => { e.preventDefault(); if (isPreview) return TH.toast('Đây là bản xem trước');
-      const f = Object.fromEntries(new FormData(wf)); TH.guestbook.add(id, 'wishes', {name:f.name.trim(), msg:f.msg.trim()});
-      wf.msg.value = ''; renderWishes(); hearts(12); TH.toast('Đã gửi lời chúc 💕'); }; }
+      const f = Object.fromEntries(new FormData(wf)), name = rememberName(f.name);
+      const ok = TH.guestbook.add(id, 'wishes', {name, msg:f.msg.trim(), ...(wishPhoto ? {photo:wishPhoto} : {})});
+      if (!ok) return TH.toast('Ảnh quá lớn so với bộ nhớ, bạn thử gửi lại không kèm ảnh nhé');
+      wf.msg.value = ''; setPhoto(''); if ($('#cheerName') && !$('#cheerName').value) $('#cheerName').value = name;
+      renderWishes(); renderSocial(); hearts(12); TH.toast('Đã gửi lời chúc 💕'); }; }
+  const ch = $('#cheerHeart'), cf = $('#cheerFire');
+  if (ch) { ch.onclick = () => cheer('heart'); cf.onclick = () => cheer('fire'); }
+
+  // Chế độ người lớn tuổi & đọc thiệp
+  $('#seniorBtn').onclick = () => setSenior(!senior);
+  const sp = $('#speakBtn');
+  sp.onclick = () => {
+    if (TH.speech.speaking()) { TH.speech.stop(); sp.classList.remove('on'); sp.textContent = '🔊 Đọc thiệp thành tiếng'; return; }
+    if (TH.speech.speak(speechText(), {onend: () => { sp.classList.remove('on'); sp.textContent = '🔊 Đọc thiệp thành tiếng'; }})) {
+      stopMusic(); sp.classList.add('on'); sp.textContent = '⏹ Dừng đọc'; }
+  };
+
+  // Nút đi nhanh tới tiệc (thiệp đầy đủ & vé mời)
+  const v = venue();
+  if ($('#rideBtn')) { $('#rideBtn').onclick = () => openRide(v); $('#parkBtn').onclick = () => openParking(v); }
+
+  // Album kỷ niệm (sau ngày cưới)
+  const da = $('#dlAll'); if (da) da.onclick = () => downloadAll(da);
   const wb = $('#wishBtn'); if (wb) wb.onclick = () => $('#wishSec').scrollIntoView({behavior:'smooth'});
 
   // Gift
   [$('#openGift'), $('#giftBtn')].forEach(b => b && (b.onclick = openGift));
 }
 
-function openGift(){
-  hearts(20);
+/* Thẻ QR mừng cưới — dùng trong hộp mừng cưới và nhánh "Không tham dự" của RSVP */
+function giftCards(){
   const card = (who, g) => !g || !g.acc ? '' : `<div class="gift-card card" style="color:#333;background:#fff8f8">
     <b style="font-family:var(--t-font),cursive;font-size:1.7rem;color:var(--t-accent);font-weight:400">Mừng cưới ${who}</b>
     ${g.qr ? `<img src="${esc(g.qr)}" alt="QR">` : `<div class="qr-box" data-bank="${esc(g.bank)}" data-acc="${esc(g.acc)}" data-owner="${esc(g.owner)}"></div>`}
     <div>${esc(g.bank)}</div><div class="acc">${esc(g.acc)}</div><div style="font-size:.85rem;opacity:.8">${esc(g.owner)}</div>
-    <button class="t-btn" style="margin-top:10px;padding:8px 16px;font-size:.85rem" data-copy="${esc(g.acc)}">Sao chép số tài khoản</button></div>`;
-  const m = TH.modal(`<div class="gift-grid">${card('chú rể', D.gift?.groom)}${card('cô dâu', D.gift?.bride)}</div>`);
+    <button type="button" class="t-btn" style="margin-top:10px;padding:8px 16px;font-size:.85rem" data-copy="${esc(g.acc)}">Sao chép số tài khoản</button></div>`;
+  return card('chú rể', D.gift?.groom) + card('cô dâu', D.gift?.bride);
+}
+function openGift(){
+  hearts(20);
+  const m = TH.modal(`<div class="gift-grid">${giftCards()}</div>`);
   m.querySelector('.modal-box').style.cssText = 'max-width:420px;max-height:90vh;overflow:auto;--t-accent:' + getComputedStyle(document.body).getPropertyValue('--t-accent');
+  mountGift(m);
+}
+function mountGift(m){
   $$('[data-copy]', m).forEach(b => b.onclick = () => navigator.clipboard.writeText(b.dataset.copy).then(()=>TH.toast('Đã sao chép số tài khoản')));
   $$('.qr-box', m).forEach(box => {
     // Thử ảnh VietQR theo tên ngân hàng; nếu lỗi thì tạo QR chứa thông tin tài khoản

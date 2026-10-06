@@ -20,7 +20,8 @@ TH.defaultInvite = (tpl='hong-pastel') => {
     events:[
       {title:'Lễ Vu Quy', time: iso(d0), place:'Tư gia nhà gái', address:'12 Nguyễn Trãi, Quận 1, TP. Hồ Chí Minh', map:''},
       {title:'Lễ Thành Hôn', time: iso(d), place:'Tư gia nhà trai', address:'45 Lê Lợi, Quận 3, TP. Hồ Chí Minh', map:''},
-      {title:'Tiệc Cưới', time: iso(d2), place:'Trung tâm Hội nghị Tiệc cưới', address:'88 Điện Biên Phủ, Bình Thạnh, TP. Hồ Chí Minh', map:''}
+      {title:'Tiệc Cưới', time: iso(d2), place:'Trung tâm Hội nghị Tiệc cưới', hall:'Sảnh Hoa Hồng · Tầng 2', address:'88 Điện Biên Phủ, Bình Thạnh, TP. Hồ Chí Minh', map:'', lat:'', lng:'',
+        parking:'Xe máy: gửi miễn phí tại hầm B1, lối vào bên phải sảnh chính.\nÔ tô: bãi đỗ phía sau tòa nhà (khoảng 40 chỗ), có bảo vệ hướng dẫn.\nĐi taxi/xe công nghệ: chọn điểm đón trả trước cổng chính để thuận tiện nhất.'}
     ],
     cover: photos[0],
     photos: photos.slice(0),
@@ -30,6 +31,13 @@ TH.defaultInvite = (tpl='hong-pastel') => {
       {date:'2026', title:'Lời cầu hôn', text:'Dưới bầu trời Đà Lạt đầy sao, cô ấy đã nói “Đồng ý”.'}
     ],
     music:{type:'builtin', url:''},
+    /* Người nhà hỗ trợ khách trong ngày cưới (hiện trên vé mời điện tử) */
+    hotlines:[
+      {name:'Anh Tuấn', role:'Anh trai chú rể · Nhà trai', phone:'0901234567'},
+      {name:'Chị Hạnh', role:'Chị gái cô dâu · Nhà gái', phone:'0907654321'}
+    ],
+    /* Thư cảm ơn sau ngày cưới — để trống thì dùng lời cảm ơn mặc định */
+    thanks:'',
     gift:{
       groom:{bank:'Vietcombank', acc:'0123456789', owner:'NGUYEN MINH KHOI', qr:''},
       bride:{bank:'Techcombank', acc:'9876543210', owner:'LE THU HA', qr:''}
@@ -52,6 +60,14 @@ TH.sampleInvite = tpl => {
   return d;
 };
 
+/* Chuẩn hoá một phản hồi RSVP (kể cả bản cũ chỉ có `count`) → số suất ăn cho nhà hàng */
+TH.rsvpParty = r => {
+  if (r.attend !== 'yes') return {adults:0, kids:0, total:0, veg:0, normal:0, allergy:''};
+  const adults = Math.max(0, parseInt(r.adults ?? r.count ?? 1, 10) || 0), kids = Math.max(0, parseInt(r.kids, 10) || 0);
+  const total = adults + kids, veg = r.veg ? Math.min(total, Math.max(0, parseInt(r.vegCount, 10) || 0)) : 0;
+  return {adults, kids, total, veg, normal: total - veg, allergy: r.allergy ? String(r.allergyNote || '').trim() || 'Có dị ứng (chưa ghi rõ)' : ''};
+};
+
 /* Lưu trữ cục bộ */
 TH.invites = {
   all: () => TH.store.get('invites', {}),
@@ -63,9 +79,9 @@ TH.invites = {
 /* RSVP & lời chúc — localStorage (thay bằng API khi có backend) */
 TH.guestbook = {
   key: id => 'gb_' + id,
-  get: id => TH.store.get(TH.guestbook.key(id), {views:0, rsvp:[], wishes:[]}),
-  put(id, gb){ TH.store.set(TH.guestbook.key(id), gb); },
-  add(id, type, item){ const gb = TH.guestbook.get(id); gb[type].unshift({...item, at:Date.now()}); TH.guestbook.put(id, gb); return gb; },
+  get: id => ({views:0, rsvp:[], wishes:[], cheers:[], ...TH.store.get(TH.guestbook.key(id), {})}),
+  put(id, gb){ return TH.store.set(TH.guestbook.key(id), gb); },
+  add(id, type, item){ const gb = TH.guestbook.get(id); gb[type] = [{...item, at:Date.now()}, ...(gb[type] || [])]; return TH.guestbook.put(id, gb) === false ? null : gb; },
   view(id){ const gb = TH.guestbook.get(id); gb.views++; TH.guestbook.put(id, gb); }
 };
 

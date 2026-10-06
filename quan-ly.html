@@ -17,7 +17,13 @@
 .tbl th{color:var(--muted);font-weight:600;font-size:.8rem;text-transform:uppercase;letter-spacing:.05em}
 .pill{padding:3px 10px;border-radius:999px;font-size:.78rem;font-weight:600}
 .pill.yes{background:#e3f4e7;color:#2d7a43}.pill.no{background:#fbe4e4;color:#b33}
-@media(max-width:760px){.kpis{grid-template-columns:repeat(2,1fr)}}
+.kx{display:flex;gap:8px;flex-wrap:wrap}
+.khint{color:var(--muted);font-size:.9rem;margin-bottom:14px}
+.ksum{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.ksum div{background:var(--blush);border-radius:12px;padding:12px;text-align:center}
+.ksum small{color:var(--muted);font-size:.78rem}.ksum b{display:block;font-family:var(--f-head);font-size:1.5rem;color:var(--rose-d)}
+.tbl .al{color:#b45309;font-size:.85rem}
+@media(max-width:760px){.kpis{grid-template-columns:repeat(2,1fr)}.ksum{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
@@ -25,7 +31,11 @@
 <h1 id="ttl">Quản lý thiệp</h1><div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:16px" id="acts"></div></div></section>
 <section class="container" style="padding-top:30px">
   <div class="kpis" id="kpis"></div>
-  <div class="panel2"><h3>Khách xác nhận tham dự <button class="btn btn-outline btn-sm" id="csv">⬇ Xuất CSV</button></h3><div class="table-wrap"><table class="tbl" id="rsvpT"></table></div></div>
+  <div class="panel2"><h3>Khách xác nhận tham dự <button class="btn btn-outline btn-sm" id="csv">⬇ Xuất CSV đầy đủ</button></h3><div class="table-wrap"><table class="tbl" id="rsvpT"></table></div></div>
+  <div class="panel2 kitchen"><h3>🍽 Danh sách cho nhà hàng
+      <span class="kx"><button class="btn btn-primary btn-sm" id="kCsv">⬇ Xuất .CSV</button><button class="btn btn-outline btn-sm" id="kXlsx">⬇ Xuất Excel (.xlsx)</button></span></h3>
+    <p class="khint">Chỉ gồm khách <b>sẽ tham dự</b>: số người lớn, trẻ em, tổng suất ăn thường, suất chay và ghi chú dị ứng — gửi thẳng cho bếp tiệc.</p>
+    <div class="ksum" id="kSum"></div></div>
   <div class="panel2"><h3>Lời chúc</h3><div id="wishL"></div></div>
   <p class="hint" style="color:var(--muted);font-size:.85rem">Lưu ý: bản tĩnh này lưu phản hồi trong trình duyệt. Để nhận phản hồi từ mọi khách mời, hãy kết nối backend (Firebase, Supabase…) tại <code>TH.guestbook</code> trong <code>assets/js/invite.js</code>.</p>
 </section>
@@ -44,23 +54,63 @@
   $('#share').onclick = () => TH.shareDialog(id, D);
   $('#del').onclick = () => { if (confirm('Xoá thiệp này? Không thể hoàn tác.')) { TH.invites.remove(id); TH.store.del('gb_'+id); location.href = 'thiep-da-tao.html'; } };
 
+  const side = r => r.side === 'bride' ? 'Nhà gái' : 'Nhà trai';
+  /* Bảng cho bếp: khách sẽ đến + dòng tổng */
+  const kitchen = () => {
+    const yes = TH.guestbook.get(id).rsvp.filter(r => r.attend === 'yes');
+    const rows = yes.map((r, i) => { const p = TH.rsvpParty(r); return [i + 1, r.name, side(r), r.phone || '', p.adults, p.kids, p.total, p.normal, p.veg, p.allergy]; });
+    const sum = k => rows.reduce((s, r) => s + r[k], 0);
+    return {head:['STT','Tên khách','Bên','Điện thoại','Người lớn','Trẻ em','Tổng suất','Suất thường','Suất chay','Ghi chú dị ứng'],
+      rows, total:['', 'TỔNG CỘNG', `${rows.length} nhóm khách`, '', sum(4), sum(5), sum(6), sum(7), sum(8), `${rows.filter(r => r[9]).length} khách có dị ứng`]};
+  };
+  const fileBase = () => `nha-hang-${D.groom.nick}-${D.bride.nick}`.normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/đ/gi,'d').replace(/\s+/g,'-').toLowerCase();
+  const saveBlob = (blob, name) => { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); };
+  const toCsv = rows => '﻿' + rows.map(r => r.map(c => `"${String(c ?? '').replace(/"/g,'""')}"`).join(',')).join('\r\n');
+
   const render = () => {
     const gb = TH.guestbook.get(id), yes = gb.rsvp.filter(r=>r.attend==='yes');
-    const people = yes.reduce((s,r)=>s + (+r.count||1), 0);
+    const people = yes.reduce((s,r)=>s + TH.rsvpParty(r).total, 0);
     const days = Math.ceil((new Date(D.date) - Date.now())/864e5);
     $('#kpis').innerHTML = [['Lượt xem', gb.views],['Xác nhận đến', yes.length],['Tổng số người', people],['Còn lại', days > 0 ? days + ' ngày' : 'Đã diễn ra']]
       .map(([l,v])=>`<div class="kpi"><small>${l}</small><b>${v}</b></div>`).join('');
-    $('#rsvpT').innerHTML = gb.rsvp.length ? `<tr><th>Tên</th><th>Điện thoại</th><th>Trạng thái</th><th>Số người</th><th>Khách</th><th>Thời gian</th></tr>` +
-      gb.rsvp.map(r=>`<tr><td>${esc(r.name)}</td><td>${esc(r.phone||'')}</td><td><span class="pill ${r.attend}">${r.attend==='yes'?'Sẽ đến':'Không đến'}</span></td><td>${r.attend==='yes'?esc(r.count):'-'}</td><td>${r.side==='bride'?'Nhà gái':'Nhà trai'}</td><td>${new Date(r.at).toLocaleString('vi-VN')}</td></tr>`).join('')
+    $('#rsvpT').innerHTML = gb.rsvp.length ? `<tr><th>Tên</th><th>Điện thoại</th><th>Trạng thái</th><th>Người lớn</th><th>Trẻ em</th><th>Suất chay</th><th>Dị ứng / Lời nhắn</th><th>Khách</th><th>Thời gian</th></tr>` +
+      gb.rsvp.map(r=>{ const p = TH.rsvpParty(r), y = r.attend === 'yes';
+        return `<tr><td>${esc(r.name)}</td><td>${esc(r.phone||'')}</td><td><span class="pill ${r.attend}">${y?'Sẽ đến':'Không đến'}</span></td><td>${y?p.adults:'-'}</td><td>${y?p.kids:'-'}</td><td>${y?p.veg:'-'}</td>
+        <td>${y ? (p.allergy ? `<span class="al">⚠️ ${esc(p.allergy)}</span>` : '') : esc(r.msg||'')}</td><td>${side(r)}</td><td>${new Date(r.at).toLocaleString('vi-VN')}</td></tr>`; }).join('')
       : '<tr><td style="color:var(--muted)">Chưa có khách xác nhận.</td></tr>';
+    const k = kitchen().total;
+    $('#kSum').innerHTML = [['Người lớn', k[4]], ['Trẻ em', k[5]], ['Tổng suất', k[6]], ['Suất thường', k[7]], ['Suất chay', k[8]]]
+      .map(([l, v]) => `<div><small>${l}</small><b>${v}</b></div>`).join('');
     $('#wishL').innerHTML = gb.wishes.length ? gb.wishes.map((w,i)=>`<div class="mock-row"><span class="avatar">${esc(w.name.slice(0,2).toUpperCase())}</span><div style="flex:1"><b>${esc(w.name)}</b><br><span style="color:var(--muted)">${esc(w.msg)}</span></div><button class="btn btn-ghost btn-sm" data-del="${i}">Ẩn</button></div>`).join('')
       : '<p style="color:var(--muted)">Chưa có lời chúc.</p>';
   };
   $('#wishL').onclick = e => { const b = e.target.closest('[data-del]'); if (!b) return; const gb = TH.guestbook.get(id); gb.wishes.splice(+b.dataset.del,1); TH.guestbook.put(id, gb); render(); };
   $('#csv').onclick = () => {
-    const rows = [['Tên','Điện thoại','Tham dự','Số người','Khách','Thời gian'], ...TH.guestbook.get(id).rsvp.map(r=>[r.name,r.phone||'',r.attend==='yes'?'Có':'Không',r.count,r.side==='bride'?'Nhà gái':'Nhà trai',new Date(r.at).toLocaleString('vi-VN')])];
-    const csv = '﻿' + rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
-    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download = `khach-moi-${id}.csv`; a.click();
+    const rows = [['Tên','Điện thoại','Tham dự','Người lớn','Trẻ em','Suất chay','Dị ứng','Lời nhắn','Khách','Thời gian'], ...TH.guestbook.get(id).rsvp.map(r=>{ const p = TH.rsvpParty(r), y = r.attend==='yes';
+      return [r.name, r.phone||'', y?'Có':'Không', y?p.adults:'', y?p.kids:'', y?p.veg:'', p.allergy, r.msg||'', side(r), new Date(r.at).toLocaleString('vi-VN')]; })];
+    saveBlob(new Blob([toCsv(rows)], {type:'text/csv;charset=utf-8'}), `khach-moi-${id}.csv`);
+  };
+
+  /* Xuất cho nhà hàng: CSV (mở được bằng Excel, giữ dấu tiếng Việt) hoặc .xlsx thật qua SheetJS */
+  const noGuests = () => !kitchen().rows.length && (TH.toast('Chưa có khách xác nhận tham dự'), true);
+  $('#kCsv').onclick = () => { if (noGuests()) return; const k = kitchen();
+    // ="0912…" để Excel giữ số 0 đầu của số điện thoại
+    const rows = k.rows.map(r => r.map((c, i) => i === 3 && c ? `="${c}"` : c));
+    saveBlob(new Blob([toCsv([k.head, ...rows, k.total])], {type:'text/csv;charset=utf-8'}), fileBase() + '.csv'); };
+  $('#kXlsx').onclick = async () => { if (noGuests()) return;
+    const btn = $('#kXlsx'), label = btn.textContent; btn.disabled = true; btn.textContent = 'Đang tạo file…';
+    try {
+      if (!window.XLSX) await new Promise((ok, fail) => { const s = document.createElement('script');
+        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'; s.onload = ok; s.onerror = fail; document.head.append(s); });
+      const k = kitchen(), when = new Date(D.date);
+      const title = [[`DANH SÁCH SUẤT ĂN – TIỆC CƯỚI ${D.groom.nick.toUpperCase()} & ${D.bride.nick.toUpperCase()}`], [`Ngày: ${isNaN(when) ? '' : when.toLocaleDateString('vi-VN')} · Xuất lúc ${new Date().toLocaleString('vi-VN')}`], []];
+      const ws = XLSX.utils.aoa_to_sheet([...title, k.head, ...k.rows, k.total]);
+      ws['!cols'] = [6, 24, 10, 14, 10, 8, 10, 12, 10, 40].map(w => ({wch:w}));
+      ws['!merges'] = [{s:{r:0, c:0}, e:{r:0, c:9}}, {s:{r:1, c:0}, e:{r:1, c:9}}];
+      const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Nhà hàng');
+      saveBlob(new Blob([XLSX.write(wb, {bookType:'xlsx', type:'array'})], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}), fileBase() + '.xlsx');
+    } catch { TH.toast('Không tạo được file Excel (mất mạng?) — bạn dùng nút Xuất .CSV nhé'); }
+    btn.disabled = false; btn.textContent = label;
   };
   render();
 })();

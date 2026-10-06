@@ -25,7 +25,7 @@ TH.TEMPLATES = [
   {id:'hoang-hon',    name:'Hoàng Hôn',        tier:'premium', cat:'Lãng mạn',   bg:'linear-gradient(160deg,#fbd3c0,#fdeee0)', fg:'#8a3b24', accent:'#e0805b', font:'Great Vibes',         deco:'star',   views:13290, ...SET(11,8)},
   {id:'co-dien',      name:'Cổ Điển Châu Âu',  tier:'basic',   cat:'Vintage',    bg:'linear-gradient(160deg,#f1ebe1,#fcfaf5)', fg:'#3e3a33', accent:'#9b8a6a', font:'Parisienne',          deco:'gold',   views:10420, ...SET(12,7)},
   {id:'nang-vang',    name:'Nắng Vàng',        tier:'premium', cat:'Sang trọng', bg:'linear-gradient(160deg,#f7ead2,#fffaf0)', fg:'#6b4a1f', accent:'#c99a4b', font:'Playfair Display',    deco:'gold',   views:16480, ...SET(13,7)},
-  {id:'tiec-vuon',    name:'Tiệc Vườn',        tier:'basic',   cat:'Lãng mạn',   bg:'linear-gradient(160deg,#e6efe0,#fbfdf7)', fg:'#3b5a33', accent:'#8fb07c', font:'Great Vibes',         deco:'leaf',   views:12140, ...SET(14,7)},
+  {id:'tiec-vuon',    name:'Tiệc Vườn',        tier:'basic',   cat:'Lãng mạn',   bg:'linear-gradient(160deg,#e6efe0,#fbfdf7)', fg:'#3b5a33', accent:'#8fb07c', font:'Great Vibes',         deco:'leaf',   heroPos:'top', /* ảnh bìa có bảng tên ở giữa → đặt chữ lên trên */   views:12140, ...SET(14,7)},
   {id:'rung-thong',   name:'Rừng Thông',       tier:'premium', cat:'Vintage',    bg:'linear-gradient(160deg,#2c3a2e,#46594a)', fg:'#f1e9d6', accent:'#c7b483', font:'Parisienne',          deco:'leaf',   views:14730, ...SET(15,8)},
   {id:'thanh-lich',   name:'Thanh Lịch',       tier:'basic',   cat:'Tối giản',   bg:'linear-gradient(160deg,#f3f3f1,#ffffff)', fg:'#33302e', accent:'#a39d96', font:'Dancing Script',      deco:'line',   views:11360, ...SET(16,6)},
   {id:'la-non',       name:'Lá Non',           tier:'basic',   cat:'Tối giản',   bg:'linear-gradient(160deg,#edf3ea,#fcfdfb)', fg:'#3f5642', accent:'#93ad8f', font:'Playfair Display',    deco:'leaf',   views:10650, ...SET(17,7)},
@@ -35,6 +35,7 @@ TH.TEMPLATES = [
 ];
 
 /* Cặp đôi mẫu của từng mẫu thiệp: hiển thị trên thẻ xem trước và trong trang thiệp demo.
+   Mẫu nào có ảnh in sẵn tên/ngày (bảng chào mừng, Save the Date…) thì phải ghi đúng như trong ảnh.
    [tên chú rể, họ, tên cô dâu, họ, ngày cưới, bố chú rể, mẹ chú rể, bố cô dâu, mẹ cô dâu] */
 const COUPLES = {
   'song-hy':       ['Quang Huy',  'Trần',   'Mai Anh',     'Phạm',   '2026-01-18', 'Trần Văn Bình',    'Nguyễn Thị Hoa',  'Phạm Đức Toàn',   'Lê Thị Hằng'],
@@ -42,7 +43,7 @@ const COUPLES = {
   'dem-sao':       ['Đức Thắng',  'Nguyễn', 'Phương Linh', 'Đặng',   '2026-12-12', 'Nguyễn Văn Tâm',   'Trịnh Thị Loan',  'Đặng Quốc Hùng',  'Bùi Thị Liên'],
   'anh-bac':       ['Hoàng Nam',  'Phan',   'Khánh Vy',    'Trương', '2026-11-21', 'Phan Thanh Sơn',   'Võ Thị Kim',      'Trương Văn Lộc',  'Huỳnh Thị Ngọc'],
   'hong-pastel':   ['Minh Quân',  'Đỗ',     'Thảo My',     'Ngô',    '2026-03-08', 'Đỗ Văn Khải',      'Phạm Thị Thanh',  'Ngô Quang Định',  'Lý Thị Hương'],
-  'vuon-xanh':     ['Thanh Tùng', 'Hoàng',  'Diễm Quỳnh',  'Lâm',    '2026-04-12', 'Hoàng Văn Phúc',   'Trần Thị Duyên',  'Lâm Hữu Tài',     'Nguyễn Thị Diệu'],
+  'vuon-xanh':     ['Mẫn',        'Hoàng Văn','Hoà',       'Lâm Thị','2026-09-20', 'Hoàng Văn Phúc',   'Trần Thị Duyên',  'Lâm Hữu Tài',     'Nguyễn Thị Diệu'], // theo bảng Save the Date trong ảnh mau-2/04
   'bien-xanh':     ['Quốc Bảo',   'Huỳnh',  'Hà My',       'Tô',     '2026-06-20', 'Huỳnh Văn Lợi',    'Lê Thị Ánh',      'Tô Minh Đức',     'Phan Thị Hà'],
   'oai-huong':     ['Trọng Hiếu', 'Bùi',    'Thùy Dung',   'Mai',    '2026-05-17', 'Bùi Văn Thịnh',    'Đặng Thị Xuân',   'Mai Xuân Trường', 'Cao Thị Lụa'],
   'giay-kraft':    ['Anh Dũng',   'Vũ',     'Bích Ngọc',   'Hồ',     '2026-09-26', 'Vũ Đình Lâm',      'Nguyễn Thị Hạnh', 'Hồ Văn Nghĩa',    'Trần Thị Bích'],
@@ -51,7 +52,7 @@ const COUPLES = {
   'hoang-hon':     ['Hữu Phước',  'Võ',     'Cẩm Ly',      'Dương',  '2026-08-15', 'Võ Hữu Nghĩa',     'Châu Thị Lệ',     'Dương Văn Tấn',   'Lê Thị Cẩm'],
   'co-dien':       ['Tiến Đạt',   'Đặng',   'Quỳnh Chi',   'Kiều',   '2026-10-24', 'Đặng Văn Tiến',    'Ngô Thị Yến',     'Kiều Minh Tuấn',  'Phạm Thị Quỳnh'],
   'nang-vang':     ['Văn Hậu',    'Lý',     'Trúc Mai',    'Thái',   '2026-09-05', 'Lý Văn Sang',      'Tạ Thị Hồng',     'Thái Thanh Bình', 'Nguyễn Thị Trúc'],
-  'tiec-vuon':     ['Nhật Minh',  'Cao',    'Hoài Thương', 'Lưu',    '2026-04-26', 'Cao Văn Thắng',    'Doãn Thị Hoài',   'Lưu Đức Mạnh',    'Tăng Thị Hiền'],
+  'tiec-vuon':     ['Hoàng Hiệp', 'Cao',    'Thủy Tiên',   'Lưu',    '2026-10-05', 'Cao Văn Thắng',    'Doãn Thị Hoài',   'Lưu Đức Mạnh',    'Tăng Thị Hiền'],  // theo bảng Welcome trong ảnh mau-14
   'rung-thong':    ['Đình Trọng', 'Hà',     'Yến Nhi',     'Quách',  '2026-11-07', 'Hà Đình Phong',    'Lại Thị Nguyệt',  'Quách Văn Hưng',  'Mạc Thị Yến'],
   'thanh-lich':    ['Gia Huy',    'Ngô',    'Tuyết Mai',   'Đoàn',   '2026-03-29', 'Ngô Gia Bảo',      'Từ Thị Tuyết',    'Đoàn Văn Kiên',   'Lâm Thị Hoa'],
   'la-non':        ['Hải Đăng',   'Tạ',     'Thùy Trang',  'Chu',    '2026-05-31', 'Tạ Văn Biển',      'Nông Thị Hải',    'Chu Minh Khang',  'Vương Thị Thủy'],
@@ -73,7 +74,7 @@ TH.SHOWCASE = [
   {groom:'Minh Khôi', bride:'Thu Hà',    date:'2026-10-18', tpl:'hong-pastel'},
   {groom:'Quốc Bảo',  bride:'Ngọc Anh',  date:'2026-11-08', tpl:'hoang-kim'},
   {groom:'Đức Anh',   bride:'Phương Linh',date:'2026-12-20', tpl:'song-hy'},
-  {groom:'Tuấn Kiệt', bride:'Mai Chi',   date:'2026-10-25', tpl:'vuon-xanh'},
+  {groom:'Mẫn',       bride:'Hoà',       date:'2026-09-20', tpl:'vuon-xanh'}, // album mẫu này có bảng Save the Date ghi Mẫn – Hoà
   {groom:'Hoàng Nam', bride:'Bảo Trân',  date:'2027-01-10', tpl:'dem-sao'},
   {groom:'Gia Huy',   bride:'Khánh Vy',  date:'2026-11-29', tpl:'oai-huong'},
   {groom:'Thành Đạt', bride:'Hải Yến',   date:'2026-12-06', tpl:'mau-don'},
