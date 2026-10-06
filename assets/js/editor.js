@@ -122,7 +122,7 @@ panel.addEventListener('click', e => {
 });
 
 /* ---------- Thanh công cụ ---------- */
-$('#btnView').onclick = () => { save(); open(TH.inviteUrl(id, null), '_blank'); };
+$('#btnView').onclick = () => { save(); location.href = TH.inviteUrl(id, null); };
 $('#btnShare').onclick = () => { save(); TH.shareDialog(id, D); };
 $$('[data-dev]').forEach(b => b.onclick = () => { $$('[data-dev]').forEach(x=>x.classList.toggle('active', x===b)); $('#stage').classList.toggle('desktop', b.dataset.dev==='desktop'); });
 $$('[data-tab]').forEach(b => b.onclick = () => { $$('[data-tab]').forEach(x=>x.classList.toggle('active', x===b)); document.body.classList.toggle('show-preview', b.dataset.tab==='preview'); push(); });

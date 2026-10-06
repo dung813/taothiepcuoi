@@ -135,7 +135,7 @@ TH.miniTpl = (t, o={}) => {
 };
 TH.tplCard = t => `<article class="tpl-card reveal" data-cat="${t.cat}">
   <div class="tpl-thumb"><span class="tier ${t.tier}">${t.tier==='premium'?'PREMIUM':'BASIC'}</span>${TH.miniTpl(t, t.couple)}
-    <div class="overlay"><a class="btn btn-primary btn-sm" href="editor.html?tpl=${t.id}">Dùng mẫu này</a><a class="btn btn-outline btn-sm" href="thiep.html?demo=${t.id}" target="_blank">Xem trước</a></div></div>
+    <div class="overlay"><a class="btn btn-primary btn-sm" href="editor.html?tpl=${t.id}">Dùng mẫu này</a><a class="btn btn-outline btn-sm" href="thiep.html?demo=${t.id}">Xem trước</a></div></div>
   <div class="tpl-info"><h3>${t.name}</h3><small>👁 ${t.views.toLocaleString('vi-VN')}</small></div></article>`;
 
 /* ---------- Hiệu ứng: reveal, count-up, FAQ ---------- */

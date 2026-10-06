@@ -9,7 +9,7 @@ const postCard = (p, featured) => `<a href="bai-viet.html?slug=${p.slug}" class=
 
 const showCard = s => { const t = TH.findTemplate(s.tpl);
   const q = new URLSearchParams({demo:s.tpl, g:s.groom, b:s.bride, d:s.date});
-  return `<a class="show-card" href="thiep.html?${q}" target="_blank"><div class="tpl-thumb">${TH.miniTpl(t,s)}</div>
+  return `<a class="show-card" href="thiep.html?${q}"><div class="tpl-thumb">${TH.miniTpl(t,s)}</div>
   <div class="meta"><b>${s.groom} &amp; ${s.bride}</b><small>${TH.fmtDate(s.date)} · ${t.name}</small></div></a>`; };
 
 /* ---------- Trang chủ ---------- */
@@ -97,7 +97,7 @@ TH.pageShowcase = () => {
   $('#mine').innerHTML = ids.length ? ids.map(id => { const d = mine[id], t = TH.findTemplate(d.tpl);
     return `<div class="show-card reveal" style="width:auto"><div class="tpl-thumb">${TH.miniTpl(t,{groom:d.groom.nick||d.groom.name,bride:d.bride.nick||d.bride.name,date:d.date,photo:d.cover})}</div>
       <div class="meta"><b>${TH.esc((d.groom.nick||d.groom.name)+' & '+(d.bride.nick||d.bride.name))}</b><small>${TH.fmtDate(d.date)}</small>
-      <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap"><a class="btn btn-primary btn-sm" href="editor.html?id=${id}">Sửa</a><a class="btn btn-outline btn-sm" target="_blank" href="thiep.html?id=${id}">Xem</a><a class="btn btn-outline btn-sm" href="quan-ly.html?id=${id}">Quản lý</a></div></div></div>`; }).join('')
+      <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap"><a class="btn btn-primary btn-sm" href="editor.html?id=${id}">Sửa</a><a class="btn btn-outline btn-sm" href="thiep.html?id=${id}">Xem</a><a class="btn btn-outline btn-sm" href="quan-ly.html?id=${id}">Quản lý</a></div></div></div>`; }).join('')
     : `<div class="empty">Bạn chưa tạo thiệp nào. <a href="mau-thiep.html" style="color:var(--rose);font-weight:600">Chọn mẫu để bắt đầu →</a></div>`;
   $('#gallery').innerHTML = TH.SHOWCASE.map(s => showCard(s).replace('class="show-card"','class="show-card reveal" style="width:auto"')).join('');
   TH.reveal();

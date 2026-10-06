@@ -40,7 +40,7 @@
   const $ = TH.$, esc = TH.esc, id = TH.qs('id'), D = id && TH.invites.get(id);
   if (!D) { $('#ttl').textContent = 'Không tìm thấy thiệp'; $('#kpis').innerHTML = '<a class="btn btn-primary" href="thiep-da-tao.html">Về danh sách thiệp</a>'; return; }
   $('#ttl').textContent = `${D.groom.nick} & ${D.bride.nick}`;
-  $('#acts').innerHTML = `<a class="btn btn-primary btn-sm" href="editor.html?id=${id}">✏️ Chỉnh sửa</a><a class="btn btn-outline btn-sm" target="_blank" href="thiep.html?id=${id}">👁 Xem thiệp</a><button class="btn btn-outline btn-sm" id="share">🔗 Chia sẻ</button><button class="btn btn-ghost btn-sm" id="del" style="color:#b33">🗑 Xoá</button>`;
+  $('#acts').innerHTML = `<a class="btn btn-primary btn-sm" href="editor.html?id=${id}">✏️ Chỉnh sửa</a><a class="btn btn-outline btn-sm" href="thiep.html?id=${id}">👁 Xem thiệp</a><button class="btn btn-outline btn-sm" id="share">🔗 Chia sẻ</button><button class="btn btn-ghost btn-sm" id="del" style="color:#b33">🗑 Xoá</button>`;
   $('#share').onclick = () => TH.shareDialog(id, D);
   $('#del').onclick = () => { if (confirm('Xoá thiệp này? Không thể hoàn tác.')) { TH.invites.remove(id); TH.store.del('gb_'+id); location.href = 'thiep-da-tao.html'; } };
 
