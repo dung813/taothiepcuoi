@@ -92,7 +92,7 @@ TH.POSTS = [
   cat:'Hướng dẫn', read:9, date:'2026-09-20', cover:['#c8506a','#e89aa9'], coverText:'7 bước',
   excerpt:'Từ chọn mẫu, điền thông tin, thêm ảnh đến gửi thiệp cho từng khách — quy trình đầy đủ để có tấm thiệp online chỉn chu trong một buổi tối.',
   body:`
-<p>Thiệp cưới online giúp bạn tiết kiệm chi phí in ấn, gửi được cho bạn bè ở xa và cập nhật thông tin bất cứ lúc nào. Dưới đây là quy trình bảy bước mà bạn có thể làm theo ngay trên Thiệp Hồng.</p>
+<p>Thiệp cưới online giúp bạn tiết kiệm chi phí in ấn, gửi được cho bạn bè ở xa và cập nhật thông tin bất cứ lúc nào. Dưới đây là quy trình bảy bước mà bạn có thể làm theo ngay trên WEDSTORY.</p>
 <h2 id="b1">Bước 1: Chọn mẫu phù hợp phong cách đám cưới</h2>
 <p>Hãy bắt đầu từ tông màu và không khí của ngày cưới. Cưới ngoài trời hợp với các mẫu xanh lá, tối giản; tiệc nhà hàng sang trọng hợp với tông đen – vàng; lễ gia tiên hợp với mẫu đỏ song hỷ.</p>
 <ul><li>Xem trước mẫu trên cả điện thoại lẫn máy tính.</li><li>Ưu tiên mẫu có đủ các mục bạn cần: lịch trình, bản đồ, album, hộp mừng cưới.</li></ul>
@@ -226,7 +226,7 @@ TH.findPost = slug => TH.POSTS.find(p => p.slug === slug);
 
 TH.FAQ = [
   ['Thiệp cưới online là gì?','Là một trang web nhỏ chứa thông tin đám cưới của bạn: tên, thời gian, địa điểm, ảnh cưới, bản đồ, nhạc nền. Khách chỉ cần mở đường dẫn trên điện thoại hoặc máy tính.'],
-  ['Tạo thiệp trên Thiệp Hồng có mất phí không?','Gói Cơ bản hoàn toàn miễn phí với đầy đủ tính năng chính. Các gói trả phí mở khoá mẫu Premium, tên miền riêng, bỏ logo và thống kê nâng cao.'],
+  ['Tạo thiệp trên WEDSTORY có mất phí không?','Gói Cơ bản hoàn toàn miễn phí với đầy đủ tính năng chính. Các gói trả phí mở khoá mẫu Premium, tên miền riêng, bỏ logo và thống kê nâng cao.'],
   ['Tôi có thể chỉnh sửa thiệp sau khi đã gửi không?','Có. Mọi thay đổi được cập nhật ngay trên đường dẫn cũ, khách mời không cần nhận lại thiệp mới.'],
   ['Làm sao gửi thiệp có tên riêng từng khách?','Trong trang quản lý thiệp, nhập tên khách mời để tạo đường dẫn riêng. Khi mở thiệp, khách sẽ thấy dòng “Kính mời: [tên khách]”.'],
   ['Thiệp có hiển thị tốt trên điện thoại không?','Tất cả mẫu được thiết kế ưu tiên điện thoại và hiển thị đẹp trên máy tính bảng, máy tính.'],

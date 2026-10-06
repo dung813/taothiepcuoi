@@ -320,6 +320,27 @@ body.inv.senior,body.inv.senior.dark{--t-bg:#fffdf8!important;--t-fg:#111!import
 .senior .board .st{display:none}
 @media (prefers-reduced-motion: reduce){.ticker-track{animation-duration:120s!important}}
 
+/* ---- Nút về trang chủ (thiệp demo): kính mờ, nằm đầu thanh trên cùng ---- */
+.home-btn{flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 13px 0 10px;border-radius:999px;
+  background:rgba(255,255,255,.55);-webkit-backdrop-filter:blur(10px) saturate(1.4);backdrop-filter:blur(10px) saturate(1.4);
+  border:1px solid rgba(255,255,255,.7);box-shadow:0 4px 14px rgba(0,0,0,.15);color:#a63a54;font:700 .78rem var(--f-body);
+  letter-spacing:.02em;white-space:nowrap;transition:background .25s,color .25s,transform .25s,box-shadow .25s}
+.home-btn svg{width:17px;height:17px;transition:transform .25s}
+.home-btn:hover,.home-btn:focus-visible{background:#a63a54;color:#fff;border-color:#a63a54;transform:translateY(-1px);box-shadow:0 6px 18px rgba(166,58,84,.35)}
+.home-btn:hover svg{transform:translateX(-2px)}
+.home-btn:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.senior .home-btn{background:#fff;border-color:#111;color:#111}
+@media (max-width:380px){.home-btn{padding:0 9px}.home-btn span{display:none}}
+
+/* ---- Tự động chạy nội dung + thanh tiến trình ---- */
+.read-progress{position:fixed;top:0;left:50%;translate:-50% 0;width:min(520px,100%);height:3px;z-index:270;background:rgba(0,0,0,.1);pointer-events:none}
+.read-progress i{display:block;height:100%;width:0;background:var(--t-accent);border-radius:0 3px 3px 0;box-shadow:0 0 8px var(--t-accent)}
+.autoplay{position:fixed;left:max(16px,calc(50% - 244px));bottom:80px;z-index:250;display:flex;align-items:center;gap:8px;height:44px;padding:0 14px 0 4px;border:none;border-radius:999px;background:#fff;color:#2b2226;font:600 .8rem var(--f-body);box-shadow:0 8px 20px rgba(0,0,0,.22);cursor:pointer;transition:background .25s,color .25s}
+.autoplay .ic{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:var(--t-accent);color:#fff;font-size:.8rem;letter-spacing:-.1em}
+.autoplay.on{background:var(--t-accent);color:#fff}
+.autoplay.on .ic{background:#fff;color:var(--t-accent);animation:glow 2s infinite}
+.preview-mode .autoplay,.preview-mode .read-progress{display:none}
+
 /* ---- RSVP: câu hỏi nối tiếp ---- */
 .rsvp-branch{border:0;padding:0;margin:0;display:grid;gap:12px;min-width:0;animation:fadeUp .35s ease}
 .rsvp-branch[hidden],.rsvp-sub[hidden]{display:none}

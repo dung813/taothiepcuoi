@@ -1,4 +1,4 @@
-/* ============ Thiệp Hồng — global styles ============ */
+/* ============ WEDSTORY — global styles ============ */
 :root{
   --rose:#c8506a; --rose-d:#a63a54; --rose-l:#f7dfe4; --blush:#fdf3f4;
   --gold:#c9a45c; --ink:#2b2226; --muted:#7a6a70; --line:#eee1e4;
@@ -38,6 +38,11 @@ h1,h2,h3{font-family:var(--f-head);line-height:1.2;font-weight:600}
 .header .container{display:flex;align-items:center;justify-content:space-between;height:72px;gap:20px}
 .logo{display:flex;align-items:center;gap:10px;font-family:var(--f-head);font-size:1.4rem;font-weight:700;color:var(--rose-d)}
 .logo svg{width:34px;height:34px}
+/* Logo chữ WEDSTORY: serif sang trọng, viết hoa, giãn chữ nhẹ; "STORY" nhạt hơn một tông làm điểm nhấn */
+.logo .brand{font-family:'Playfair Display',Georgia,serif;font-weight:700;font-size:1.3rem;text-transform:uppercase;letter-spacing:.14em;line-height:1;color:var(--rose-d)}
+.logo .brand em{font-style:normal;font-weight:600;color:var(--rose)}
+.footer .logo .brand{color:#fff}
+.footer .logo .brand em{color:#f3b8c4}
 .nav{display:flex;gap:4px;align-items:center}
 .nav a{white-space:nowrap;padding:8px 12px;border-radius:999px;font-size:.93rem;font-weight:500;color:var(--muted);transition:.25s}
 .nav a:hover,.nav a.active{color:var(--rose);background:var(--blush)}

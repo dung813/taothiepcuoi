@@ -71,7 +71,7 @@ TH.pageArticle = () => {
   TH.initPage();
   const p = TH.findPost(TH.qs('slug'));
   if (!p) { $('#article').innerHTML = '<div class="article-hero"><h1>Không tìm thấy bài viết</h1><a class="btn btn-primary" href="cam-nang.html">Về trang Cẩm nang</a></div>'; return; }
-  document.title = p.title + ' – Thiệp Hồng';
+  document.title = p.title + ' – WEDSTORY';
   const tmp = document.createElement('div'); tmp.innerHTML = p.body;
   const heads = $$('h2[id]', tmp);
   $('#article').innerHTML = `<div class="article-hero"><div class="crumbs"><a href="index.html">Trang chủ</a> / <a href="cam-nang.html">Cẩm nang</a> / ${p.cat}</div>
@@ -107,8 +107,8 @@ TH.pageShowcase = () => {
 TH.pagePricing = () => {
   TH.initPage();
   const PLANS = [
-    {name:'Cơ bản', desc:'Đủ dùng cho hầu hết cặp đôi', m:0, feats:[['Mẫu thiệp BASIC',1],['Nhạc nền, album 12 ảnh',1],['Bản đồ, đếm ngược',1],['Xác nhận tham dự & lời chúc',1],['Tên khách mời riêng',1],['Mẫu PREMIUM',0],['Ẩn logo Thiệp Hồng',0],['Thống kê nâng cao & xuất CSV',0]]},
-    {name:'Premium', desc:'Nổi bật và riêng tư hơn', m:199000, hot:1, feats:[['Tất cả tính năng gói Cơ bản',1],['Toàn bộ mẫu PREMIUM',1],['Album không giới hạn + video',1],['Ẩn logo Thiệp Hồng',1],['Hộp mừng cưới hiệu ứng',1],['Thống kê nâng cao & xuất CSV',1],['Lưu trữ thiệp 2 năm',1],['Tên miền riêng',0]]},
+    {name:'Cơ bản', desc:'Đủ dùng cho hầu hết cặp đôi', m:0, feats:[['Mẫu thiệp BASIC',1],['Nhạc nền, album 12 ảnh',1],['Bản đồ, đếm ngược',1],['Xác nhận tham dự & lời chúc',1],['Tên khách mời riêng',1],['Mẫu PREMIUM',0],['Ẩn logo WEDSTORY',0],['Thống kê nâng cao & xuất CSV',0]]},
+    {name:'Premium', desc:'Nổi bật và riêng tư hơn', m:199000, hot:1, feats:[['Tất cả tính năng gói Cơ bản',1],['Toàn bộ mẫu PREMIUM',1],['Album không giới hạn + video',1],['Ẩn logo WEDSTORY',1],['Hộp mừng cưới hiệu ứng',1],['Thống kê nâng cao & xuất CSV',1],['Lưu trữ thiệp 2 năm',1],['Tên miền riêng',0]]},
     {name:'Trọn gói', desc:'Chúng tôi làm giúp từ A–Z', m:599000, feats:[['Tất cả tính năng Premium',1],['Nhà thiết kế làm thiệp giúp bạn',1],['Thiết kế theo yêu cầu riêng',1],['Tên miền riêng (.com/.vn)',1],['Chỉnh sửa không giới hạn',1],['Hỗ trợ ưu tiên 24/7',1],['Lưu trữ trọn đời',1],['Bàn giao trong 48 giờ',1]]}
   ];
   let yearly = false;

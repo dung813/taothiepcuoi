@@ -33,7 +33,7 @@ function header(){
   const el = document.createElement('header');
   el.className = 'header';
   el.innerHTML = `<div class="container">
-    <a href="index.html" class="logo">${LOGO}<span>Thiệp Hồng</span></a>
+    <a href="index.html" class="logo" aria-label="WEDSTORY – Trang chủ">${LOGO}<span class="brand">WED<em>STORY</em></span></a>
     <nav class="nav">${NAV.map(([h,t,c])=>`<a href="${h}" class="${c||''} ${h===page||(page.startsWith('bai-viet')&&h==='cam-nang.html')?'active':''}">${t}</a>`).join('')}</nav>
     <div class="header-actions">
       ${user ? `<a href="thiep-da-tao.html?mine=1" class="btn btn-ghost btn-sm">👋 ${TH.esc(user.name)}</a><button class="btn btn-ghost btn-sm" data-logout>Đăng xuất</button>`
@@ -52,7 +52,7 @@ function footer(){
   const el = document.createElement('footer');
   el.className = 'footer';
   el.innerHTML = `<div class="container"><div class="footer-grid">
-    <div><a href="index.html" class="logo">${LOGO}<span>Thiệp Hồng</span></a>
+    <div><a href="index.html" class="logo" aria-label="WEDSTORY – Trang chủ">${LOGO}<span class="brand">WED<em>STORY</em></span></a>
       <p style="font-size:.92rem;max-width:300px">Nền tảng tạo thiệp cưới online miễn phí — đẹp, hiện đại và đầy cảm xúc. Kể câu chuyện tình yêu của bạn theo cách riêng.</p>
       <div class="socials"><a href="#" aria-label="Facebook">${ICON.fb}</a><a href="#" aria-label="Instagram">${ICON.ig}</a><a href="#" aria-label="TikTok">${ICON.tt}</a></div></div>
     <div><h4>Sản phẩm</h4><ul>
@@ -65,7 +65,7 @@ function footer(){
       <li><a href="chinh-sach.html#thanh-toan">Thanh toán &amp; hoàn tiền</a></li><li><a href="chinh-sach.html#noi-dung">Chính sách nội dung</a></li>
       <li><a href="lien-he.html">hello@thiephong.vn</a></li></ul></div>
   </div>
-  <div class="footer-bottom"><span>© ${new Date().getFullYear()} Thiệp Hồng. Mọi quyền được bảo lưu.</span><span>Làm bằng ❤ tại Việt Nam</span></div></div>`;
+  <div class="footer-bottom"><span>© ${new Date().getFullYear()} WEDSTORY. Mọi quyền được bảo lưu.</span><span>Làm bằng ❤ tại Việt Nam</span></div></div>`;
   document.body.append(el);
   const top = document.createElement('button');
   top.className = 'to-top'; top.innerHTML = ICON.up; top.setAttribute('aria-label','Lên đầu trang');

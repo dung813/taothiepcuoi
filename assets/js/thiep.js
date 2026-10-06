@@ -60,10 +60,13 @@ function render(){
 
   const top = `
   <div class="t-topbar">
+    ${isDemo && !isPreview ? `<a class="home-btn" href="index.html" aria-label="Về trang chủ WEDSTORY"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5h13V10"/><path d="M10 19.5v-5h4v5"/></svg><span>Trang chủ</span></a>` : ''}
     ${o.wishes !== false ? '<div class="ticker" id="ticker" aria-label="Hoạt động mới của khách mời"><div class="ticker-track"></div></div>' : '<span></span>'}
     <button class="senior-btn" id="seniorBtn" aria-pressed="${senior}">${senior ? '👓 Chế độ thường' : '👓 Chữ lớn'}</button>
   </div>
-  <button class="speak-btn" id="speakBtn" aria-label="Đọc thiệp thành tiếng">🔊 Đọc thiệp thành tiếng</button>`;
+  <button class="speak-btn" id="speakBtn" aria-label="Đọc thiệp thành tiếng">🔊 Đọc thiệp thành tiếng</button>
+  <div class="read-progress" aria-hidden="true"><i id="progBar"></i></div>
+  <button class="autoplay" id="autoBtn" aria-pressed="false" aria-label="Tự động chạy nội dung thiệp"><span class="ic">▶</span><span class="lb">Tự động chạy</span></button>`;
 
   /* Giai đoạn 1 — trước ngày cưới: thiệp đầy đủ */
   const beforeView = () => `
@@ -168,7 +171,7 @@ function render(){
 
   <footer class="t-foot"><div class="t-script reveal">Thank you!</div><p class="reveal" style="opacity:.8">Rất hân hạnh được đón tiếp quý khách</p>
     <div class="t-script reveal" style="font-size:2rem;margin-top:10px">${esc(D.groom.nick)} &amp; ${esc(D.bride.nick)}</div>
-    <div class="t-brand">Thiệp được tạo bởi <a href="index.html" target="_blank">Thiệp Hồng</a> · <a href="mau-thiep.html" target="_blank">Tạo thiệp miễn phí</a></div>
+    <div class="t-brand">Thiệp được tạo bởi <a href="index.html" target="_blank">WEDSTORY</a> · <a href="mau-thiep.html" target="_blank">Tạo thiệp miễn phí</a></div>
     ${stageSwitch(stage)}</footer>`;
 
   $('#app').innerHTML = top + (stage === 'today' ? ticketView(v) : stage === 'after' ? thanksView(photos, dateStr) : beforeView()) + `
@@ -307,6 +310,74 @@ function openRide(v){
   $$('[data-ride]', m).forEach(b => b.onclick = () => TH.rideTo(b.dataset.ride, dest));
   $('#rideCopy', m).onclick = () => navigator.clipboard.writeText(`${v.place}, ${v.address}`).then(() => TH.toast('Đã sao chép địa chỉ'));
 }
+/* ---------- Tự động chạy nội dung (presentation mode) ----------
+   Cuộn đều theo thứ tự các phần của thiệp, dừng ~1,8s ở đầu mỗi phần;
+   khách chạm / lăn chuột / bấm phím cuộn thì tự tạm dừng. */
+const tour = {on:false, raf:0, timer:0, y:0, last:0, hold:0, stops:[], next:0};
+const TOUR_DWELL = 1800, TOUR_EASE = 600;
+const scrollMax = () => Math.max(0, document.documentElement.scrollHeight - innerHeight);
+function tourStops(){
+  const ys = $$('#app > section, #app > footer').map(s => Math.max(0, Math.round(s.getBoundingClientRect().top + scrollY - 56)));
+  return ys.filter((y, i) => i === 0 || y - ys[i-1] > 40);
+}
+function setTourUI(on, label){
+  const b = $('#autoBtn'); if (!b) return;
+  b.classList.toggle('on', on); b.setAttribute('aria-pressed', on);
+  $('.ic', b).textContent = on ? '❚❚' : '▶';
+  $('.lb', b).textContent = label || (on ? 'Tạm dừng' : 'Tự động chạy');
+}
+function tourStart(){
+  if (tour.on || tour.timer) return;
+  const env = $('#env');
+  if (env && !env.classList.contains('gone')) {          // còn phong bì → mở thiệp trước rồi mới chạy
+    if (!env.classList.contains('opening')) $('#openEnv')?.click();
+    setTourUI(true, 'Đang mở thiệp…');
+    tour.timer = setTimeout(() => { tour.timer = 0; tourStart(); }, 2700);
+    return;
+  }
+  if (scrollY >= scrollMax() - 2) scrollTo({top:0, behavior:'instant'});   // đã xem hết → chạy lại từ đầu
+  Object.assign(tour, {on:true, y:scrollY, last:performance.now(), hold:performance.now() - TOUR_EASE});
+  tour.stops = tourStops(); tour.next = tour.stops.findIndex(s => s > tour.y + 2);
+  setTourUI(true);
+  tour.raf = requestAnimationFrame(tourTick);
+}
+function tourStop(finished){
+  clearTimeout(tour.timer); tour.timer = 0;
+  cancelAnimationFrame(tour.raf); tour.on = false;
+  setTourUI(false, finished ? 'Xem lại' : '');
+  if (finished) TH.toast('Bạn đã xem hết thiệp 💕');
+}
+function tourTick(now){
+  if (!tour.on) return;
+  const dt = Math.min(64, now - tour.last); tour.last = now;
+  if (now >= tour.hold) {
+    const ease = Math.min(1, (now - tour.hold) / TOUR_EASE);            // tăng tốc nhẹ sau mỗi lần dừng
+    tour.y = Math.min(scrollMax(), tour.y + (senior ? 40 : 55) * ease * dt / 1000);
+    const stop = tour.stops[tour.next];
+    if (stop != null && tour.y >= stop) {
+      tour.y = stop; tour.hold = now + TOUR_DWELL;
+      tour.stops = tourStops(); tour.next = tour.stops.findIndex(s => s > tour.y + 2);  // ảnh tải xong có thể làm lệch vị trí
+      if (tour.next < 0) tour.next = tour.stops.length;
+    }
+    scrollTo({top:tour.y, behavior:'instant'});
+    if (tour.y >= scrollMax() - 1) return tourStop(true);
+  }
+  tour.raf = requestAnimationFrame(tourTick);
+}
+function updateProgress(){
+  const bar = $('#progBar'); if (bar) bar.style.width = (scrollMax() ? Math.min(100, scrollY / scrollMax() * 100) : 0) + '%';
+}
+/* Khách tự tương tác → tạm dừng (bỏ qua chính nút tự động chạy) */
+const userTakeover = e => {
+  if (!tour.on && !tour.timer) return;
+  if (e.target?.closest?.('#autoBtn')) return;
+  tourStop(); TH.toast('Đã tạm dừng — bạn tự do xem nhé');
+};
+['wheel', 'touchstart', 'pointerdown'].forEach(t => addEventListener(t, userTakeover, {passive:true}));
+addEventListener('keydown', e => ['ArrowDown','ArrowUp','PageDown','PageUp',' ','Home','End'].includes(e.key) && userTakeover(e));
+addEventListener('scroll', updateProgress, {passive:true});
+addEventListener('resize', updateProgress);
+
 /* ---------- RSVP: câu hỏi nối tiếp ---------- */
 const stepper = (name, label, val, min, max) => `<div class="stepper"><span>${label}</span>
   <div><button type="button" data-step="-1" aria-label="Bớt ${label.toLowerCase()}">−</button><input type="number" name="${name}" value="${val}" min="${min}" max="${max}" inputmode="numeric"><button type="button" data-step="1" aria-label="Thêm ${label.toLowerCase()}">+</button></div></div>`;
@@ -367,7 +438,13 @@ function currentStage(){
 const stageUrl = s => { const u = new URL(location.href); u.searchParams.set('stage', s); return u.pathname.split('/').pop() + u.search + u.hash; };
 /* Thanh chuyển giai đoạn: chỉ hiện trên thiệp demo để chủ thiệp xem thử */
 const stageSwitch = cur => !isDemo || isPreview ? '' : `<nav class="stage-switch" aria-label="Xem thử giai đoạn"><small>Xem thử giai đoạn</small>
-  <div>${Object.entries(STAGES).map(([k, n]) => `<a href="${esc(stageUrl(k))}" class="${k === cur ? 'on' : ''}">${n}</a>`).join('')}</div></nav>`;
+  <div>${Object.entries(STAGES).map(([k, n]) => `<a href="${esc(stageUrl(k))}" data-stage-link class="${k === cur ? 'on' : ''}">${n}</a>`).join('')}</div></nav>`;
+/* Chuyển giai đoạn bằng location.replace → không chồng thêm lịch sử, nút Back về thẳng trang trước */
+document.addEventListener('click', e => {
+  const a = e.target.closest('[data-stage-link]');
+  if (!a || e.ctrlKey || e.metaKey || e.shiftKey) return;
+  e.preventDefault(); location.replace(a.href);
+});
 
 const fmtPhone = p => String(p).replace(/\D/g, '').replace(/^(\d{4})(\d{3})(\d+)$/, '$1 $2 $3');
 const ascii = s => String(s||'').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D');
@@ -409,7 +486,7 @@ function ticketView(v){
 }
 function drawTicketQr(){
   const box = $('#tkQr'); if (!box) return;
-  const text = ['THIEPHONG-CHECKIN', id, ticketCode(), ascii(guest) || 'KHACH', 'BAN:' + (ascii(table) || '-')].join('|');
+  const text = ['WEDSTORY-CHECKIN', id, ticketCode(), ascii(guest) || 'KHACH', 'BAN:' + (ascii(table) || '-')].join('|');
   if (window.QRCode) new QRCode(box, {text, width:168, height:168, correctLevel: QRCode.CorrectLevel.M});
   else box.textContent = ticketCode();
 }
@@ -431,7 +508,7 @@ Hẹn gặp lại bạn ở tổ ấm nhỏ của chúng mình nhé!`).split('\n
   ${D.opts?.wishes !== false ? `<section><h2 class="t-title reveal">Lời chúc đã nhận</h2><div class="t-sub reveal">Cảm ơn những lời yêu thương</div><div class="wishes" id="wishes"></div></section>` : ''}
   <footer class="t-foot"><div class="t-script reveal">With love,</div>
     <div class="t-script reveal" style="font-size:2rem;margin-top:6px">${g} &amp; ${b}</div>
-    <div class="t-brand">Thiệp được tạo bởi <a href="index.html" target="_blank">Thiệp Hồng</a> · <a href="mau-thiep.html" target="_blank">Tạo thiệp miễn phí</a></div>
+    <div class="t-brand">Thiệp được tạo bởi <a href="index.html" target="_blank">WEDSTORY</a> · <a href="mau-thiep.html" target="_blank">Tạo thiệp miễn phí</a></div>
     ${stageSwitch('after')}</footer>`;
 }
 const photoName = (p, i) => {
@@ -576,6 +653,10 @@ function bind(photos){
   // Nút đi nhanh tới tiệc (thiệp đầy đủ & vé mời)
   const v = venue();
   if ($('#rideBtn')) { $('#rideBtn').onclick = () => openRide(v); $('#parkBtn').onclick = () => openParking(v); }
+
+  // Tự động chạy nội dung
+  $('#autoBtn').onclick = () => tour.on || tour.timer ? tourStop() : tourStart();
+  updateProgress();
 
   // Album kỷ niệm (sau ngày cưới)
   const da = $('#dlAll'); if (da) da.onclick = () => downloadAll(da);
