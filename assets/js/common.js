@@ -160,7 +160,8 @@ document.addEventListener('click', e => {
 
 TH.tplCard = t => `<article class="tpl-card reveal" data-cat="${t.cat}">
   <div class="tpl-thumb"><span class="tier ${t.tier}">${t.tier==='premium'?'PREMIUM':'BASIC'}</span>${TH.miniTpl(t, t.couple)}
-    <div class="overlay"><a class="btn btn-primary btn-sm" href="editor.html?tpl=${t.id}">Dùng mẫu này</a><a class="btn btn-outline btn-sm" href="thiep.html?demo=${t.id}">Xem trước</a></div></div>
+    <span class="tpl-peek" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>Xem mẫu</span></div>
+  <a class="card-link" href="thiep.html?template=${t.id}" aria-label="Xem mẫu ${t.name}"></a>
   <div class="tpl-info"><h3>${t.name}</h3><div class="tpl-stats">${likeBtn(t)}<small title="Lượt xem">👁 ${t.views.toLocaleString('vi-VN')}</small></div></div></article>`;
 
 /* ---------- Hiệu ứng: reveal, count-up, FAQ ---------- */

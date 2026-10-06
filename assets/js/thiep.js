@@ -7,7 +7,9 @@ const isPreview = P.has('preview');
 const guest = (P.get('guest') || P.get('to') || '').trim();
 const table = (P.get('table') || '').trim();
 const isDemo = !P.get('id') && !location.hash.startsWith('#d=');
-let id = P.get('id') || (P.get('demo') ? 'demo-' + P.get('demo') : 'demo');
+/* ?template=<id> (link từ trang Mẫu thiệp); ?demo= giữ cho link cũ */
+const demoTpl = P.get('template') || P.get('demo');
+let id = P.get('id') || (demoTpl ? 'demo-' + demoTpl : 'demo');
 let D, music = null, audioEl = null, cdTimer = null, petalsOn = false;
 /* ?senior=1 trên link: mở sẵn chế độ chữ lớn (tiện gửi cho ông bà, bố mẹ) */
 let senior = P.has('senior') ? P.get('senior') !== '0' : !!TH.store.get('senior', false), wishPhoto = '';
@@ -19,7 +21,7 @@ function load(){
   if (hash) return hash;
   const local = P.get('id') && TH.invites.get(P.get('id'));
   if (local) return local;
-  const tpl = P.get('demo') || 'hong-pastel';
+  const tpl = demoTpl || 'hong-pastel';
   /* Link từ thẻ "Thiệp khách hàng" truyền tên riêng (g/b) → giữ dữ liệu chung; còn lại dùng đúng cặp đôi của mẫu */
   const c = TH.findTemplate(tpl).couple || {};
   const own = (P.get('g') || P.get('b')) && !(P.get('g') === c.groom && P.get('b') === c.bride);
@@ -67,6 +69,9 @@ function render(){
   </div>
   <button class="speak-btn" id="speakBtn" aria-label="Đọc thiệp thành tiếng">🔊 Đọc thiệp thành tiếng</button>
   <div class="read-progress" aria-hidden="true"><i id="progBar"></i></div>
+  ${isDemo && !isPreview ? `<a class="use-tpl" href="editor.html?template=${encodeURIComponent(D.tpl)}" aria-label="Dùng mẫu ${esc(t.name)} để tạo thiệp">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4l5 5L9 20H4v-5z"/><path d="M13 6l5 5"/></svg>
+    <span>Dùng mẫu này</span><small>${esc(t.name)}</small></a>` : ''}
   <div class="autoplay-wrap" role="group" aria-label="Tự động chạy nội dung">
     <button class="autoplay" id="autoBtn" aria-pressed="false" aria-label="Tự động chạy nội dung thiệp"><span class="ic">▶</span><span class="lb">Tự động chạy</span></button>
     <button class="speed-btn" id="speedBtn" aria-label="Tốc độ cuộn: ${SPEEDS[speedIdx]}x — bấm để đổi" title="Đổi tốc độ cuộn (1x · 2x · 4x)">${SPEEDS[speedIdx]}x</button>

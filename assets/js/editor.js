@@ -6,7 +6,7 @@ $('#logo').insertAdjacentHTML('afterbegin', TH.LOGO);
 
 let id = P.get('id');
 let D = id && TH.invites.get(id);
-if (!D) { id = TH.uid(); D = TH.defaultInvite(P.get('tpl') || 'hong-pastel'); history.replaceState(null, '', '?id=' + id); }
+if (!D) { id = TH.uid(); D = TH.defaultInvite(P.get('template') || P.get('tpl') || 'hong-pastel'); history.replaceState(null, '', '?id=' + id); }
 D.events = D.events || []; D.photos = D.photos || []; D.story = D.story || []; D.gift = D.gift || {groom:{}, bride:{}};
 let dirty = false;
 
