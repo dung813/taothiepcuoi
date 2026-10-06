@@ -59,6 +59,7 @@ function render(){
   b.dataset.stage = stage;
 
   const top = `
+  <div class="inv-backdrop" aria-hidden="true" style="background-image:url('${esc(D.cover || photos[0] || '')}')"></div>
   <div class="t-topbar">
     ${isDemo && !isPreview ? `<a class="home-btn" href="index.html" aria-label="Về trang chủ WEDSTORY"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5h13V10"/><path d="M10 19.5v-5h4v5"/></svg><span>Trang chủ</span></a>` : ''}
     ${o.wishes !== false ? '<div class="ticker" id="ticker" aria-label="Hoạt động mới của khách mời"><div class="ticker-track"></div></div>' : '<span></span>'}

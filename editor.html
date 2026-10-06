@@ -12,7 +12,8 @@ body{background:#f6eff1;height:100vh;display:flex;flex-direction:column;overflow
 .ed-top .logo{font-size:1.15rem}.ed-top .logo svg{width:28px;height:28px}
 .ed-top .acts{display:flex;gap:8px;align-items:center}
 .save-state{font-size:.8rem;color:var(--muted)}
-.ed{flex:1;display:grid;grid-template-columns:440px 1fr;min-height:0}
+/* Cột chỉnh sửa luôn hiện, chiếm ~38% (tối thiểu 320px, tối đa 520px); phần còn lại là khung xem trước */
+.ed{flex:1;display:grid;grid-template-columns:clamp(320px,38%,520px) minmax(0,1fr);min-height:0}
 .panel{background:#fff;border-right:1px solid var(--line);overflow-y:auto;padding:14px}
 .stage{display:flex;align-items:center;justify-content:center;padding:20px;position:relative;background:radial-gradient(circle at 30% 20%,#fde8ec,transparent 50%),radial-gradient(circle at 80% 90%,#fbeccf,transparent 50%)}
 .stage .phone{position:relative;width:380px;height:min(780px,calc(100vh - 120px));transform:none;animation:none}
@@ -29,9 +30,11 @@ body{background:#f6eff1;height:100vh;display:flex;flex-direction:column;overflow
 .stage{transition:padding .3s}
 .stage.desktop{padding:64px 24px 20px}
 .stage .phone{transition:width .35s ease,height .35s ease,border-radius .35s ease}
-.stage.desktop .phone{width:min(100%,1100px);height:calc(100vh - 150px);border-radius:14px;padding:30px 8px 8px;background:#2a2326}
+.stage.desktop .phone{width:min(100%,1100px);height:calc(100vh - 150px);border-radius:14px;padding:30px 8px 8px;background:#2a2326;overflow:hidden}
 .stage.desktop .phone::before{content:"";position:absolute;top:11px;left:14px;width:9px;height:9px;border-radius:50%;background:#ff5f57;box-shadow:15px 0 #febc2e,30px 0 #28c840}
-.stage.desktop iframe{border-radius:6px}
+/* Máy tính: dựng thiệp ở độ rộng màn hình thật (1280px) rồi thu nhỏ vừa khung → đúng tỉ lệ, không phóng to chữ/nút */
+.stage.desktop iframe{width:1280px;border-radius:0;transform:scale(var(--pv-scale,.6));transform-origin:0 0}
+.stage{min-width:0}
 .acc{border:1px solid var(--line);border-radius:14px;margin-bottom:10px;overflow:hidden}
 .acc>summary{list-style:none;padding:14px 16px;font-weight:600;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
 .acc>summary::-webkit-details-marker{display:none}
@@ -101,7 +104,7 @@ body{background:#f6eff1;height:100vh;display:flex;flex-direction:column;overflow
 .mini-acc[open]>summary{background:var(--blush);color:var(--rose-d)}
 .mini-acc>.body,.mini-acc>.field{padding:12px 14px;display:grid;gap:10px}
 @media(max-width:420px){.ed-tabs{grid-template-columns:repeat(2,1fr)}.gift-row{grid-template-columns:1fr}.qr-prev{margin:0 auto}.ed-pane .row{grid-template-columns:1fr}}
-@media(max-width:900px){
+@media(max-width:640px){
   .ed{grid-template-columns:1fr}
   .stage{display:none}.show-preview .stage{display:flex}.show-preview .panel{display:none}
   .mobile-tabs{display:flex;gap:6px}

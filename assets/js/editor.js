@@ -225,11 +225,25 @@ panel.addEventListener('click', e => {
 $('#btnView').onclick = () => { save(); location.href = TH.inviteUrl(id, null); };
 $('#btnShare').onclick = () => { save(); TH.shareDialog(id, D); };
 /* Công tắc Điện thoại / Máy tính — nhớ lựa chọn; sau khi khung đổi kích thước thì cuộn lại đúng phần đang sửa */
+/* Máy tính: iframe rộng 1280px (màn hình thật) rồi thu nhỏ vừa khung laptop */
+const DESKTOP_W = 1280;
+function fitPreview(){
+  const ph = $('#stage .phone'), fr = $('#pv');
+  if (!$('#stage').classList.contains('desktop')) { fr.style.removeProperty('--pv-scale'); fr.style.height = ''; return; }
+  const cs = getComputedStyle(ph);
+  const w = ph.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+  const h = ph.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+  const s = Math.min(1, w / DESKTOP_W);
+  fr.style.setProperty('--pv-scale', s);
+  fr.style.height = Math.round(h / s) + 'px';
+}
+new ResizeObserver(fitPreview).observe($('#stage .phone'));
 const setDev = dev => {
   $$('[data-dev]').forEach(x => { const on = x.dataset.dev === dev; x.classList.toggle('active', on); x.setAttribute('aria-pressed', on); });
   $('#stage').classList.toggle('desktop', dev === 'desktop');
+  fitPreview();
   try { localStorage.setItem('ed_dev', dev); } catch {}
-  setTimeout(scrollPreview, 450);
+  setTimeout(() => { fitPreview(); scrollPreview(); }, 450);
 };
 $$('[data-dev]').forEach(b => b.onclick = () => setDev(b.dataset.dev));
 try { if (localStorage.getItem('ed_dev') === 'desktop') setDev('desktop'); } catch {}
