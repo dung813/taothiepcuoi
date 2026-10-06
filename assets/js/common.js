@@ -133,10 +133,35 @@ TH.miniTpl = (t, o={}) => {
     <div class="tm-names" style="font-family:'${t.font}',serif">${TH.esc(o.groom||'Minh Khôi')}<span class="tm-amp" style="color:${t.accent}">&amp;</span>${TH.esc(o.bride||'Thu Hà')}</div>
     <div class="tm-date">${String(d.getDate()).padStart(2,'0')} · ${String(d.getMonth()+1).padStart(2,'0')} · ${d.getFullYear()}</div></div>`;
 };
+/* ---------- Thả tim mẫu thiệp ----------
+   Số tim gốc cố định theo từng mẫu (≈5,5% lượt xem + độ lệch theo id → vài trăm đến ~2.000);
+   mỗi máy chỉ thả được 1 tim / mẫu, lưu ở localStorage để F5 không mất và không spam được. */
+const likedSet = () => TH.store.get('likedTpl', {});
+const baseLikes = t => { let h = 0; for (const c of t.id) h = (h * 31 + c.charCodeAt(0)) >>> 0; return Math.round(t.views * .055) + h % 140; };
+TH.tplLikes = t => baseLikes(t) + (likedSet()[t.id] ? 1 : 0);
+const likeBtn = t => { const on = !!likedSet()[t.id];
+  return `<button type="button" class="like-btn${on ? ' on' : ''}" data-like="${t.id}" aria-pressed="${on}" aria-label="${on ? 'Bỏ thả tim' : 'Thả tim'} mẫu ${t.name}" title="${on ? 'Bạn đã thả tim mẫu này' : 'Thả tim mẫu này'}">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3.1 4.5 6.9 4.5c2.1 0 3.6 1.1 5.1 3 1.5-1.9 3-3 5.1-3 3.8 0 6 3.9 4.5 7.3C19.5 16.4 12 21 12 21z"/></svg>
+    <span>${TH.tplLikes(t).toLocaleString('vi-VN')}</span></button>`; };
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-like]'); if (!b) return;
+  e.preventDefault(); e.stopPropagation();
+  const t = TH.findTemplate(b.dataset.like), liked = likedSet(), on = !liked[t.id];
+  if (on) liked[t.id] = Date.now(); else delete liked[t.id];
+  TH.store.set('likedTpl', liked);
+  // Cập nhật mọi thẻ của mẫu này trên trang (trang chủ có thể hiện cùng mẫu ở nhiều chỗ)
+  $$(`[data-like="${t.id}"]`).forEach(x => {
+    x.classList.toggle('on', on); x.setAttribute('aria-pressed', on);
+    x.setAttribute('aria-label', `${on ? 'Bỏ thả tim' : 'Thả tim'} mẫu ${t.name}`);
+    $('span', x).textContent = TH.tplLikes(t).toLocaleString('vi-VN');
+    x.classList.remove('pop'); void x.offsetWidth; if (on) x.classList.add('pop');
+  });
+});
+
 TH.tplCard = t => `<article class="tpl-card reveal" data-cat="${t.cat}">
   <div class="tpl-thumb"><span class="tier ${t.tier}">${t.tier==='premium'?'PREMIUM':'BASIC'}</span>${TH.miniTpl(t, t.couple)}
     <div class="overlay"><a class="btn btn-primary btn-sm" href="editor.html?tpl=${t.id}">Dùng mẫu này</a><a class="btn btn-outline btn-sm" href="thiep.html?demo=${t.id}">Xem trước</a></div></div>
-  <div class="tpl-info"><h3>${t.name}</h3><small>👁 ${t.views.toLocaleString('vi-VN')}</small></div></article>`;
+  <div class="tpl-info"><h3>${t.name}</h3><div class="tpl-stats">${likeBtn(t)}<small title="Lượt xem">👁 ${t.views.toLocaleString('vi-VN')}</small></div></div></article>`;
 
 /* ---------- Hiệu ứng: reveal, count-up, FAQ ---------- */
 TH.reveal = (root=document) => {

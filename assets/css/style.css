@@ -118,6 +118,18 @@ h1,h2,h3{font-family:var(--f-head);line-height:1.2;font-weight:600}
 .tpl-info{padding:14px 16px;display:flex;justify-content:space-between;align-items:center;gap:8px}
 .tpl-info h3{font-family:var(--f-body);font-size:.98rem;font-weight:600}
 .tpl-info small{color:var(--muted);font-size:.8rem;display:flex;align-items:center;gap:4px}
+.tpl-info h3{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tpl-stats{display:flex;align-items:center;gap:10px;flex:0 0 auto}
+/* Nút thả tim trên thẻ mẫu */
+.like-btn{display:inline-flex;align-items:center;gap:4px;padding:4px 8px;margin:-4px -2px;border:0;border-radius:999px;background:transparent;color:var(--muted);font:600 .8rem var(--f-body);cursor:pointer;transition:background .2s,color .2s}
+.like-btn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;transition:fill .2s,transform .2s}
+.like-btn:hover{background:#fdecef;color:#e0315a}
+.like-btn:hover svg{transform:scale(1.12)}
+.like-btn.on{color:#e0315a}
+.like-btn.on svg{fill:#e0315a;stroke:#e0315a}
+.like-btn.pop svg{animation:likePop .45s cubic-bezier(.3,1.6,.5,1)}
+@keyframes likePop{0%{transform:scale(1)}40%{transform:scale(1.55)}100%{transform:scale(1)}}
+.like-btn:focus-visible{outline:2px solid #e0315a;outline-offset:2px}
 
 /* Features */
 .features{display:grid;grid-template-columns:repeat(3,1fr);gap:26px}
