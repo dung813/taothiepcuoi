@@ -190,7 +190,7 @@ function render(){
   <button class="fab fab-music" id="musicBtn" aria-label="Nhạc nền">🎵</button>
   ${o.wishes !== false && stage === 'before' ? '<button class="fab fab-wish" id="wishBtn" aria-label="Gửi lời chúc">💬</button>' : ''}
   ${o.gift !== false ? '<button class="fab fab-gift" id="giftBtn" aria-label="Mừng cưới">🎁</button>' : ''}
-  <div class="lightbox" id="lb"><button class="lb-x">×</button><button class="lb-prev">‹</button><img alt=""><button class="lb-next">›</button><span class="lb-n"></span></div>`;
+  <div class="lightbox" id="lb"><div class="lb-stage"><img alt="" draggable="false"></div><button class="lb-prev" aria-label="Ảnh trước">‹</button><button class="lb-next" aria-label="Ảnh sau">›</button><div class="lb-tools"><button class="lb-zout" aria-label="Thu nhỏ" title="Thu nhỏ (−)">−</button><span class="lb-zv">100%</span><button class="lb-zin" aria-label="Phóng to" title="Phóng to (+)">+</button><button class="lb-fs" aria-label="Toàn màn hình" title="Toàn màn hình"><svg class="ic-in" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><svg class="ic-out" viewBox="0 0 24 24"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg></button><button class="lb-x" aria-label="Đóng">×</button></div><span class="lb-n"></span></div>`;
 
   bind(photos);
   if (stage === 'today') drawTicketQr();
@@ -617,15 +617,166 @@ function bind(photos){
 
   $('#musicBtn').onclick = () => (music?.on || (audioEl && !audioEl.paused)) ? stopMusic() : playMusic();
 
-  // Lightbox
-  const lb = $('#lb'); let cur = 0;
-  const show = i => { cur = (i + photos.length) % photos.length; $('img', lb).src = photos[cur]; $('.lb-n', lb).textContent = `${cur+1} / ${photos.length}`; lb.classList.add('open'); };
+  // Lightbox: zoom bằng nút / lăn chuột / chụm 2 ngón, kéo để xem góc ảnh, toàn màn hình
+  const lb = $('#lb'), stage = $('.lb-stage', lb), lbImg = $('img', lb); let cur = 0;
+  const Z = {s:1, x:0, y:0}, MAXZ = 5;
+  const lbCenter = () => { const r = stage.getBoundingClientRect(); return [r.left + r.width/2, r.top + r.height/2]; };
+  const renderZ = anim => {
+    lbImg.classList.toggle('anim', !!anim);
+    lbImg.style.transform = `translate3d(${Z.x}px,${Z.y}px,0) scale(${Z.s})`;
+    lb.classList.toggle('zoomed', Z.s > 1.001);
+    $('.lb-zv', lb).textContent = Math.round(Z.s * 100) + '%';
+  };
+  // Giữ ảnh không bị kéo lệch ra ngoài khung
+  const clampZ = () => {
+    const r = stage.getBoundingClientRect();
+    const mx = Math.max(0, (lbImg.offsetWidth * Z.s - r.width) / 2), my = Math.max(0, (lbImg.offsetHeight * Z.s - r.height) / 2);
+    Z.x = Math.min(mx, Math.max(-mx, Z.x)); Z.y = Math.min(my, Math.max(-my, Z.y));
+  };
+  // Zoom quanh điểm (px, py) trên màn hình: điểm đó đứng yên dưới con trỏ / ngón tay
+  const zoomTo = (ns, px, py, anim) => {
+    ns = Math.min(MAXZ, Math.max(1, ns));
+    const [cx, cy] = lbCenter();
+    const dx = (px ?? cx) - cx, dy = (py ?? cy) - cy, k = ns / Z.s;
+    Z.x = dx - (dx - Z.x) * k; Z.y = dy - (dy - Z.y) * k; Z.s = ns;
+    if (ns === 1) Z.x = Z.y = 0;
+    clampZ(); renderZ(anim);
+  };
+  const resetZ = anim => { Z.s = 1; Z.x = Z.y = 0; renderZ(anim); };
+  const show = i => {
+    cur = (i + photos.length) % photos.length; resetZ();
+    lbImg.style.animation = 'none'; lbImg.offsetWidth; lbImg.style.animation = '';
+    lbImg.src = photos[cur]; $('.lb-n', lb).textContent = `${cur+1} / ${photos.length}`; lb.classList.add('open');
+  };
+  const fsEl = () => document.fullscreenElement || document.webkitFullscreenElement;
+  const exitFs = () => { try { (document.exitFullscreen || document.webkitExitFullscreen).call(document)?.catch?.(() => {}); } catch {} };
+  const closeLb = () => { if (fsEl() === lb) exitFs(); lb.classList.remove('open'); resetZ(); };
   $$('.album img, .album-all img').forEach(im => im.onclick = () => show(+im.dataset.i));
-  $('.lb-x', lb).onclick = () => lb.classList.remove('open');
+  $('.lb-x', lb).onclick = closeLb;
   $('.lb-prev', lb).onclick = () => show(cur-1); $('.lb-next', lb).onclick = () => show(cur+1);
-  lb.onclick = e => { if (e.target === lb) lb.classList.remove('open'); };
-  document.onkeydown = e => { if (!lb.classList.contains('open')) return; if (e.key==='Escape') lb.classList.remove('open'); if (e.key==='ArrowLeft') show(cur-1); if (e.key==='ArrowRight') show(cur+1); };
-  let sx = 0; lb.ontouchstart = e => sx = e.touches[0].clientX; lb.ontouchend = e => { const dx = e.changedTouches[0].clientX - sx; if (Math.abs(dx) > 50) show(cur + (dx < 0 ? 1 : -1)); };
+  $('.lb-zin', lb).onclick = () => zoomTo(Z.s * 1.5, null, null, true);
+  $('.lb-zout', lb).onclick = () => zoomTo(Z.s / 1.5, null, null, true);
+  const fsBtn = $('.lb-fs', lb);
+  if (!(lb.requestFullscreen || lb.webkitRequestFullscreen)) fsBtn.hidden = true;
+  fsBtn.onclick = () => {
+    if (fsEl()) return exitFs();
+    try { (lb.requestFullscreen || lb.webkitRequestFullscreen).call(lb)?.catch?.(() => {}); } catch {}
+  };
+  ['fullscreenchange', 'webkitfullscreenchange'].forEach(t => document.addEventListener(t, () => { lb.classList.toggle('fs', fsEl() === lb); resetZ(); }));
+  let noClickUntil = 0;
+  lb.onclick = e => { if ((e.target === lb || e.target === stage) && Date.now() > noClickUntil) closeLb(); };
+  document.onkeydown = e => {
+    if (!lb.classList.contains('open')) return;
+    if (e.key==='Escape') closeLb();
+    if (e.key==='ArrowLeft') show(cur-1); if (e.key==='ArrowRight') show(cur+1);
+    if (e.key==='+' || e.key==='=') zoomTo(Z.s * 1.5, null, null, true);
+    if (e.key==='-') zoomTo(Z.s / 1.5, null, null, true);
+    if (e.key==='0') resetZ(true);
+  };
+
+  // Máy tính: lăn chuột trên ảnh để zoom, giữ chuột kéo ảnh đang zoom, nhấp đúp để zoom nhanh
+  lb.addEventListener('wheel', e => {
+    e.preventDefault();
+    if (e.target !== lbImg) return;
+    const step = e.deltaMode ? e.deltaY * 33 : e.deltaY;
+    zoomTo(Z.s * Math.exp(-step * 0.0015), e.clientX, e.clientY);
+  }, {passive:false});
+  let drag = null, lastTouch = 0;
+  lbImg.addEventListener('mousedown', e => {
+    if (e.button || Z.s <= 1) return;
+    e.preventDefault();
+    drag = {px:e.clientX, py:e.clientY, x:Z.x, y:Z.y, moved:false}; lb.classList.add('dragging');
+  });
+  addEventListener('mousemove', e => {
+    if (!drag) return;
+    Z.x = drag.x + e.clientX - drag.px; Z.y = drag.y + e.clientY - drag.py;
+    if (Math.abs(e.clientX - drag.px) + Math.abs(e.clientY - drag.py) > 4) drag.moved = true;
+    clampZ(); renderZ();
+  });
+  addEventListener('mouseup', () => {
+    if (!drag) return;
+    if (drag.moved) noClickUntil = Date.now() + 300;
+    drag = null; lb.classList.remove('dragging');
+  });
+  lbImg.addEventListener('dblclick', e => {
+    if (Date.now() - lastTouch < 800) return;   // điện thoại đã tự xử lý chạm đúp
+    Z.s > 1 ? resetZ(true) : zoomTo(2.5, e.clientX, e.clientY, true);
+  });
+
+  // Điện thoại: chụm 2 ngón để zoom tại chỗ, 1 ngón kéo xem góc ảnh khi đang zoom.
+  // Quẹt chuyển ảnh CHỈ chạy khi ảnh ở kích thước gốc (scale 1) và cả cử chỉ chưa từng có 2 ngón.
+  let G = null, multi = false, lastTap = 0;
+  const tDist = (a, b) => Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY) || 1;
+  const startPinch = ts => {
+    const [cx, cy] = lbCenter(), a = ts[0], b = ts[1];
+    if (Z.s <= 1) Z.x = Z.y = 0;   // bỏ phần lệch do đang quẹt dở
+    G = {mode:'pinch', d:tDist(a, b), s:Z.s, x:Z.x, y:Z.y,
+         mx:(a.clientX + b.clientX)/2 - cx, my:(a.clientY + b.clientY)/2 - cy};
+  };
+  const startPan = t => G = {mode:'pan', px:t.clientX, py:t.clientY, x:Z.x, y:Z.y, moved:false};
+  lb.addEventListener('touchstart', e => {
+    lastTouch = Date.now();
+    if (e.target.closest('button')) return;
+    const ts = e.touches;
+    if (ts.length > 1) { multi = true; startPinch(ts); renderZ(); }
+    else if (Z.s > 1) startPan(ts[0]);
+    else if (!multi) G = {mode:'swipe', sx:ts[0].clientX, sy:ts[0].clientY, dx:0, dy:0, lock:null, moved:false};
+  }, {passive:false});
+  lb.addEventListener('touchmove', e => {
+    if (!G) return;
+    e.preventDefault();
+    const ts = e.touches;
+    if (G.mode === 'pinch' && ts.length > 1) {
+      const [cx, cy] = lbCenter(), a = ts[0], b = ts[1];
+      const ns = Math.min(MAXZ * 1.2, Math.max(.8, G.s * tDist(a, b) / G.d)), k = ns / G.s;
+      const mx = (a.clientX + b.clientX)/2 - cx, my = (a.clientY + b.clientY)/2 - cy;
+      Z.s = ns; Z.x = mx - (G.mx - G.x) * k; Z.y = my - (G.my - G.y) * k;
+      renderZ();
+    } else if (G.mode === 'pan') {
+      const dx = ts[0].clientX - G.px, dy = ts[0].clientY - G.py;
+      if (Math.abs(dx) + Math.abs(dy) > 8) G.moved = true;
+      Z.x = G.x + dx; Z.y = G.y + dy;
+      clampZ(); renderZ();
+    } else if (G.mode === 'swipe') {
+      G.dx = ts[0].clientX - G.sx; G.dy = ts[0].clientY - G.sy;
+      if (Math.abs(G.dx) + Math.abs(G.dy) > 8) G.moved = true;
+      if (!G.lock && G.moved) G.lock = Math.abs(G.dx) > Math.abs(G.dy) ? 'x' : 'y';
+      if (G.lock === 'x') { Z.x = G.dx; renderZ(); }   // ảnh chạy theo ngón tay
+    }
+  }, {passive:false});
+  // Chạm đúp vào ảnh: đang gốc thì zoom 2.5x tại chỗ chạm, đang zoom thì về gốc
+  const doubleTap = (e, g) => {
+    if (g.moved || multi || e.target !== lbImg) return false;
+    const now = Date.now(), t = e.changedTouches[0];
+    if (now - lastTap < 300) { lastTap = 0; Z.s > 1 ? resetZ(true) : zoomTo(2.5, t.clientX, t.clientY, true); return true; }
+    lastTap = now; return false;
+  };
+  const touchEnd = e => {
+    const ts = e.touches;
+    if (ts.length > 1) { startPinch(ts); return; }
+    if (ts.length === 1) {   // nhấc 1 trong 2 ngón: đang zoom thì chuyển sang kéo, không bao giờ quẹt
+      if (Z.s > 1) { startPan(ts[0]); G.moved = true; } else G = {mode:'hold'};
+      return;
+    }
+    // Đã nhấc hết ngón
+    const g = G; G = null;
+    if (!g) { multi = false; return; }
+    if (g.mode === 'swipe' && !multi && Z.s === 1) {
+      if (g.lock === 'x' && Math.abs(g.dx) > 50) show(cur + (g.dx < 0 ? 1 : -1));
+      else if (g.moved) resetZ(true);
+      else doubleTap(e, g);
+    } else {
+      if (g.moved || multi) noClickUntil = Date.now() + 400;
+      if (!doubleTap(e, g)) {
+        if (Z.s < 1.05) resetZ(true);   // chụm nhỏ hơn gốc thì bật về đúng kích thước gốc
+        else { Z.s = Math.min(MAXZ, Z.s); clampZ(); renderZ(true); }
+      }
+    }
+    multi = false;
+  };
+  lb.addEventListener('touchend', touchEnd);
+  lb.addEventListener('touchcancel', touchEnd);
+  lb.addEventListener('gesturestart', e => e.preventDefault());   // iOS: chặn zoom cả trang
 
   // RSVP: câu hỏi nối tiếp theo lựa chọn của khách
   const rs = $('#rsvp');
