@@ -44,13 +44,14 @@ function render(){
 
   $('#app').innerHTML = `
   ${o.envelope !== false && !isPreview ? `<div class="envelope-wrap" id="env">
+    <div class="env-sparkles" aria-hidden="true">${Array.from({length:14},(_,i)=>`<i style="--x:${(i*37)%100}%;--y:${(i*61+13)%100}%;--d:${(i%5)*.6}s;--s:${.6+(i%3)*.35}"></i>`).join('')}</div>
     <div class="env-guest"><small>Thân gửi</small><div>${esc(guest || 'Quý khách')}</div></div>
-    <div class="envelope" id="envelope"><div class="env-body"></div><div class="env-letter"><span>Save the date</span><b>${esc(D.groom.nick)} & ${esc(D.bride.nick)}</b><span>${dateStr}</span></div><div class="env-flap"></div><div class="env-seal">♥</div></div>
+    <div class="envelope" id="envelope" role="button" tabindex="0" aria-label="Mở thiệp"><div class="env-body"></div><div class="env-letter"><span>Save the date</span><b>${esc(D.groom.nick)}<i>&amp;</i>${esc(D.bride.nick)}</b><span>${dateStr}</span></div><div class="env-flap"></div><div class="env-seal">♥</div></div>
     <button class="t-btn" id="openEnv">💌 Mở thiệp</button></div>` : ''}
 
-  <section class="t-hero"><div class="bg" style="background-image:url('${esc(D.cover || photos[0] || '')}')"></div>
-    <div class="in"><div class="t-sub" style="margin-bottom:10px;opacity:.9">We're getting married</div>
-    <div class="names">${esc(D.groom.nick)}<span>&amp;</span>${esc(D.bride.nick)}</div><div class="date">${dateStr}</div></div><div class="scroll"></div></section>
+  <section class="t-hero${isPreview ? '' : ' intro'}" id="hero"><div class="bg" style="background-image:url('${esc(D.cover || photos[0] || '')}')"></div><div class="flash"></div>
+    <div class="in"><div class="t-sub kick" style="margin-bottom:10px">We're getting married</div>
+    <div class="names"><span class="nm g">${esc(D.groom.nick)}</span><span class="amp">&amp;</span><span class="nm b">${esc(D.bride.nick)}</span></div><div class="date">${dateStr}</div></div><div class="scroll"></div></section>
 
   <section>
     ${D.quote ? `<p class="reveal" style="font-style:italic;opacity:.8;max-width:380px;margin:0 auto">“${esc(D.quote)}”</p><div class="divider"></div>` : ''}
@@ -148,10 +149,47 @@ function renderWishes(){
   box.innerHTML = list.map(w=>`<div class="wish"><small>${new Date(w.at).toLocaleDateString('vi-VN')}</small><b>${esc(w.name)}</b><p>${esc(w.msg)}</p></div>`).join('');
 }
 
+/* ---------- Hiệu ứng mở thiệp ---------- */
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+function heartBurst(from){
+  const r = from.getBoundingClientRect(), cx = r.left + r.width/2, cy = r.top + r.height/2;
+  for (let i = 0; i < 14; i++) {
+    const h = document.createElement('span'), a = (i / 14) * Math.PI * 2, dist = 90 + Math.random() * 70;
+    h.className = 'heart-pop'; h.textContent = ['♥','❤','✦'][i % 3];
+    h.style.cssText = `left:${cx}px;top:${cy}px;--dx:${Math.cos(a)*dist}px;--dy:${Math.sin(a)*dist}px;--r:${(Math.random()-.5)*120}deg;animation-delay:${Math.random()*.12}s`;
+    document.body.append(h); setTimeout(()=>h.remove(), 1500);
+  }
+}
+function confetti(){
+  const box = document.createElement('div'); box.className = 'confetti'; box.setAttribute('aria-hidden','true');
+  const cs = getComputedStyle(document.body), colors = [cs.getPropertyValue('--t-accent').trim(), '#ffffff', '#f6d58e', '#f4b6c2'];
+  box.innerHTML = Array.from({length:70}, (_, i) => `<i style="left:${Math.random()*100}%;background:${colors[i%colors.length]};--w:${5+Math.random()*6}px;--h:${8+Math.random()*10}px;--dx:${(Math.random()-.5)*160}px;--rot:${360+Math.random()*720}deg;animation-duration:${2.6+Math.random()*2}s;animation-delay:${Math.random()*.9}s;border-radius:${i%3?'2px':'50%'}"></i>`).join('');
+  document.body.append(box); setTimeout(()=>box.remove(), 6000);
+}
+function playIntro(){
+  const h = $('#hero'); if (!h || !h.classList.contains('intro')) return;
+  requestAnimationFrame(()=>h.classList.add('play'));
+  if (!reduceMotion) setTimeout(confetti, 900);
+}
+
 /* ---------- Sự kiện ---------- */
 function bind(photos){
   const env = $('#env');
-  if (env) $('#openEnv').onclick = () => { $('#envelope').classList.add('open'); playMusic(); setTimeout(()=>env.classList.add('gone'), 1900); setTimeout(()=>env.remove(), 3000); };
+  if (env) {
+    const open = () => {
+      if (env.classList.contains('opening')) return;
+      env.classList.add('opening'); playMusic();
+      if (reduceMotion) { env.classList.add('gone'); setTimeout(()=>{ env.remove(); playIntro(); }, 400); return; }
+      heartBurst($('.env-seal'));
+      $('#envelope').classList.add('open');
+      setTimeout(()=>env.classList.add('zoom'), 1900);
+      setTimeout(()=>{ env.classList.add('gone'); playIntro(); }, 2500);
+      setTimeout(()=>env.remove(), 3600);
+    };
+    $('#openEnv').onclick = open;
+    $('#envelope').onclick = open;
+    $('#envelope').onkeydown = e => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), open());
+  } else if (!isPreview) playIntro();
 
   $('#musicBtn').onclick = () => (music?.on || (audioEl && !audioEl.paused)) ? stopMusic() : playMusic();
 
