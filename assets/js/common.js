@@ -20,11 +20,9 @@ TH.LOGO = LOGO;
 const NAV = [
   ['index.html','Trang chủ'],
   ['mau-thiep.html','Mẫu thiệp'],
-  ['cam-nang.html','Cẩm nang'],
-  ['thiep-da-tao.html','Thiệp đã tạo'],
   ['bang-gia.html','Bảng giá'],
-  ['lien-he.html','Liên hệ'],
-  ['bang-gia.html#tron-goi','Tạo thiệp trọn gói','nav-hl']
+  ['cam-nang.html','Cẩm nang'],
+  ['bang-gia.html#tron-goi','Tạo thiệp trọn gói <span class="hot">HOT</span>','nav-hl']
 ];
 
 function header(){
@@ -60,7 +58,8 @@ function footer(){
       <li><a href="bang-gia.html#tron-goi">Thiệp trọn gói</a></li><li><a href="bang-gia.html">Bảng giá</a></li>
       <li><a href="lien-he.html">Chương trình đối tác</a></li></ul></div>
     <div><h4>Cẩm nang</h4><ul>${TH.POSTS.slice(0,5).map(p=>`<li><a href="bai-viet.html?slug=${p.slug}">${TH.esc(p.title.length>38?p.title.slice(0,38)+'…':p.title)}</a></li>`).join('')}</ul></div>
-    <div><h4>Chính sách</h4><ul>
+    <div><h4>Hỗ trợ &amp; chính sách</h4><ul>
+      <li><a href="lien-he.html" class="ft-contact">Liên hệ với chúng tôi →</a></li>
       <li><a href="chinh-sach.html#bao-mat">Chính sách bảo mật</a></li><li><a href="chinh-sach.html#dieu-khoan">Điều khoản dịch vụ</a></li>
       <li><a href="chinh-sach.html#thanh-toan">Thanh toán &amp; hoàn tiền</a></li><li><a href="chinh-sach.html#noi-dung">Chính sách nội dung</a></li>
       <li><a href="lien-he.html">hello@thiephong.vn</a></li></ul></div>
