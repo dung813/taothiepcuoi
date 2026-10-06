@@ -292,6 +292,28 @@ h1,h2,h3{font-family:var(--f-head);line-height:1.2;font-weight:600}
 @media(max-width:860px){.footer-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:520px){.footer-grid{grid-template-columns:1fr}}
 
+/* Testimonials */
+.testi-section{background:linear-gradient(180deg,var(--bg),var(--blush) 55%,var(--bg))}
+.testi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
+.testi-card{position:relative;background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:28px 24px 22px;display:flex;flex-direction:column;gap:14px;overflow:hidden}
+.testi-card::before{content:"\201C";position:absolute;top:-18px;right:14px;font-family:var(--f-head);font-size:7rem;line-height:1;color:var(--rose-l);pointer-events:none}
+.testi-card.reveal.in{transition:opacity .8s ease,transform .4s ease,box-shadow .4s ease,border-color .4s ease}
+.testi-card.reveal.in:hover{transform:translateY(-6px);box-shadow:var(--shadow);border-color:transparent}
+.testi-top{display:flex;align-items:center;gap:12px;position:relative}
+.testi-top h3{font-family:var(--f-body);font-size:1rem;font-weight:600;margin-bottom:4px}
+.testi-avatar{width:52px;height:52px;flex:0 0 auto;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:.95rem;letter-spacing:.03em;background:var(--av,var(--rose));box-shadow:0 0 0 3px #fff,0 0 0 5px var(--rose-l)}
+.testi-role{display:inline-block;font-size:.74rem;font-weight:600;padding:3px 10px;border-radius:999px}
+.role-couple{background:var(--blush);color:var(--rose-d)}
+.role-guest{background:#e6f1f8;color:#2f6a92}
+.role-parent{background:#f8efe1;color:#8a6234}
+.role-partner{background:#efebf8;color:#5d4a96}
+.testi-stars{color:var(--gold);letter-spacing:.15em;font-size:1rem}
+.testi-card blockquote{color:var(--muted);font-size:.93rem;line-height:1.7;flex:1;position:relative}
+.testi-tpl{align-self:flex-start;font-size:.82rem;color:var(--rose);padding-top:12px;border-top:1px dashed var(--line);width:100%;transition:color .25s}
+.testi-tpl:hover{color:var(--rose-d)}
+@media(max-width:1060px){.testi-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.testi-grid{grid-template-columns:1fr;gap:18px}.testi-card{padding:24px 20px 20px}}
+
 /* Reveal animation */
 .reveal{opacity:0;transform:translateY(34px);transition:opacity .8s ease,transform .8s ease}
 .reveal.in{opacity:1;transform:none}
