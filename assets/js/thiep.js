@@ -80,7 +80,9 @@ function render(){
     <div class="in">${guest ? `<div class="guest-pill">Thân mời <b>${esc(guest)}</b>${table ? ` · Bàn ${esc(table)}` : ''}</div>` : ''}<div class="t-sub kick" style="margin-bottom:10px">We're getting married</div>
     <div class="names"><span class="nm g">${esc(D.groom.nick)}</span><span class="amp">&amp;</span><span class="nm b">${esc(D.bride.nick)}</span></div><div class="date">${dateStr}</div></div><div class="scroll"></div></section>
 
-  <section>
+  <section class="sec-couple">
+    <div class="couple-photo reveal left" style="background-image:url('${esc(photos[1] || D.cover || photos[0] || '')}')" aria-hidden="true"></div>
+    <div class="couple-info">
     ${D.quote ? `<p class="reveal" style="font-style:italic;opacity:.8;max-width:380px;margin:0 auto">“${esc(D.quote)}”</p><div class="divider"></div>` : ''}
     <div class="couple">
       <div class="p reveal left"><div class="role">Nhà trai</div><small>${esc(D.groom.father)}<br>${esc(D.groom.mother)}</small></div><span></span>
@@ -94,6 +96,7 @@ function render(){
     </div>
     ${guest ? `<div class="guest-line reveal"><small style="letter-spacing:.2em;text-transform:uppercase;font-size:.7rem;opacity:.7">Kính mời</small><b>${esc(guest)}</b>${table ? `<span class="guest-table">🎟 Bàn số ${esc(table)}</span>` : ''}</div>` : ''}
     <p class="reveal" style="margin-top:24px;opacity:.85;line-height:1.8">${esc(D.message)}</p>
+    </div>
   </section>
 
   ${o.countdown !== false ? `<section style="padding-top:20px"><h2 class="t-title reveal">Đếm ngược</h2><div class="t-sub reveal">Đến ngày chung đôi</div>
@@ -101,7 +104,7 @@ function render(){
 
   ${o.calendar !== false && !isNaN(wd) ? `<section style="padding-top:10px"><div class="card cal reveal">${calendar(wd)}</div></section>` : ''}
 
-  <section><h2 class="t-title reveal">Sự kiện cưới</h2><div class="t-sub reveal">Thời gian & địa điểm</div>
+  <section class="sec-events"><h2 class="t-title reveal">Sự kiện cưới</h2><div class="t-sub reveal">Thời gian & địa điểm</div>
     <div class="events">${(D.events||[]).filter(e=>e.title).map((e,i)=>`<div class="card event reveal ${i%2?'right':'left'}">
       <h3>${esc(e.title)}</h3><div class="when">${fmtTime(e.time)}</div><div class="where"><b>${esc(e.place)}</b><br>${esc(e.address)}</div>
       <div class="acts"><a class="t-btn" target="_blank" href="${esc(mapUrl(e))}">📍 Chỉ đường</a><a class="t-btn ghost" target="_blank" href="${esc(gcal(e))}">📅 Lưu lịch</a></div></div>`).join('')}</div>
@@ -114,13 +117,13 @@ function render(){
       </div></div>` : ''}
   </section>
 
-  ${o.story !== false && (D.story||[]).length ? `<section><h2 class="t-title reveal">Chuyện tình yêu</h2><div class="t-sub reveal">Our love story</div>
+  ${o.story !== false && (D.story||[]).length ? `<section class="sec-story"><h2 class="t-title reveal">Chuyện tình yêu</h2><div class="t-sub reveal">Our love story</div>
     <div class="timeline">${D.story.filter(s=>s.title).map(s=>`<div class="tl-item reveal"><div class="y">${esc(s.date)}</div><h4>${esc(s.title)}</h4><p>${esc(s.text)}</p></div>`).join('')}</div></section>` : ''}
 
-  ${o.album !== false && photos.length ? `<section><h2 class="t-title reveal">Album ảnh cưới</h2><div class="t-sub reveal">Khoảnh khắc hạnh phúc</div>
+  ${o.album !== false && photos.length ? `<section class="sec-album"><h2 class="t-title reveal">Album ảnh cưới</h2><div class="t-sub reveal">Khoảnh khắc hạnh phúc</div>
     <div class="album">${photos.map((p,i)=>`<img class="reveal zoom" loading="lazy" src="${esc(p)}" data-i="${i}" alt="Ảnh cưới ${i+1}">`).join('')}</div></section>` : ''}
 
-  ${o.rsvp !== false ? `<section><h2 class="t-title reveal">Xác nhận tham dự</h2><div class="t-sub reveal">Vui lòng phản hồi trước ngày cưới</div>
+  ${o.rsvp !== false ? `<section class="sec-rsvp"><h2 class="t-title reveal">Xác nhận tham dự</h2><div class="t-sub reveal">Vui lòng phản hồi trước ngày cưới</div>
     <form class="t-form card reveal" id="rsvp" novalidate>
       <input name="name" placeholder="Họ tên của bạn *" required value="${esc(guest||'')}">
       <input name="phone" type="tel" inputmode="tel" placeholder="Số điện thoại">

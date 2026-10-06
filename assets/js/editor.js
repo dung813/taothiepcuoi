@@ -224,7 +224,15 @@ panel.addEventListener('click', e => {
 /* ---------- Thanh công cụ ---------- */
 $('#btnView').onclick = () => { save(); location.href = TH.inviteUrl(id, null); };
 $('#btnShare').onclick = () => { save(); TH.shareDialog(id, D); };
-$$('[data-dev]').forEach(b => b.onclick = () => { $$('[data-dev]').forEach(x=>x.classList.toggle('active', x===b)); $('#stage').classList.toggle('desktop', b.dataset.dev==='desktop'); });
+/* Công tắc Điện thoại / Máy tính — nhớ lựa chọn; sau khi khung đổi kích thước thì cuộn lại đúng phần đang sửa */
+const setDev = dev => {
+  $$('[data-dev]').forEach(x => { const on = x.dataset.dev === dev; x.classList.toggle('active', on); x.setAttribute('aria-pressed', on); });
+  $('#stage').classList.toggle('desktop', dev === 'desktop');
+  try { localStorage.setItem('ed_dev', dev); } catch {}
+  setTimeout(scrollPreview, 450);
+};
+$$('[data-dev]').forEach(b => b.onclick = () => setDev(b.dataset.dev));
+try { if (localStorage.getItem('ed_dev') === 'desktop') setDev('desktop'); } catch {}
 $$('[data-tab]').forEach(b => b.onclick = () => { $$('[data-tab]').forEach(x=>x.classList.toggle('active', x===b)); document.body.classList.toggle('show-preview', b.dataset.tab==='preview'); push(); setTimeout(scrollPreview, 300); });
 
 build(); save();

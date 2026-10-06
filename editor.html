@@ -17,9 +17,21 @@ body{background:#f6eff1;height:100vh;display:flex;flex-direction:column;overflow
 .stage{display:flex;align-items:center;justify-content:center;padding:20px;position:relative;background:radial-gradient(circle at 30% 20%,#fde8ec,transparent 50%),radial-gradient(circle at 80% 90%,#fbeccf,transparent 50%)}
 .stage .phone{position:relative;width:380px;height:min(780px,calc(100vh - 120px));transform:none;animation:none}
 .stage iframe{width:100%;height:100%;border:0;border-radius:30px;background:#fff}
-.dev-switch{position:absolute;top:14px;right:18px;display:flex;gap:6px}
-.stage.desktop .phone{width:min(100%,1000px);border-radius:14px;padding:6px}
-.stage.desktop iframe{border-radius:10px}
+/* Công tắc Điện thoại / Máy tính */
+.dev-switch{position:absolute;top:14px;right:18px;z-index:3;display:flex;padding:4px;border-radius:999px;background:rgba(255,255,255,.75);backdrop-filter:blur(8px);border:1px solid var(--line);box-shadow:0 6px 18px rgba(166,58,84,.12)}
+.dev-btn{position:relative;display:flex;align-items:center;gap:6px;padding:8px 14px;border:0;border-radius:999px;background:transparent;color:var(--muted);font:600 .82rem var(--f-body);cursor:pointer;transition:background .25s,color .25s}
+.dev-btn svg{width:18px;height:18px}
+.dev-btn:hover{color:var(--rose-d)}
+.dev-btn.active{background:var(--rose);color:#fff;box-shadow:0 4px 12px rgba(200,80,106,.3)}
+.dev-btn::after{content:attr(data-tip);position:absolute;top:calc(100% + 8px);right:0;white-space:nowrap;background:var(--ink);color:#fff;font-size:.75rem;font-weight:500;padding:6px 10px;border-radius:8px;opacity:0;transform:translateY(-4px);pointer-events:none;transition:.2s}
+.dev-btn:hover::after,.dev-btn:focus-visible::after{opacity:1;transform:none}
+/* Chế độ máy tính: khung laptop chiếm phần còn lại (tối đa ~1100px) */
+.stage{transition:padding .3s}
+.stage.desktop{padding:64px 24px 20px}
+.stage .phone{transition:width .35s ease,height .35s ease,border-radius .35s ease}
+.stage.desktop .phone{width:min(100%,1100px);height:calc(100vh - 150px);border-radius:14px;padding:30px 8px 8px;background:#2a2326}
+.stage.desktop .phone::before{content:"";position:absolute;top:11px;left:14px;width:9px;height:9px;border-radius:50%;background:#ff5f57;box-shadow:15px 0 #febc2e,30px 0 #28c840}
+.stage.desktop iframe{border-radius:6px}
 .acc{border:1px solid var(--line);border-radius:14px;margin-bottom:10px;overflow:hidden}
 .acc>summary{list-style:none;padding:14px 16px;font-weight:600;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
 .acc>summary::-webkit-details-marker{display:none}
@@ -109,7 +121,10 @@ body{background:#f6eff1;height:100vh;display:flex;flex-direction:column;overflow
 <div class="ed">
   <aside class="panel" id="panel"></aside>
   <main class="stage" id="stage">
-    <div class="dev-switch"><button class="chip active" data-dev="phone">📱</button><button class="chip" data-dev="desktop">🖥</button></div>
+    <div class="dev-switch" role="group" aria-label="Chế độ xem trước">
+      <button class="dev-btn active" data-dev="phone" aria-pressed="true" title="Xem giao diện điện thoại" data-tip="Xem giao diện điện thoại"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg><span>Điện thoại</span></button>
+      <button class="dev-btn" data-dev="desktop" aria-pressed="false" title="Xem giao diện máy tính" data-tip="Xem giao diện máy tính"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M1.5 20h21M9 16l-.5 4M15 16l.5 4"/></svg><span>Máy tính</span></button>
+    </div>
     <div class="phone"><iframe id="pv" src="thiep.html?preview=1" title="Xem trước"></iframe></div>
   </main>
 </div>

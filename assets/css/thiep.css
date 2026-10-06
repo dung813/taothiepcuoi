@@ -446,3 +446,63 @@ body.inv.senior,body.inv.senior.dark{--t-bg:#fffdf8!important;--t-fg:#111!import
 .senior .tk-acts{grid-template-columns:1fr}
 .senior .tk-head b,.senior .ty-title{font-family:var(--f-body);font-weight:700}
 @media (max-width:360px){.tk-acts{grid-template-columns:1fr}.tk-table b{font-size:3.4rem}}
+
+/* ============ Màn hình lớn (máy tính / tablet ngang): dàn trang nhiều cột ============
+   Điện thoại giữ nguyên bố cục 1 cột ở trên. */
+.couple-photo{display:none}
+@media (min-width:760px){
+  html:has(body.inv){background:var(--t-bg)}
+  body.inv{max-width:none;box-shadow:none}
+  .inv section{padding:96px max(40px,calc(50% - 540px))}
+  .confetti{max-width:none}
+
+  /* Ảnh bìa tách đôi: ảnh cưới bên trái, tên & ngày bên phải */
+  .inv .t-hero{flex-direction:row;align-items:center;justify-content:flex-end}
+  .inv .t-hero .bg{right:50%}
+  .inv .t-hero::after{right:50%;background:linear-gradient(to right,transparent 70%,rgba(0,0,0,.15))}
+  .inv .t-hero .in{width:50%;padding:60px 56px;color:var(--t-fg)}
+  .inv .t-hero .names{font-size:clamp(3.6rem,6vw,5.4rem);color:var(--t-accent);text-shadow:none}
+  .inv .t-hero .guest-pill{background:var(--t-card);border-color:var(--t-line)}
+  .inv .t-hero .scroll{left:75%;border-color:var(--t-accent)}
+  .inv .t-hero .scroll::after{background:var(--t-accent)}
+  .hero-top.inv .t-hero{justify-content:flex-end}
+  .hero-top.inv .t-hero::after{background:none}
+  .hero-top.inv .t-hero .in{padding:60px 56px}
+  .hero-top.inv .t-hero .names .nm,.hero-top.inv .t-hero .names .amp{display:block}
+
+  /* Cô dâu chú rể: ảnh một bên, thông tin một bên */
+  .inv section.sec-couple{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:64px;align-items:center}
+  .couple-photo{display:block;aspect-ratio:3/4;border-radius:240px 240px 24px 24px;background:center/cover;box-shadow:0 30px 60px rgba(0,0,0,.18)}
+
+  .countdown{max-width:680px;margin:0 auto}
+  .countdown b{font-size:2.8rem}
+  .sec-events .events{grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:22px}
+  .sec-events iframe{height:380px!important}
+  .quick-go{max-width:760px;margin-inline:auto}
+  .sec-story .timeline{max-width:760px;margin:0 auto}
+  .sec-album .album{grid-template-columns:repeat(4,1fr);gap:12px}
+  .sec-album .album img,.sec-album .album img:nth-child(3n+1){grid-column:auto;aspect-ratio:1}
+  .sec-album .album img:nth-child(7n+1){grid-column:span 2;grid-row:span 2;aspect-ratio:auto}
+  .t-form,.wishes,.cheer-card,.board,#giftSec>p{max-width:660px;margin-inline:auto}
+  .wishes{max-height:460px}
+
+  /* Nút nổi bám hai mép màn hình thay vì cột 520px */
+  .t-topbar{width:100%;padding:12px 20px}
+  .ticker{max-width:640px;margin:0 auto}
+  .read-progress{width:100%}
+  .fab-music,.autoplay{left:24px}
+  .fab-gift,.fab-wish{right:24px}
+  .speak-btn{max-width:none}
+
+  /* Vé mời & thư cảm ơn */
+  .inv section.tk-wrap{padding:96px max(24px,calc(50% - 240px)) 120px}
+  .inv section.ty-hero{min-height:72vh}
+  .ty-letter{max-width:720px;margin-inline:auto}
+  .album-all{grid-template-columns:repeat(4,1fr);gap:12px}
+  .stage-switch{margin-top:34px}
+
+  /* Chữ lớn trên máy tính: vẫn 1 cột cho dễ đọc */
+  .senior .inv section.sec-couple,.senior.inv section.sec-couple{grid-template-columns:1fr}
+  .senior.inv .couple-photo{display:none}
+  .senior.inv .sec-album .album,.senior.inv .album-all{grid-template-columns:repeat(2,1fr)}
+}
