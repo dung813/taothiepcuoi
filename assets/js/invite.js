@@ -60,6 +60,22 @@ TH.sampleInvite = tpl => {
   return d;
 };
 
+/* Mỗi sự kiện cần id cố định để nhóm khách tham chiếu (sự kiện thêm từ trình chỉnh sửa chưa có id) */
+TH.ensureEventIds = d => { let changed = false;
+  (d.events || []).forEach(e => { if (!e.id) { e.id = 'ev' + TH.uid(); changed = true; } });
+  return changed; };
+/* Lọc lịch trình theo nhóm khách (?grp=): khách chỉ thấy các buổi họ được mời */
+TH.applyGroup = (d, grpId) => {
+  const g = grpId && (d.groups || []).find(x => x.id === grpId);
+  if (!g) return null;
+  const evs = (d.events || []).filter(e => (g.events || []).includes(e.id));
+  if (!evs.length) return g;
+  d.events = evs;
+  const main = evs.find(e => /tiệc|báo hỷ/i.test(e.title)) || evs[evs.length - 1];
+  if (main?.time) d.date = main.time;
+  return g;
+};
+
 /* Chuẩn hoá một phản hồi RSVP (kể cả bản cũ chỉ có `count`) → số suất ăn cho nhà hàng */
 TH.rsvpParty = r => {
   if (r.attend !== 'yes') return {adults:0, kids:0, total:0, veg:0, normal:0, allergy:''};
@@ -81,7 +97,7 @@ TH.guestbook = {
   key: id => 'gb_' + id,
   get: id => ({views:0, rsvp:[], wishes:[], cheers:[], ...TH.store.get(TH.guestbook.key(id), {})}),
   put(id, gb){ return TH.store.set(TH.guestbook.key(id), gb); },
-  add(id, type, item){ const gb = TH.guestbook.get(id); gb[type] = [{...item, at:Date.now()}, ...(gb[type] || [])]; return TH.guestbook.put(id, gb) === false ? null : gb; },
+  add(id, type, item){ const gb = TH.guestbook.get(id); gb[type] = [{uid:TH.uid(), ...item, at:Date.now()}, ...(gb[type] || [])]; return TH.guestbook.put(id, gb) === false ? null : gb; },
   view(id){ const gb = TH.guestbook.get(id); gb.views++; TH.guestbook.put(id, gb); }
 };
 
@@ -93,16 +109,18 @@ TH.packInvite = data => {
   d.cover = strip(d.cover); d.photos = (d.photos||[]).map(strip).filter(Boolean);
   if (d.gift) ['groom','bride'].forEach(k => d.gift[k] && (d.gift[k].qr = strip(d.gift[k].qr)));
   if (d.music) d.music.url = strip(d.music.url);
+  if (d.groups) d.groups = d.groups.map(({guests, ...g}) => g);   // không để lộ danh sách tên khách trong link
   delete d.updated;
   return window.LZString ? LZString.compressToEncodedURIComponent(JSON.stringify(d)) : '';
 };
 TH.unpackInvite = s => { try { return JSON.parse(LZString.decompressFromEncodedURIComponent(s)); } catch { return null; } };
 TH.hasLocalImages = data => [data.cover, ...(data.photos||[]), data.gift?.groom?.qr, data.gift?.bride?.qr].some(v => typeof v === 'string' && v.startsWith('data:'));
 
-TH.inviteUrl = (id, data, guest) => {
+TH.inviteUrl = (id, data, guest, extra = {}) => {
   const base = new URL('thiep.html', location.href);
   base.searchParams.set('id', id);
   if (guest) base.searchParams.set('to', guest);
+  Object.entries(extra).forEach(([k, v]) => v != null && v !== '' && base.searchParams.set(k, v));   // grp, table…
   const packed = data ? TH.packInvite(data) : '';
   return base.href + (packed ? '#d=' + packed : '');
 };

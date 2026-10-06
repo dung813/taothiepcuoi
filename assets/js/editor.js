@@ -34,12 +34,12 @@ const ascii = s => String(s||'').normalize('NFD').replace(/[̀-ͯ]/g, '').replac
 
 /* ---------- Các tab của thanh công cụ ---------- */
 const TABS = [
-  {k:'tpl',    ic:'🎨', name:'Mẫu & Màu sắc',        pv:'#hero'},
-  {k:'couple', ic:'💑', name:'Thông tin cặp đôi',    pv:'.couple'},
-  {k:'time',   ic:'📍', name:'Thời gian & Địa điểm', pv:'.events'},
-  {k:'photos', ic:'🖼', name:'Hình ảnh & Album',     pv:'.album'},
-  {k:'gift',   ic:'🎁', name:'Mừng cưới & Lời mời',  pv:'#giftSec'},
-  {k:'more',   ic:'✨', name:'Khác',                  pv:'.timeline'}
+  {k:'tpl',    ic:'🎨', name:'Mẫu & Màu sắc',        go:'Chọn mẫu & màu sắc',        pv:'#hero'},
+  {k:'couple', ic:'💑', name:'Thông tin cặp đôi',    go:'Nhập thông tin cặp đôi',    pv:'.couple'},
+  {k:'time',   ic:'📍', name:'Thời gian & Địa điểm', go:'Chọn thời gian & địa điểm', pv:'.events'},
+  {k:'photos', ic:'🖼', name:'Hình ảnh & Album',     go:'Tải ảnh cưới & album',      pv:'.album'},
+  {k:'gift',   ic:'🎁', name:'Mừng cưới & Lời mời',  go:'Mừng cưới & lời mời',       pv:'#giftSec'},
+  {k:'more',   ic:'✨', name:'Khác',                  go:'Tuỳ chọn khác',              pv:'.timeline'}
 ];
 let tab = (() => { try { return sessionStorage.getItem('ed_tab') || 'tpl'; } catch { return 'tpl'; } })();
 if (!TABS.some(x => x.k === tab)) tab = 'tpl';
@@ -119,13 +119,19 @@ function build(){
   const i = TABS.findIndex(x => x.k === tab), next = TABS[i + 1];
   const y = $('#panel').scrollTop;
   $('#panel').innerHTML = `
-    <nav class="ed-tabs" role="tablist" aria-label="Các mục chỉnh sửa">${TABS.map((x, n) => `<button role="tab" aria-selected="${x.k === tab}" data-tab-k="${x.k}" class="${x.k === tab ? 'on' : ''}"><i>${x.ic}</i><span>${x.name}</span></button>`).join('')}</nav>
+    <nav class="ed-tabs" role="tablist" aria-label="Các mục chỉnh sửa">${TABS.map((x, n) => `<button role="tab" aria-selected="${x.k === tab}" data-tab-k="${x.k}" class="${x.k === tab ? 'on' : ''}${n < i ? ' done' : ''}"><i>${x.ic}</i><span>${x.name}</span></button>`).join('')}</nav>
     <section class="ed-pane" role="tabpanel" aria-label="${TABS[i].name}">
       <h2 class="pane-h"><span>Bước ${i + 1}/${TABS.length}</span>${TABS[i].ic} ${TABS[i].name}</h2>
       ${BODY[tab]()}
-      <div class="pane-nav">${i ? `<button class="btn btn-ghost btn-sm" data-go="${TABS[i-1].k}">← ${TABS[i-1].name}</button>` : '<span></span>'}
-        ${next ? `<button class="btn btn-primary btn-sm" data-go="${next.k}">${next.name} →</button>` : `<button class="btn btn-primary btn-sm" data-act="share">Lưu &amp; chia sẻ →</button>`}</div>
-    </section>`;
+    </section>
+    <footer class="step-nav" aria-label="Điều hướng các bước">
+      <div class="step-bar" aria-hidden="true"><i style="width:${(i + 1) / TABS.length * 100}%"></i></div>
+      <div class="step-btns">
+        <button class="btn btn-outline btn-sm step-back" ${i ? `data-go="${TABS[i-1].k}"` : 'disabled aria-disabled="true"'} title="${i ? 'Về bước ' + i + ': ' + TABS[i-1].name : 'Đang ở bước đầu tiên'}">← Quay lại</button>
+        ${next ? `<button class="btn btn-primary step-next" data-go="${next.k}">Tiếp tục: ${next.go} →</button>`
+               : `<button class="btn btn-primary step-next" data-act="finish">✓ Hoàn tất &amp; Mở thiệp</button>`}
+      </div>
+    </footer>`;
   $('#panel').scrollTop = y;
   if (tab === 'gift') ['groom','bride'].forEach(drawQr);
 }
@@ -212,7 +218,7 @@ panel.addEventListener('click', e => {
   if (b.dataset.add === 'story') { D.story.push({date:'', title:'', text:''}); touch(true); }
   if (b.dataset.act === 'resetColor') { D.accent = ''; touch(true); }
   if (b.dataset.act === 'addPhoto') { const u = $('#photoUrl').value.trim(); if (u) { D.photos.push(u); if (!D.cover) D.cover = u; touch(true); } }
-  if (b.dataset.act === 'share') $('#btnShare').click();
+  if (b.dataset.act === 'finish') { save(); TH.toast('Đã lưu thiệp 💕'); setTimeout(() => $('#btnView').click(), 400); }
 });
 
 /* ---------- Thanh công cụ ---------- */

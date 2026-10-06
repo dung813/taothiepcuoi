@@ -414,7 +414,7 @@ function rsvpError(rs){
 }
 function rsvpData(rs){
   const f = Object.fromEntries(new FormData(rs)), yes = f.attend === 'yes';
-  const out = {name:f.name.trim(), phone:(f.phone||'').trim(), side:f.side, attend:f.attend};
+  const out = {name:f.name.trim(), phone:(f.phone||'').trim(), side:f.side, attend:f.attend, ...(group ? {grp:group.id} : {})};
   if (yes) Object.assign(out, {adults:+f.adults, kids:+f.kids, count:+f.adults + +f.kids, veg:!!f.veg, vegCount:f.veg ? +f.vegCount : 0,
     allergy:!!f.allergy, allergyNote:f.allergy ? (f.allergyNote||'').trim() : ''});
   else out.msg = (f.msg||'').trim();
@@ -714,13 +714,22 @@ function stopMusic(){ music?.stop(); audioEl?.pause(); const b = $('#musicBtn');
 
 /* ---------- Khởi động ---------- */
 D = load();
+/* ?grp=…: chỉ hiện lịch trình của nhóm khách được mời */
+const group = TH.applyGroup(D, P.get("grp"));
 render();
 if (!isPreview && P.get('id')) TH.guestbook.view(id);
 
 // Nhận dữ liệu trực tiếp từ trình chỉnh sửa
+let pvJump = null;
 addEventListener('message', e => {
-  if (e.origin !== location.origin || e.data?.type !== 'th-preview') return;
-  const y = scrollY; D = e.data.data; render(); scrollTo(0, y);
+  if (e.origin !== location.origin) return;
+  // Trình chỉnh sửa đổi tab → cuộn khung xem trước tới phần tương ứng
+  if (e.data?.type === 'th-scroll') { pvJump = {sel:e.data.sel, at:Date.now()}; const el = $(e.data.sel); if (el) scrollTo({top: el.getBoundingClientRect().top + scrollY - 20, behavior:'smooth'}); return; }
+  if (e.data?.type !== 'th-preview') return;
+  const y = scrollY; D = e.data.data; render();
+  // Vừa đổi tab (<1,5s) → giữ khung ở phần tương ứng; còn lại giữ nguyên vị trí người dùng đang xem
+  const el = pvJump && Date.now() - pvJump.at < 1500 && $(pvJump.sel);
+  scrollTo({top: el ? el.getBoundingClientRect().top + scrollY - 20 : y, behavior:'instant'});
   $$('.reveal').forEach(el => el.classList.add('in'));
 });
 if (isPreview) parent.postMessage({type:'th-ready'}, location.origin);
