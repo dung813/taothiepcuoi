@@ -38,6 +38,20 @@ TH.defaultInvite = (tpl='hong-pastel') => {
   };
 };
 
+/* Thiệp demo của một mẫu: dùng đúng cặp đôi, gia đình và ngày cưới gắn với mẫu đó (xem COUPLES trong data.js) */
+TH.sampleInvite = tpl => {
+  const d = TH.defaultInvite(tpl), t = TH.findTemplate(tpl);
+  if (!t.family) return d;
+  d.groom = {...t.family.groom}; d.bride = {...t.family.bride};
+  const day = t.couple.date, prev = new Date(day + 'T00:00'); prev.setDate(prev.getDate() - 1);
+  const prevDay = `${prev.getFullYear()}-${String(prev.getMonth()+1).padStart(2,'0')}-${String(prev.getDate()).padStart(2,'0')}`;
+  d.date = day + 'T11:00';
+  [prevDay + 'T09:00', day + 'T11:00', day + 'T17:30'].forEach((x, i) => { if (d.events[i]) d.events[i].time = x; });
+  const owner = s => s.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').toUpperCase();
+  d.gift.groom.owner = owner(d.groom.name); d.gift.bride.owner = owner(d.bride.name);
+  return d;
+};
+
 /* Lưu trữ cục bộ */
 TH.invites = {
   all: () => TH.store.get('invites', {}),

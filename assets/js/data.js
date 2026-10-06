@@ -33,6 +33,38 @@ TH.TEMPLATES = [
   {id:'be-kem',       name:'Be Kem',           tier:'premium', cat:'Vintage',    bg:'linear-gradient(160deg,#f2e6dc,#fcf7f2)', fg:'#6a4a43', accent:'#c98a86', font:'Great Vibes',         deco:'petal',  views:13870, ...SET(19,9)},
   {id:'anh-bac',      name:'Ánh Bạc',          tier:'premium', cat:'Sang trọng', bg:'linear-gradient(160deg,#16181f,#2e323d)', fg:'#eef0f4', accent:'#b9c0cc', font:'Playfair Display',    deco:'star',   views:19620, ...SET(20,6)}
 ];
+
+/* Cặp đôi mẫu của từng mẫu thiệp: hiển thị trên thẻ xem trước và trong trang thiệp demo.
+   [tên chú rể, họ, tên cô dâu, họ, ngày cưới, bố chú rể, mẹ chú rể, bố cô dâu, mẹ cô dâu] */
+const COUPLES = {
+  'song-hy':       ['Quang Huy',  'Trần',   'Mai Anh',     'Phạm',   '2026-01-18', 'Trần Văn Bình',    'Nguyễn Thị Hoa',  'Phạm Đức Toàn',   'Lê Thị Hằng'],
+  'hoang-kim':     ['Tuấn Kiệt',  'Lê',     'Bảo Ngọc',    'Vũ',     '2026-02-22', 'Lê Minh Châu',     'Đỗ Thị Nga',      'Vũ Văn Thành',    'Hoàng Thị Thu'],
+  'dem-sao':       ['Đức Thắng',  'Nguyễn', 'Phương Linh', 'Đặng',   '2026-12-12', 'Nguyễn Văn Tâm',   'Trịnh Thị Loan',  'Đặng Quốc Hùng',  'Bùi Thị Liên'],
+  'anh-bac':       ['Hoàng Nam',  'Phan',   'Khánh Vy',    'Trương', '2026-11-21', 'Phan Thanh Sơn',   'Võ Thị Kim',      'Trương Văn Lộc',  'Huỳnh Thị Ngọc'],
+  'hong-pastel':   ['Minh Quân',  'Đỗ',     'Thảo My',     'Ngô',    '2026-03-08', 'Đỗ Văn Khải',      'Phạm Thị Thanh',  'Ngô Quang Định',  'Lý Thị Hương'],
+  'vuon-xanh':     ['Thanh Tùng', 'Hoàng',  'Diễm Quỳnh',  'Lâm',    '2026-04-12', 'Hoàng Văn Phúc',   'Trần Thị Duyên',  'Lâm Hữu Tài',     'Nguyễn Thị Diệu'],
+  'bien-xanh':     ['Quốc Bảo',   'Huỳnh',  'Hà My',       'Tô',     '2026-06-20', 'Huỳnh Văn Lợi',    'Lê Thị Ánh',      'Tô Minh Đức',     'Phan Thị Hà'],
+  'oai-huong':     ['Trọng Hiếu', 'Bùi',    'Thùy Dung',   'Mai',    '2026-05-17', 'Bùi Văn Thịnh',    'Đặng Thị Xuân',   'Mai Xuân Trường', 'Cao Thị Lụa'],
+  'giay-kraft':    ['Anh Dũng',   'Vũ',     'Bích Ngọc',   'Hồ',     '2026-09-26', 'Vũ Đình Lâm',      'Nguyễn Thị Hạnh', 'Hồ Văn Nghĩa',    'Trần Thị Bích'],
+  'mau-don':       ['Duy Khánh',  'Phạm',   'Lan Hương',   'Đinh',   '2026-01-04', 'Phạm Văn Quý',     'Hà Thị Oanh',     'Đinh Công Thành', 'Vũ Thị Lan'],
+  'toi-gian-trang':['Thành Long', 'Trịnh',  'Ngọc Ánh',    'Lương',  '2026-07-11', 'Trịnh Văn Hòa',    'Phùng Thị Mến',   'Lương Đức Hậu',   'Đào Thị Ngọc'],
+  'hoang-hon':     ['Hữu Phước',  'Võ',     'Cẩm Ly',      'Dương',  '2026-08-15', 'Võ Hữu Nghĩa',     'Châu Thị Lệ',     'Dương Văn Tấn',   'Lê Thị Cẩm'],
+  'co-dien':       ['Tiến Đạt',   'Đặng',   'Quỳnh Chi',   'Kiều',   '2026-10-24', 'Đặng Văn Tiến',    'Ngô Thị Yến',     'Kiều Minh Tuấn',  'Phạm Thị Quỳnh'],
+  'nang-vang':     ['Văn Hậu',    'Lý',     'Trúc Mai',    'Thái',   '2026-09-05', 'Lý Văn Sang',      'Tạ Thị Hồng',     'Thái Thanh Bình', 'Nguyễn Thị Trúc'],
+  'tiec-vuon':     ['Nhật Minh',  'Cao',    'Hoài Thương', 'Lưu',    '2026-04-26', 'Cao Văn Thắng',    'Doãn Thị Hoài',   'Lưu Đức Mạnh',    'Tăng Thị Hiền'],
+  'rung-thong':    ['Đình Trọng', 'Hà',     'Yến Nhi',     'Quách',  '2026-11-07', 'Hà Đình Phong',    'Lại Thị Nguyệt',  'Quách Văn Hưng',  'Mạc Thị Yến'],
+  'thanh-lich':    ['Gia Huy',    'Ngô',    'Tuyết Mai',   'Đoàn',   '2026-03-29', 'Ngô Gia Bảo',      'Từ Thị Tuyết',    'Đoàn Văn Kiên',   'Lâm Thị Hoa'],
+  'la-non':        ['Hải Đăng',   'Tạ',     'Thùy Trang',  'Chu',    '2026-05-31', 'Tạ Văn Biển',      'Nông Thị Hải',    'Chu Minh Khang',  'Vương Thị Thủy'],
+  'ngay-nang':     ['Việt Anh',   'Mạc',    'Hồng Nhung',  'Tôn',    '2026-07-25', 'Mạc Văn Cường',    'Đàm Thị Thu',     'Tôn Thất Hòa',    'Phạm Thị Nhàn'],
+  'be-kem':        ['Khắc Việt',  'Nguyễn', 'Thu Thảo',    'Trần',   '2026-12-27', 'Nguyễn Khắc Hiếu', 'Lê Thị Minh',     'Trần Văn Thuận',  'Hoàng Thị Mận']
+};
+TH.TEMPLATES.forEach(t => { const c = COUPLES[t.id]; if (!c) return;
+  t.couple = {groom:c[0], bride:c[2], date:c[4]};
+  t.family = {
+    groom:{name:`${c[1]} ${c[0]}`, nick:c[0], father:'Ông ' + c[5], mother:'Bà ' + c[6]},
+    bride:{name:`${c[3]} ${c[2]}`, nick:c[2], father:'Ông ' + c[7], mother:'Bà ' + c[8]}
+  };
+});
 TH.TEMPLATE_CATS = ['Tất cả','Lãng mạn','Tối giản','Sang trọng','Truyền thống','Vintage'];
 TH.findTemplate = id => TH.TEMPLATES.find(t => t.id === id) || TH.TEMPLATES[0];
 

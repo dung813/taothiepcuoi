@@ -13,7 +13,9 @@ function load(){
   if (hash) return hash;
   const local = P.get('id') && TH.invites.get(P.get('id'));
   if (local) return local;
-  const d = TH.defaultInvite(P.get('demo') || 'hong-pastel');
+  const tpl = P.get('demo') || 'hong-pastel';
+  /* Link từ thẻ "Thiệp khách hàng" truyền tên riêng (g/b) → giữ dữ liệu chung; còn lại dùng đúng cặp đôi của mẫu */
+  const d = P.get('g') || P.get('b') ? TH.defaultInvite(tpl) : TH.sampleInvite(tpl);
   if (P.get('g')) { d.groom.nick = P.get('g'); d.groom.name = P.get('g'); }
   if (P.get('b')) { d.bride.nick = P.get('b'); d.bride.name = P.get('b'); }
   if (P.get('d')) { d.date = P.get('d') + 'T11:00'; d.events.forEach(e => e.time = P.get('d') + e.time.slice(10)); }
@@ -136,7 +138,9 @@ function startCountdown(){
   const tick = () => { let s = Math.max(0, Math.floor((target - Date.now())/1000));
     const v = [Math.floor(s/86400), Math.floor(s%86400/3600), Math.floor(s%3600/60), s%60];
     v.forEach((x,i)=> b[i].textContent = pad(x));
-    if (s === 0) { clearInterval(cdTimer); el.insertAdjacentHTML('afterend','<p style="margin-top:14px">💍 Hôm nay là ngày trọng đại!</p>'); } };
+    if (s === 0) { clearInterval(cdTimer);
+      const msg = new Date().toDateString() === new Date(target).toDateString() ? '💍 Hôm nay là ngày trọng đại!' : '💍 Hai bạn đã chính thức về chung một nhà!';
+      el.insertAdjacentHTML('afterend',`<p style="margin-top:14px">${msg}</p>`); } };
   tick(); cdTimer = setInterval(tick, 1000);
 }
 
