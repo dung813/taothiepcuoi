@@ -1,30 +1,37 @@
 /* ============ Dữ liệu mẫu thiệp & cẩm nang ============ */
 window.TH = window.TH || {};
 
-/* Ảnh minh hoạ mặc định (Unsplash – giấy phép miễn phí). Có thể thay bằng ảnh của bạn. */
-TH.PHOTOS = [
-  'https://images.unsplash.com/photo-1519741497674-611481863552?w=900&q=70',
-  'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=900&q=70',
-  'https://images.unsplash.com/photo-1606800052052-a08af7148866?w=900&q=70',
-  'https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=900&q=70',
-  'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?w=900&q=70',
-  'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=900&q=70'
-];
+/* Bộ ảnh của từng mẫu: assets/img/mau/mau-N/01.webp… (đã nén WebP) + thumb.webp cho thẻ xem trước */
+const SET = (n, count) => ({
+  photos: Array.from({length:count}, (_, i) => `assets/img/mau/mau-${n}/${String(i+1).padStart(2,'0')}.webp`),
+  thumb: `assets/img/mau/mau-${n}/thumb.webp`
+});
+
+/* Ảnh mặc định khi không xác định được mẫu */
+TH.PHOTOS = SET(1, 6).photos;
 
 /* Mỗi mẫu = một bộ theme. Trang thiệp (thiep.html) đọc theme để dựng giao diện. */
 TH.TEMPLATES = [
-  {id:'hong-pastel',  name:'Hồng Pastel',      tier:'basic',   cat:'Lãng mạn',   bg:'linear-gradient(160deg,#fde8ec,#fff6f3)', fg:'#8a3149', accent:'#d9738a', font:'Great Vibes',         deco:'petal',  views:18420},
-  {id:'vuon-xanh',    name:'Khu Vườn Xanh',    tier:'basic',   cat:'Tối giản',   bg:'linear-gradient(160deg,#e8f1ea,#fbfdf9)', fg:'#2f5a3e', accent:'#7aa586', font:'Dancing Script',      deco:'leaf',   views:12980},
-  {id:'hoang-kim',    name:'Hoàng Kim',        tier:'premium', cat:'Sang trọng', bg:'linear-gradient(160deg,#1f1a17,#3a2e25)', fg:'#e9cf8f', accent:'#c9a45c', font:'Playfair Display',    deco:'gold',   views:25110},
-  {id:'song-hy',      name:'Song Hỷ Đỏ',       tier:'premium', cat:'Truyền thống',bg:'linear-gradient(160deg,#8e1b22,#b9302f)', fg:'#ffe3a8', accent:'#f2c25b', font:'Playfair Display',   deco:'hy',     views:30240},
-  {id:'bien-xanh',    name:'Biển Xanh',        tier:'basic',   cat:'Tối giản',   bg:'linear-gradient(160deg,#e3f0f7,#fbfeff)', fg:'#1f4d6b', accent:'#5d9bc4', font:'Parisienne',          deco:'wave',   views:9870},
-  {id:'oai-huong',    name:'Oải Hương',        tier:'premium', cat:'Lãng mạn',   bg:'linear-gradient(160deg,#ece6f6,#fbf9ff)', fg:'#4d3a78', accent:'#9b87c9', font:'Great Vibes',         deco:'petal',  views:14550},
-  {id:'giay-kraft',   name:'Giấy Kraft',       tier:'basic',   cat:'Vintage',    bg:'linear-gradient(160deg,#eadbc5,#f7efe2)', fg:'#5b4130', accent:'#a67c52', font:'Dancing Script',      deco:'leaf',   views:11200},
-  {id:'dem-sao',      name:'Đêm Đầy Sao',      tier:'premium', cat:'Sang trọng', bg:'linear-gradient(160deg,#0f1834,#26345f)', fg:'#f3e7c9', accent:'#d9bb74', font:'Parisienne',          deco:'star',   views:21760},
-  {id:'mau-don',      name:'Mẫu Đơn',          tier:'premium', cat:'Truyền thống',bg:'linear-gradient(160deg,#fbe4e1,#fff8f2)', fg:'#8d2b3a', accent:'#c9485b', font:'Playfair Display',   deco:'petal',  views:17330},
-  {id:'toi-gian-trang',name:'Trắng Tinh Khôi', tier:'basic',   cat:'Tối giản',   bg:'linear-gradient(160deg,#ffffff,#f4f1ee)', fg:'#2b2226', accent:'#8c7b75', font:'Playfair Display',    deco:'line',   views:15840},
-  {id:'hoang-hon',    name:'Hoàng Hôn',        tier:'premium', cat:'Lãng mạn',   bg:'linear-gradient(160deg,#fbd3c0,#fdeee0)', fg:'#8a3b24', accent:'#e0805b', font:'Great Vibes',         deco:'star',   views:13290},
-  {id:'co-dien',      name:'Cổ Điển Châu Âu',  tier:'basic',   cat:'Vintage',    bg:'linear-gradient(160deg,#f1ebe1,#fcfaf5)', fg:'#3e3a33', accent:'#9b8a6a', font:'Parisienne',          deco:'gold',   views:10420}
+  {id:'hong-pastel',  name:'Hồng Pastel',      tier:'basic',   cat:'Lãng mạn',   bg:'linear-gradient(160deg,#fde8ec,#fff6f3)', fg:'#8a3149', accent:'#d9738a', font:'Great Vibes',         deco:'petal',  views:18420, ...SET(1,6)},
+  {id:'vuon-xanh',    name:'Khu Vườn Xanh',    tier:'basic',   cat:'Tối giản',   bg:'linear-gradient(160deg,#e8f1ea,#fbfdf9)', fg:'#2f5a3e', accent:'#7aa586', font:'Dancing Script',      deco:'leaf',   views:12980, ...SET(2,6)},
+  {id:'hoang-kim',    name:'Hoàng Kim',        tier:'premium', cat:'Sang trọng', bg:'linear-gradient(160deg,#1f1a17,#3a2e25)', fg:'#e9cf8f', accent:'#c9a45c', font:'Playfair Display',    deco:'gold',   views:25110, ...SET(3,7)},
+  {id:'song-hy',      name:'Song Hỷ Đỏ',       tier:'premium', cat:'Truyền thống',bg:'linear-gradient(160deg,#8e1b22,#b9302f)', fg:'#ffe3a8', accent:'#f2c25b', font:'Playfair Display',   deco:'hy',     views:30240, ...SET(4,6)},
+  {id:'bien-xanh',    name:'Biển Xanh',        tier:'basic',   cat:'Tối giản',   bg:'linear-gradient(160deg,#e3f0f7,#fbfeff)', fg:'#1f4d6b', accent:'#5d9bc4', font:'Parisienne',          deco:'wave',   views:9870, ...SET(5,7)},
+  {id:'oai-huong',    name:'Oải Hương',        tier:'premium', cat:'Lãng mạn',   bg:'linear-gradient(160deg,#ece6f6,#fbf9ff)', fg:'#4d3a78', accent:'#9b87c9', font:'Great Vibes',         deco:'petal',  views:14550, ...SET(6,6)},
+  {id:'giay-kraft',   name:'Giấy Kraft',       tier:'basic',   cat:'Vintage',    bg:'linear-gradient(160deg,#eadbc5,#f7efe2)', fg:'#5b4130', accent:'#a67c52', font:'Dancing Script',      deco:'leaf',   views:11200, ...SET(7,6)},
+  {id:'dem-sao',      name:'Đêm Đầy Sao',      tier:'premium', cat:'Sang trọng', bg:'linear-gradient(160deg,#0f1834,#26345f)', fg:'#f3e7c9', accent:'#d9bb74', font:'Parisienne',          deco:'star',   views:21760, ...SET(8,5)},
+  {id:'mau-don',      name:'Mẫu Đơn',          tier:'premium', cat:'Truyền thống',bg:'linear-gradient(160deg,#fbe4e1,#fff8f2)', fg:'#8d2b3a', accent:'#c9485b', font:'Playfair Display',   deco:'petal',  views:17330, ...SET(9,6)},
+  {id:'toi-gian-trang',name:'Trắng Tinh Khôi', tier:'basic',   cat:'Tối giản',   bg:'linear-gradient(160deg,#ffffff,#f4f1ee)', fg:'#2b2226', accent:'#8c7b75', font:'Playfair Display',    deco:'line',   views:15840, ...SET(10,9)},
+  {id:'hoang-hon',    name:'Hoàng Hôn',        tier:'premium', cat:'Lãng mạn',   bg:'linear-gradient(160deg,#fbd3c0,#fdeee0)', fg:'#8a3b24', accent:'#e0805b', font:'Great Vibes',         deco:'star',   views:13290, ...SET(11,8)},
+  {id:'co-dien',      name:'Cổ Điển Châu Âu',  tier:'basic',   cat:'Vintage',    bg:'linear-gradient(160deg,#f1ebe1,#fcfaf5)', fg:'#3e3a33', accent:'#9b8a6a', font:'Parisienne',          deco:'gold',   views:10420, ...SET(12,7)},
+  {id:'nang-vang',    name:'Nắng Vàng',        tier:'premium', cat:'Sang trọng', bg:'linear-gradient(160deg,#f7ead2,#fffaf0)', fg:'#6b4a1f', accent:'#c99a4b', font:'Playfair Display',    deco:'gold',   views:16480, ...SET(13,7)},
+  {id:'tiec-vuon',    name:'Tiệc Vườn',        tier:'basic',   cat:'Lãng mạn',   bg:'linear-gradient(160deg,#e6efe0,#fbfdf7)', fg:'#3b5a33', accent:'#8fb07c', font:'Great Vibes',         deco:'leaf',   views:12140, ...SET(14,7)},
+  {id:'rung-thong',   name:'Rừng Thông',       tier:'premium', cat:'Vintage',    bg:'linear-gradient(160deg,#2c3a2e,#46594a)', fg:'#f1e9d6', accent:'#c7b483', font:'Parisienne',          deco:'leaf',   views:14730, ...SET(15,8)},
+  {id:'thanh-lich',   name:'Thanh Lịch',       tier:'basic',   cat:'Tối giản',   bg:'linear-gradient(160deg,#f3f3f1,#ffffff)', fg:'#33302e', accent:'#a39d96', font:'Dancing Script',      deco:'line',   views:11360, ...SET(16,6)},
+  {id:'la-non',       name:'Lá Non',           tier:'basic',   cat:'Tối giản',   bg:'linear-gradient(160deg,#edf3ea,#fcfdfb)', fg:'#3f5642', accent:'#93ad8f', font:'Playfair Display',    deco:'leaf',   views:10650, ...SET(17,7)},
+  {id:'ngay-nang',    name:'Ngày Nắng',        tier:'basic',   cat:'Lãng mạn',   bg:'linear-gradient(160deg,#fdeee4,#f4f9ee)', fg:'#6e4a35', accent:'#e39b78', font:'Dancing Script',      deco:'petal',  views:9940,  ...SET(18,9)},
+  {id:'be-kem',       name:'Be Kem',           tier:'premium', cat:'Vintage',    bg:'linear-gradient(160deg,#f2e6dc,#fcf7f2)', fg:'#6a4a43', accent:'#c98a86', font:'Great Vibes',         deco:'petal',  views:13870, ...SET(19,9)},
+  {id:'anh-bac',      name:'Ánh Bạc',          tier:'premium', cat:'Sang trọng', bg:'linear-gradient(160deg,#16181f,#2e323d)', fg:'#eef0f4', accent:'#b9c0cc', font:'Playfair Display',    deco:'star',   views:19620, ...SET(20,6)}
 ];
 TH.TEMPLATE_CATS = ['Tất cả','Lãng mạn','Tối giản','Sang trọng','Truyền thống','Vintage'];
 TH.findTemplate = id => TH.TEMPLATES.find(t => t.id === id) || TH.TEMPLATES[0];

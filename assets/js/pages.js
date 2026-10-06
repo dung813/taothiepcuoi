@@ -16,8 +16,8 @@ const showCard = s => { const t = TH.findTemplate(s.tpl);
 TH.pageHome = () => {
   TH.initPage();
   const [a,b] = [TH.TEMPLATES[0], TH.TEMPLATES[3]];
-  $('#ph1').innerHTML = TH.miniTpl(a, {photo:TH.PHOTOS[0]});
-  $('#ph2').innerHTML = TH.miniTpl(b, {groom:'Đức Anh', bride:'Phương Linh', photo:TH.PHOTOS[1]});
+  $('#ph1').innerHTML = TH.miniTpl(a);
+  $('#ph2').innerHTML = TH.miniTpl(b, {groom:'Đức Anh', bride:'Phương Linh'});
   $('#hotTpl').innerHTML = [...TH.TEMPLATES].sort((x,y)=>y.views-x.views).slice(0,8).map(TH.tplCard).join('');
   const cards = TH.SHOWCASE.map(showCard).join('');
   $('#showTrack').innerHTML = cards + cards;

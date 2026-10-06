@@ -107,7 +107,13 @@ panel.addEventListener('change', e => {
 });
 panel.addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b) return;
-  if (b.dataset.tpl) { D.tpl = b.dataset.tpl; D.accent = ''; touch(true); return; }
+  if (b.dataset.tpl) {
+    /* Nếu vẫn đang dùng ảnh mẫu của mẫu cũ thì đổi sang bộ ảnh của mẫu mới; ảnh riêng của người dùng được giữ nguyên */
+    const oldSet = TH.findTemplate(D.tpl).photos || [], nt = TH.findTemplate(b.dataset.tpl);
+    const isSample = D.photos.every(p => oldSet.includes(p)) && (!D.cover || oldSet.includes(D.cover));
+    if (isSample && nt.photos) { D.photos = nt.photos.slice(); D.cover = nt.photos[0]; }
+    D.tpl = b.dataset.tpl; D.accent = ''; touch(true); return;
+  }
   if (b.dataset.rm) { const [arr, i] = b.dataset.rm.split('.'); D[arr].splice(+i, 1); touch(true); return; }
   if (b.dataset.add === 'events') { D.events.push({title:'Sự kiện mới', time:D.date, place:'', address:'', map:''}); touch(true); }
   if (b.dataset.add === 'story') { D.story.push({date:'', title:'', text:''}); touch(true); }

@@ -126,7 +126,8 @@ const DECO = {
 };
 TH.miniTpl = (t, o={}) => {
   const d = o.date ? new Date(o.date) : new Date(Date.now()+60*864e5);
-  const photo = o.photo ? `<div class="tm-photo" style="background-image:url('${o.photo}')"></div>` : '';
+  const src = o.photo === undefined ? t.thumb : o.photo;
+  const photo = src ? `<div class="tm-photo" style="background-image:url('${src}')"></div>` : '';
   return `<div class="tpl-mini" style="background:${t.bg};color:${t.fg}">${(DECO[t.deco]||DECO.line)(t.accent)}
     ${photo}<div class="tm-top">Save the date</div>
     <div class="tm-names" style="font-family:'${t.font}',serif">${TH.esc(o.groom||'Minh Khôi')}<span class="tm-amp" style="color:${t.accent}">&amp;</span>${TH.esc(o.bride||'Thu Hà')}</div>

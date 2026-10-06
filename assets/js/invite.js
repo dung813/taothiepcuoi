@@ -9,6 +9,7 @@ TH.defaultInvite = (tpl='hong-pastel') => {
   const iso = x => new Date(x - x.getTimezoneOffset()*6e4).toISOString().slice(0,16);
   const d2 = new Date(d); d2.setHours(17,30);
   const d0 = new Date(d); d0.setDate(d.getDate()-1); d0.setHours(9,0);
+  const photos = TH.findTemplate(tpl).photos || TH.PHOTOS;
   return {
     tpl, accent:'', font:'',
     groom:{name:'Nguyễn Minh Khôi', nick:'Minh Khôi', father:'Ông Nguyễn Văn Hải', mother:'Bà Trần Thị Lan'},
@@ -21,8 +22,8 @@ TH.defaultInvite = (tpl='hong-pastel') => {
       {title:'Lễ Thành Hôn', time: iso(d), place:'Tư gia nhà trai', address:'45 Lê Lợi, Quận 3, TP. Hồ Chí Minh', map:''},
       {title:'Tiệc Cưới', time: iso(d2), place:'Trung tâm Hội nghị Tiệc cưới', address:'88 Điện Biên Phủ, Bình Thạnh, TP. Hồ Chí Minh', map:''}
     ],
-    cover: TH.PHOTOS[0],
-    photos: TH.PHOTOS.slice(0),
+    cover: photos[0],
+    photos: photos.slice(0),
     story:[
       {date:'2021', title:'Lần đầu gặp gỡ', text:'Một buổi chiều mưa ở quán cà phê nhỏ, hai người lạ ngồi chung bàn vì hết chỗ.'},
       {date:'2023', title:'Chính thức hẹn hò', text:'Sau hai năm làm bạn, anh lấy hết can đảm để nói lời thương.'},
