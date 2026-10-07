@@ -127,10 +127,25 @@ body{background:#f6eff1;height:100vh;display:flex;flex-direction:column;overflow
 .font-grid button span{font-size:.66rem;color:var(--muted);font-family:var(--f-body);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 .font-grid button:hover{border-color:#7c5cff}
 .font-grid button.on{border-color:#7c5cff;background:#f1edff;box-shadow:0 0 0 2px rgba(124,92,255,.25)}
-.rng{display:grid;gap:4px}
-.rng label{display:flex;justify-content:space-between;font-size:.82rem;font-weight:600}
-.rng output{color:#6a4fd6;font-variant-numeric:tabular-nums}
-.rng input{accent-color:#7c5cff;width:100%}
+.rng{display:grid;gap:6px}
+.rng-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.rng-top label{font-size:.82rem;font-weight:600}
+.rng-num{display:flex;align-items:center;gap:4px;color:#6a4fd6;font-weight:700;font-size:.8rem}
+.rng-num input{width:70px;padding:4px 6px;border:1px solid var(--line);border-radius:8px;text-align:right;font:700 .85rem var(--f-body);color:#6a4fd6;font-variant-numeric:tabular-nums}
+.rng-num input:focus{outline:2px solid rgba(124,92,255,.35);border-color:#7c5cff}
+.rng-num i{font-style:normal;min-width:14px}
+.rng-ctl{display:flex;align-items:flex-start;gap:4px}
+.nudge{flex:0 0 46px;width:46px;height:28px;padding:0 2px;border:1px solid var(--line);border-radius:8px;background:#fff;color:#4a3a8a;font:700 .72rem var(--f-body);cursor:pointer;font-variant-numeric:tabular-nums;user-select:none;touch-action:manipulation;transition:background .15s,border-color .15s}
+.nudge:hover{border-color:#7c5cff;background:#f1edff}
+.nudge:active{background:#7c5cff;color:#fff}
+.rng-track{flex:1;min-width:0;position:relative;padding-bottom:22px}
+.rng-track input[type=range]{display:block;width:100%;height:28px;margin:0;accent-color:#7c5cff}
+/* Thang đo: vạch chia + số; tâm vạch thẳng hàng với tâm nút kéo (nút rộng ~16px) */
+.rng-scale{position:absolute;left:8px;right:8px;top:24px;height:20px}
+.rng-scale button{position:absolute;left:calc(var(--p) * 100%);translate:-50% 0;padding:5px 2px 0;border:0;background:none;font:600 .62rem var(--f-body);color:var(--muted);cursor:pointer;white-space:nowrap;font-variant-numeric:tabular-nums}
+.rng-scale button::before{content:"";position:absolute;left:50%;top:0;width:1px;height:4px;background:#c9bfe0}
+.rng-scale button:hover{color:#6a4fd6}
+@media(max-width:420px){.rng-scale button:nth-child(even){font-size:0}}
 .sw-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .sw-row input[type=color]{width:38px;height:32px;padding:2px;border-radius:8px}
 .sw{width:26px;height:26px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px var(--line);cursor:pointer}

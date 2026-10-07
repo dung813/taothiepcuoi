@@ -208,6 +208,8 @@ panel.addEventListener('input', e => {
 panel.addEventListener('change', e => {
   const el = e.target;
   if (el.dataset.simg && el.files[0]) return TH.readImage(el.files[0], 1400, .82).then(url => selImage(url));
+  if (el.dataset.s && el.type === 'number') { const v = isNaN(+el.value) || el.value === '' ? +$(`.rng input[type=range][data-s="${el.dataset.s}"]`, panel).value : +el.value;
+    el.value = fmtNum(Math.min(+el.max, Math.max(+el.min, v))); return selInput(el); }
   if (el.dataset.q === 'date') touch(setQuick('date', el.value));
   if (el.dataset.p === 'music.type') { setP(D, 'music.type', el.value); touch(true); }
   if (el.dataset.opt) { D.opts[el.dataset.opt] = el.checked; touch(false); }
@@ -252,12 +254,52 @@ let sel = null;   // thông tin phần tử đang chọn (do khung xem trước 
 const SWATCH = () => [...new Set([D.accent || TH.findTemplate(D.tpl).accent, '#ffffff', '#2b2326', '#c9a45c', '#b23a48', '#e8a0ae', '#6b4f3a', '#1f3a5f', '#2d7a43'])];
 const KIND = {text:'✏️ Chữ', image:'🖼 Hình ảnh', box:'▢ Khối'};
 const fmtNum = x => +(+x).toFixed(2);
+/* Thang đo cho từng thanh chỉnh: [bước nhỏ, bước lớn] cho nút −/+ và các vạch số bên dưới */
+const SCALE = {
+  fs:[1, 5, [8, 20, 40, 60, 80, 100, 120, 140]],
+  ls:[.01, .05, [-.1, 0, .1, .2, .3, .4, .5, .6]],
+  lh:[.05, .2, [.8, 1, 1.2, 1.4, 1.6, 1.8, 2, 2.2, 2.4, 2.6]],
+  'img.px':[1, 10, [0, 25, 50, 75, 100]], 'img.py':[1, 10, [0, 25, 50, 75, 100]],
+  'img.br':[1, 10, [40, 60, 80, 100, 120, 140, 160]], 'img.rad':[1, 10, [0, 25, 50, 75, 100, 150, 200]],
+  sc:[.05, .25, [.2, .5, 1, 1.5, 2, 2.5, 3]], rot:[1, 15, [-180, -135, -90, -45, 0, 45, 90, 135, 180]],
+  op:[.05, .1, [.05, .25, .5, .75, 1]]
+};
+const sgn = x => (x > 0 ? '+' : '−') + fmtNum(Math.abs(x));
+function scaleCtl(k, label, min, max, step, val, unit){
+  const [sm, bg, ticks] = SCALE[k] || [step, step * 10, [min, max]];
+  const pos = t => (t - min) / (max - min);
+  const nb = d => `<button type="button" class="nudge" data-snudge="${k}" data-d="${d}" title="${d > 0 ? 'Tăng' : 'Giảm'} ${fmtNum(Math.abs(d))}${unit}">${sgn(d)}</button>`;
+  return `<div class="rng">
+    <div class="rng-top"><label for="rn-${k}">${label}</label><span class="rng-num"><input type="number" id="rn-${k}" data-s="${k}" min="${min}" max="${max}" step="${step}" value="${fmtNum(val)}" inputmode="decimal"><i>${unit}</i></span></div>
+    <div class="rng-ctl">${nb(-bg)}${nb(-sm)}
+      <div class="rng-track"><input type="range" data-s="${k}" min="${min}" max="${max}" step="${step}" value="${val}" aria-label="${label}">
+        <div class="rng-scale" aria-hidden="true">${ticks.map(t => `<button type="button" tabindex="-1" data-stick="${k}" data-val="${t}" style="--p:${pos(t)}">${fmtNum(t)}</button>`).join('')}</div></div>
+      ${nb(sm)}${nb(bg)}</div></div>`;
+}
+/* Đặt giá trị cho một thanh chỉnh (dùng cho nút −/+ và vạch số) */
+function setScale(k, v){
+  const r = $(`.rng input[type=range][data-s="${k}"]`, panel); if (!r) return;
+  r.value = Math.min(+r.max, Math.max(+r.min, +(+v).toFixed(3)));
+  selInput(r);
+}
+/* Nhấn giữ nút −/+ để tăng / giảm liên tục */
+let nudgeT = 0;
+const stopNudge = () => { clearTimeout(nudgeT); nudgeT = 0; };
+panel.addEventListener('pointerdown', e => {
+  const b = e.target.closest('[data-snudge]'); if (!b || !sel) return;
+  e.preventDefault(); stopNudge();
+  const k = b.dataset.snudge, d = +b.dataset.d;
+  const once = () => { const r = $(`.rng input[type=range][data-s="${k}"]`, panel); if (r) setScale(k, +r.value + d); };
+  once();
+  const rep = delay => nudgeT = setTimeout(() => { once(); rep(70); }, delay);
+  rep(420);
+});
+['pointerup', 'pointercancel', 'pointerleave', 'blur'].forEach(t => addEventListener(t, stopNudge));
 
 function selPane(){
   const s = sel, o = s.o || {}, cs = s.cs || {}, v = (k, d) => o[k] ?? cs[k] ?? d;
   const im = s.img || s.under, io = im?.o || {};
-  const rng = (k, label, min, max, step, val, unit = '') => `<div class="rng"><label>${label}<output data-out="${k}">${fmtNum(val)}${unit}</output></label>
-    <input type="range" data-s="${k}" data-unit="${unit}" min="${min}" max="${max}" step="${step}" value="${val}"></div>`;
+  const rng = (k, label, min, max, step, val, unit = '') => scaleCtl(k, label, min, max, step, val, unit);
   const tog = (k, ic, t) => `<button type="button" class="tg ${v(k) ? 'on' : ''}" data-stog="${k}" title="${t}" aria-pressed="${!!v(k)}">${ic}</button>`;
   const al = a => `<button type="button" class="tg ${v('ta', 'center') === a ? 'on' : ''}" data-sset="ta" data-val="${a}" title="Căn ${{left:'trái', center:'giữa', right:'phải', justify:'đều'}[a]}">${{left:'⇤', center:'≡', right:'⇥', justify:'☰'}[a]}</button>`;
   const curFont = o.ff || cs.ff;
@@ -315,8 +357,13 @@ function setOv(key, patch){
 }
 const DEFAULTS = {sc:1, rot:0, op:1, 'img.br':100};
 function selInput(el){
-  const k = el.dataset.s, raw = el.value;
-  const out = $(`[data-out="${k}"]`, panel); if (out) out.textContent = fmtNum(raw) + (el.dataset.unit || '');
+  const k = el.dataset.s;
+  let raw = el.value;
+  if (el.type === 'number') {          // ô số: bỏ qua khi đang gõ dở (VD: "-" hoặc trống), giới hạn trong khoảng cho phép
+    if (raw === '' || isNaN(+raw)) return;
+    raw = String(Math.min(+el.max, Math.max(+el.min, +raw)));
+  }
+  $$(`.rng [data-s="${k}"]`, panel).forEach(x => { if (x !== el) x.value = x.type === 'number' ? fmtNum(raw) : raw; });
   if (k === 'text') {
     if (sel.bound) { setP(D, sel.bound, raw); sel.text = raw; touch(false); }
     else if (sel.layer) { const l = D.layers.find(x => 'L:' + x.id === sel.key); if (l) { l.text = raw; touch(false); } }
@@ -350,6 +397,8 @@ function selClick(b){
   if (d.stog) { const cur = sel.o?.[d.stog] ?? sel.cs?.[d.stog]; setOv(sel.key, {[d.stog]: cur ? 0 : 1}); build(); return true; }
   if (d.sset) { setOv(sel.key, {[d.sset]: d.val}); build(); return true; }
   if (d.spick != null) { selImage(D.photos[+d.spick]); return true; }
+  if (d.snudge) return true;   // đã xử lý ở pointerdown
+  if (d.stick) { setScale(d.stick, d.val); return true; }
   const a = d.sact; if (!a) return false;
   if (a === 'done') { sel = null; pvPost({type:'th-select', key:null}); build(); if (matchMedia('(max-width:640px)').matches) $('[data-tab="preview"]').click(); }
   if (a === 'imgUrl') { const u = $('#selImgUrl').value.trim(); if (u) selImage(u); }
