@@ -69,6 +69,37 @@ TH.TEMPLATES.forEach(t => { const c = COUPLES[t.id]; if (!c) return;
 TH.TEMPLATE_CATS = ['Tất cả','Lãng mạn','Tối giản','Sang trọng','Truyền thống','Vintage'];
 TH.findTemplate = id => TH.TEMPLATES.find(t => t.id === id) || TH.TEMPLATES[0];
 
+/* Cảm nhận của các cặp đôi đã dùng mẫu & lời chúc của khách — chạy như danh đề phim trong cửa sổ chi tiết mẫu.
+   Mỗi mẫu lấy một bộ cố định (theo id) nên mở lại vẫn thấy đúng các dòng cũ. */
+const REVIEWS = [
+  ['Ngọc Anh & Đức Huy', 'Hà Nội', 'Mẫu đẹp hơn cả mong đợi, họ hàng ai mở thiệp cũng khen. Chỉnh sửa rất dễ, 20 phút là xong!'],
+  ['Thu Trang & Minh Tuấn', 'TP. Hồ Chí Minh', 'Phần xác nhận tham dự giúp tụi mình đếm khách chính xác, nhà hàng chuẩn bị vừa đủ bàn.'],
+  ['Hải Yến & Quốc Bảo', 'Đà Nẵng', 'Ông bà mình dùng chế độ chữ lớn và nghe đọc thiệp, cảm động lắm luôn.'],
+  ['Phương Thảo & Gia Khánh', 'Cần Thơ', 'Gửi qua Zalo có tên riêng từng khách, bạn bè bảo trông rất chuyên nghiệp.'],
+  ['Mai Linh & Trọng Nghĩa', 'Hải Phòng', 'Nhạc nền + hiệu ứng mở phong bì làm khách nào cũng xem tới cuối thiệp.'],
+  ['Khánh Linh & Văn Đức', 'Huế', 'Mã QR mừng cưới tiện cho khách ở xa, tụi mình nhận được nhiều lời chúc dễ thương.'],
+  ['Bảo Trâm & Hoàng Long', 'Nha Trang', 'Đổi phông chữ, kéo thả ảnh y như Canva. Không biết thiết kế vẫn làm được.'],
+  ['Diệu Linh & Anh Khoa', 'Bắc Ninh', 'Album ảnh cưới hiển thị nét, khách vào xem lại nhiều lần sau ngày cưới.'],
+  ['Thanh Hương & Đình Phúc', 'Vũng Tàu', 'Đếm ngược ngày cưới ngay trang đầu, cả nhà háo hức theo từng ngày.'],
+  ['Kim Ngân & Thành Đạt', 'Quảng Ninh', 'Màu sắc tinh tế, in ảnh màn hình đăng Facebook cũng rất đẹp.'],
+  ['Hồng Nhung & Quang Vinh', 'Đà Lạt', 'Khách bấm chỉ đường tới nhà hàng một chạm, không ai bị lạc đường.'],
+  ['Lan Chi & Tuấn Anh', 'Thanh Hoá', 'Tiết kiệm được cả triệu tiền in thiệp giấy mà vẫn sang trọng.']
+];
+const WISHES = [
+  ['Cô Hạnh', 'Chúc hai con trăm năm hạnh phúc, đầu bạc răng long!'], ['Anh Tuấn', 'Thiệp xinh quá, hẹn gặp hai bạn ở tiệc nhé 🥂'],
+  ['Chị Ngọc', 'Chúc mừng hạnh phúc! Sớm có thiên thần nhỏ nha 👶'], ['Bạn thân Hà', 'Cuối cùng cũng chờ được ngày này, mãi yêu nhau như hôm nay nhé 💕'],
+  ['Nhóm lớp 12A1', 'Cả lớp sẽ có mặt đông đủ, chúc hai bạn mãi là một đôi!'], ['Đồng nghiệp Minh', 'Chúc mừng đám cưới, thiệp online tiện ghê, mở là thấy đường đi luôn.'],
+  ['Bác Tư', 'Chúc hai cháu thuận vợ thuận chồng, tát biển Đông cũng cạn.'], ['Em Vy', 'Ảnh cưới đẹp như phim luôn, chúc anh chị hạnh phúc!'],
+  ['Anh Long', 'Ở xa không về kịp, gửi chút quà qua mã QR nhé. Chúc mừng hai em!'], ['Chị Thảo', 'Trăm năm tình viên mãn, bạc đầu nghĩa phu thê 💐']
+];
+TH.tplReviews = t => {
+  let h = 0; for (const c of t.id) h = (h * 33 + c.charCodeAt(0)) >>> 0;
+  const pick = (arr, n) => Array.from({length:n}, (_, i) => arr[(h + i * 7) % arr.length]).filter((x, i, a) => a.indexOf(x) === i);
+  const rv = pick(REVIEWS, 6).map(([who, city, text], i) => ({kind:'review', who, city, text, stars: (h + i) % 5 === 3 ? 4 : 5}));
+  const ws = pick(WISHES, 5).map(([who, text]) => ({kind:'wish', who, text}));
+  return rv.flatMap((r, i) => ws[i] ? [r, ws[i]] : [r]);
+};
+
 /* Thiệp mẫu “khách hàng đã tạo” để trưng bày */
 TH.SHOWCASE = [
   {groom:'Minh Khôi', bride:'Thu Hà',    date:'2026-10-18', tpl:'hong-pastel'},

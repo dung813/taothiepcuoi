@@ -19,6 +19,7 @@ TH.pageHome = () => {
   $('#ph1').innerHTML = TH.miniTpl(a);
   $('#ph2').innerHTML = TH.miniTpl(b, {groom:'Đức Anh', bride:'Phương Linh'});
   $('#hotTpl').innerHTML = [...TH.TEMPLATES].sort((x,y)=>y.views-x.views).slice(0,8).map(TH.tplCard).join('');
+  TH.watchCards($('#hotTpl'));
   const cards = TH.SHOWCASE.map(showCard).join('');
   $('#showTrack').innerHTML = cards + cards;
   $('#homePosts').innerHTML = TH.POSTS.slice(0,3).map(p=>postCard(p)).join('');
@@ -36,13 +37,14 @@ TH.pageTemplates = () => {
     list.sort(sort==='hot' ? (a,b)=>b.views-a.views : (a,b)=>a.name.localeCompare(b.name,'vi'));
     $('#grid').innerHTML = list.length ? list.map(TH.tplCard).join('') : '<p class="empty">Không tìm thấy mẫu phù hợp.</p>';
     $('#count').textContent = list.length + ' mẫu';
-    TH.reveal($('#grid'));
+    TH.reveal($('#grid')); TH.watchCards($('#grid'));
   };
   $('#cats').onclick = e => { const b = e.target.closest('[data-c]'); if (!b) return; cat = b.dataset.c; $$('#cats .chip').forEach(x=>x.classList.toggle('active', x===b)); render(); };
   $('#tier').onchange = e => { tier = e.target.value; render(); };
   $('#sort').onchange = e => { sort = e.target.value; render(); };
   $('#q').oninput = e => { q = e.target.value.trim().toLowerCase(); render(); };
   render();
+  TH.openTplFromHash();   // link chia sẻ dạng mau-thiep.html#mau=<id> mở thẳng cửa sổ chi tiết mẫu
 };
 
 /* ---------- Cẩm nang ---------- */

@@ -82,7 +82,7 @@ TH.store = {
 
 /* ---------- Thư viện phông chữ (Google Fonts, có dấu tiếng Việt) — tải khi cần ---------- */
 TH.FONTS = [
-  ['Chữ ký & bay bướm', 'cursive', ['Great Vibes','Dancing Script','Allura','Alex Brush','Corinthia','Imperial Script','Ephesis','Charm','Parisienne','Pacifico','Lobster']],
+  ['Chữ ký & bay bướm', 'cursive', ['Great Vibes','Dancing Script','Allura','Alex Brush','Corinthia','Imperial Script','Ephesis','Charm','Pacifico','Lobster']],
   ['Có chân sang trọng', 'serif', ['Playfair Display','Cormorant Garamond','Lora','EB Garamond','Prata','Noto Serif','Merriweather']],
   ['Không chân hiện đại', 'sans-serif', ['Be Vietnam Pro','Montserrat','Quicksand','Nunito','Josefin Sans','Lexend','Roboto','Oswald']],
   ['Vui nhộn', 'cursive', ['Patrick Hand','Comfortaa','Mali','Itim','Pattaya','Baloo 2','Bungee']]
@@ -176,11 +176,172 @@ document.addEventListener('click', e => {
   });
 });
 
-TH.tplCard = t => `<article class="tpl-card reveal" data-cat="${t.cat}">
+TH.tplCard = t => `<article class="tpl-card reveal" data-cat="${t.cat}" data-tpl="${t.id}">
   <div class="tpl-thumb"><span class="tier ${t.tier}">${t.tier==='premium'?'PREMIUM':'BASIC'}</span>${TH.miniTpl(t, t.couple)}
     <span class="tpl-peek" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>Xem mẫu</span></div>
   <a class="card-link" href="thiep.html?template=${t.id}" aria-label="Xem mẫu ${t.name}"></a>
   <div class="tpl-info"><h3>${t.name}</h3><div class="tpl-stats">${likeBtn(t)}<small title="Lượt xem">👁 ${t.views.toLocaleString('vi-VN')}</small></div></div></article>`;
+
+/* ---------- Xem trước "sống": thiệp thật thu nhỏ trong thẻ mẫu, tự lướt từ trên xuống ----------
+   Máy tính: rê chuột vào thẻ. Điện thoại: thẻ nằm giữa màn hình. Mỗi lúc chỉ chạy 1 thẻ cho nhẹ máy. */
+const reduceMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+const PV_W = 390;   // dựng thiệp ở bề rộng điện thoại rồi thu nhỏ vừa khung
+/* Tự cuộn cửa sổ của iframe; hết trang thì dừng một nhịp rồi quay lại đầu. Trả về hàm dừng. */
+TH.autoScroll = (frame, pxPerSec = 120) => {
+  let raf = 0, last = 0, y = 0, hold = performance.now() + 700, stopped = false;
+  const step = now => {
+    if (stopped) return;
+    const w = frame.contentWindow, doc = w?.document?.documentElement;
+    if (doc) {
+      const max = doc.scrollHeight - w.innerHeight, dt = Math.min(64, now - (last || now));
+      if (now > hold) {
+        y += pxPerSec * dt / 1000;
+        if (y >= max) { y = max; hold = now + 1600; w.scrollTo({top:y, behavior:'instant'}); y = -1; }
+        else if (y < 0) { y = 0; w.scrollTo({top:0, behavior:'smooth'}); hold = now + 900; }
+        else w.scrollTo({top:y, behavior:'instant'});   // 'instant': trang đặt scroll-behavior:smooth, mỗi khung hình sẽ tự huỷ nhau
+      }
+    }
+    last = now; raf = requestAnimationFrame(step);
+  };
+  raf = requestAnimationFrame(step);
+  return () => { stopped = true; cancelAnimationFrame(raf); };
+};
+let live = null;   // {card, box, stop}
+function stopLive(){
+  if (!live) return;
+  const {card, box, stop} = live; live = null;
+  stop?.(); card.classList.remove('is-live');
+  box.classList.remove('ready'); setTimeout(() => box.remove(), 300);
+}
+function startLive(card){
+  if (live?.card === card || reduceMotion()) return;
+  stopLive();
+  const thumb = $('.tpl-thumb', card), id = card.dataset.tpl; if (!thumb || !id) return;
+  const box = document.createElement('div'); box.className = 'tpl-live'; box.setAttribute('aria-hidden', 'true');
+  const s = thumb.clientWidth / PV_W;
+  box.innerHTML = `<iframe src="thiep.html?template=${encodeURIComponent(id)}&preview=1&lite=1" tabindex="-1" loading="eager" title=""
+    style="width:${PV_W}px;height:${Math.ceil(thumb.clientHeight / s)}px;transform:scale(${s})"></iframe><i class="tpl-live-bar"><b></b></i>`;
+  thumb.append(box); card.classList.add('is-live');
+  const fr = $('iframe', box), me = live = {card, box, stop:null};
+  fr.onload = () => setTimeout(() => {
+    if (live !== me) return;
+    box.classList.add('ready');
+    me.stop = TH.autoScroll(fr, 150);
+    // thanh tiến độ ở đáy thẻ
+    const bar = $('.tpl-live-bar b', box);
+    const tick = () => { if (live !== me) return; const w = fr.contentWindow, d = w.document.documentElement;
+      bar.style.width = Math.min(100, w.scrollY / Math.max(1, d.scrollHeight - w.innerHeight) * 100) + '%'; requestAnimationFrame(tick); };
+    tick();
+  }, 350);
+}
+const hoverable = matchMedia('(hover:hover) and (pointer:fine)');
+let hoverT = 0;
+document.addEventListener('pointerover', e => {
+  if (!hoverable.matches) return;
+  const card = e.target.closest('.tpl-card[data-tpl]'); if (!card || card.contains(e.relatedTarget)) return;
+  clearTimeout(hoverT); hoverT = setTimeout(() => startLive(card), 180);
+});
+document.addEventListener('pointerout', e => {
+  if (!hoverable.matches) return;
+  const card = e.target.closest('.tpl-card[data-tpl]'); if (!card || card.contains(e.relatedTarget)) return;
+  clearTimeout(hoverT); if (live?.card === card) stopLive();
+});
+/* Điện thoại: thẻ chiếm phần lớn màn hình (gần giữa) thì tự chạy */
+const cardIO = 'IntersectionObserver' in window ? new IntersectionObserver(es => {
+  if (hoverable.matches) return;
+  es.forEach(e => {
+    if (e.isIntersecting && e.intersectionRatio >= .75) { clearTimeout(hoverT); hoverT = setTimeout(() => startLive(e.target), 400); }
+    else if (live?.card === e.target) stopLive();
+  });
+}, {threshold:[0, .75, 1], rootMargin:'-12% 0px -12% 0px'}) : null;
+TH.watchCards = (root = document) => { if (cardIO) $$('.tpl-card[data-tpl]', root).forEach(c => cardIO.observe(c)); };
+
+/* ---------- Cửa sổ chi tiết mẫu (bấm vào thẻ) ---------- */
+const loadQR = () => window.QRCode ? Promise.resolve() : new Promise((ok, fail) => {
+  const s = document.createElement('script'); s.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+  s.onload = ok; s.onerror = fail; document.head.append(s); });
+const stars = n => '★'.repeat(n) + '☆'.repeat(5 - n);
+TH.openTpl = (id, push = true) => {
+  const t = TH.TEMPLATES.find(x => x.id === id); if (!t) return;
+  stopLive(); TH.closeTpl(false);
+  const liveUrl = new URL(`thiep.html?template=${encodeURIComponent(t.id)}`, location.href).href;
+  const reviews = TH.tplReviews ? TH.tplReviews(t) : [];
+  const users = Math.round(t.views * .062);
+  const credits = `<div class="tc-half"><div class="tc-spacer"></div>
+    <p class="tc-title">${TH.esc(t.name)}</p><p class="tc-sub">Cảm nhận &amp; lời chúc</p>
+    ${reviews.map(r => r.kind === 'review'
+      ? `<div class="tc-item"><span class="tc-stars" aria-label="${r.stars} sao">${stars(r.stars)}</span><q>${TH.esc(r.text)}</q><small>— ${TH.esc(r.who)} · ${TH.esc(r.city)}</small></div>`
+      : `<div class="tc-item wish"><span class="tc-tag">💌 Lời chúc</span><q>${TH.esc(r.text)}</q><small>— ${TH.esc(r.who)}</small></div>`).join('')}
+    <p class="tc-end">Đã có <b>${users.toLocaleString('vi-VN')}</b> cặp đôi chọn mẫu này</p><p class="tc-fin">♥</p></div>`;
+  const m = document.createElement('div');
+  m.className = 'tm-modal'; m.setAttribute('role', 'dialog'); m.setAttribute('aria-modal', 'true'); m.setAttribute('aria-label', 'Mẫu thiệp ' + t.name);
+  m.innerHTML = `<div class="tm-box">
+    <button type="button" class="tm-x" aria-label="Đóng">×</button>
+    <div class="tm-top-stats">${likeBtn(t)}<span class="tm-views" title="Lượt xem"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>${t.views.toLocaleString('vi-VN')}</span></div>
+    <div class="tm-preview">
+      <div class="tm-phone"><div class="tm-static">${TH.miniTpl(t, t.couple)}</div><iframe src="thiep.html?template=${encodeURIComponent(t.id)}&preview=1&lite=1" title="Xem trước mẫu ${TH.esc(t.name)}"></iframe></div>
+      <p class="tm-hint" id="tmHint">▶ Đang tự lướt · chạm vào thiệp để tự xem</p></div>
+    <div class="tm-info">
+      <div><span class="tier ${t.tier}">${t.tier === 'premium' ? 'PREMIUM' : 'BASIC'}</span><small class="tm-cat">${TH.esc(t.cat)}</small></div>
+      <h3 class="tm-name">${TH.esc(t.name)}</h3>
+      <ul class="tm-feats">
+        <li><b>Chuyên nghiệp:</b> Thiết kế đẹp mắt, phù hợp nhiều phong cách</li>
+        <li><b>Dễ dàng:</b> Chỉnh sửa trực quan như Canva, không cần kinh nghiệm</li>
+        <li><b>Tiện lợi:</b> Chia sẻ ngay qua Zalo, Facebook, Messenger hoặc tin nhắn</li>
+        <li><b>Tối ưu:</b> Hiển thị tốt trên mọi thiết bị, có chế độ chữ lớn cho ông bà</li></ul>
+      <div class="tm-acts"><a class="btn btn-outline" href="thiep.html?template=${encodeURIComponent(t.id)}">Xem trực tiếp</a>
+        <a class="btn btn-primary tm-use" href="editor.html?template=${encodeURIComponent(t.id)}">Dùng mẫu này</a></div>
+      <div class="tm-qr"><div class="tm-qr-box" aria-label="Mã QR xem mẫu trên điện thoại"></div><small>Quét mã QR để xem trên điện thoại</small></div>
+    </div>
+    <aside class="tm-credits" aria-label="Cảm nhận và lời chúc"><div class="tc-head">🎬 Cảm nhận từ các cặp đôi</div>
+      <div class="tc-roll"><div class="tc-track" style="--dur:${Math.max(36, reviews.length * 6.5)}s">${credits}${credits.replace('class="tc-half"', 'class="tc-half" aria-hidden="true"')}</div></div>
+      <p class="tc-note">Rê chuột vào để dừng đọc</p></aside>
+  </div>`;
+  document.body.append(m); document.body.classList.add('tm-open');
+  requestAnimationFrame(() => m.classList.add('show'));
+  const back = document.activeElement;
+  m._back = back;
+  $('.tm-x', m).focus();
+  // Thiệp trong cửa sổ: tự lướt; khách chạm / lăn chuột trong thiệp thì dừng để tự xem
+  const fr = $('iframe', m);
+  fr.onload = () => setTimeout(() => {
+    if (!m.isConnected) return;
+    $('.tm-phone', m).classList.add('ready');
+    if (reduceMotion()) { $('#tmHint', m).textContent = 'Cuộn trong thiệp để xem'; return; }
+    m._stop = TH.autoScroll(fr, 85);
+    const pause = () => { if (!m._stop) return; m._stop(); m._stop = null; $('#tmHint', m).innerHTML = '⏸ Bạn đang tự xem · <button type="button" class="link-btn" id="tmResume">Tự lướt tiếp</button>'; };
+    ['wheel', 'pointerdown', 'touchstart', 'keydown'].forEach(ev => fr.contentWindow.addEventListener(ev, pause, {passive:true}));
+    m.addEventListener('click', e => { if (e.target.id === 'tmResume') { m._stop = TH.autoScroll(fr, 85); $('#tmHint', m).textContent = '▶ Đang tự lướt · chạm vào thiệp để tự xem'; } });
+  }, 300);
+  loadQR().then(() => new QRCode($('.tm-qr-box', m), {text:liveUrl, width:150, height:150, correctLevel:QRCode.CorrectLevel.M})).catch(() => { $('.tm-qr-box', m).innerHTML = '<small>Không tải được mã QR</small>'; });
+  m.addEventListener('click', e => { if (e.target === m || e.target.closest('.tm-x')) TH.closeTpl(); });
+  m.addEventListener('keydown', e => {
+    if (e.key === 'Escape') TH.closeTpl();
+    if (e.key === 'Tab') {   // giữ phím Tab trong cửa sổ
+      const f = $$('a[href],button:not([disabled]),iframe', m).filter(x => x.offsetParent !== null);
+      if (e.shiftKey && document.activeElement === f[0]) { e.preventDefault(); f[f.length - 1].focus(); }
+      else if (!e.shiftKey && document.activeElement === f[f.length - 1]) { e.preventDefault(); f[0].focus(); }
+    }
+  });
+  if (push) history.pushState({tpl:t.id}, '', '#mau=' + t.id);
+};
+TH.closeTpl = (pop = true) => {
+  const m = $('.tm-modal'); if (!m) return;
+  m._stop?.(); m.classList.remove('show'); document.body.classList.remove('tm-open');
+  setTimeout(() => m.remove(), 250);
+  m._back?.focus?.();
+  if (pop && history.state?.tpl) history.back();
+};
+addEventListener('popstate', () => {
+  const id = location.hash.startsWith('#mau=') ? location.hash.slice(5) : '';
+  if (id) TH.openTpl(id, false); else TH.closeTpl(false);
+});
+/* Bấm thẻ → mở cửa sổ chi tiết (giữ Ctrl/Cmd hoặc chuột giữa vẫn mở trang thiệp ở tab mới) */
+document.addEventListener('click', e => {
+  const a = e.target.closest('.tpl-card .card-link'); if (!a || e.ctrlKey || e.metaKey || e.shiftKey || e.button) return;
+  e.preventDefault(); TH.openTpl(a.closest('.tpl-card').dataset.tpl);
+});
+TH.openTplFromHash = () => { if (location.hash.startsWith('#mau=')) TH.openTpl(location.hash.slice(5), false); };
 
 /* ---------- Hiệu ứng: reveal, count-up, FAQ ---------- */
 TH.reveal = (root=document) => {

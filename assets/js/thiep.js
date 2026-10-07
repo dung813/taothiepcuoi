@@ -50,6 +50,13 @@ function render(){
   b.style.setProperty('--t-accent', accent); b.style.setProperty('--t-font', `'${font}'`);
   TH.loadFont(font, D.fontBody);
   D.fontBody ? b.style.setProperty('--f-body', TH.fontStack(D.fontBody)) : b.style.removeProperty('--f-body');
+  /* Nền thiệp do khách chọn: màu đơn, dải màu hoặc ảnh */
+  const bg = D.bg || {};
+  if (bg.c) b.style.setProperty('--t-bg', bg.c);
+  b.style.backgroundImage = bg.img ? `url('${bg.img}')` : bg.g || '';
+  b.style.backgroundSize = bg.img ? 'cover' : '';
+  b.style.backgroundPosition = bg.img ? 'center' : '';
+  b.style.backgroundAttachment = bg.img ? 'fixed' : '';
   b.classList.toggle('dark', lum(t.fg) > .6);
   b.classList.toggle('preview-mode', isPreview);
   document.title = `${D.groom.nick} & ${D.bride.nick} – Thiệp cưới`;
@@ -119,7 +126,7 @@ function render(){
     <div class="events">${(D.events||[]).filter(e=>e.title).map((e,i,_,n=D.events.indexOf(e))=>`<div class="card event reveal ${i%2?'right':'left'}">
       <h3 data-b="events.${n}.title">${esc(e.title)}</h3><div class="when">${fmtTime(e.time)}</div><div class="where"><b data-b="events.${n}.place">${esc(e.place)}</b><br><span data-b="events.${n}.address">${esc(e.address)}</span></div>
       <div class="acts"><a class="t-btn" target="_blank" href="${esc(mapUrl(e))}">📍 Chỉ đường</a><a class="t-btn ghost" target="_blank" href="${esc(gcal(e))}">📅 Lưu lịch</a></div></div>`).join('')}</div>
-    ${(D.events||[]).length ? `<iframe class="reveal" title="Bản đồ" loading="lazy" style="width:100%;height:240px;border:0;border-radius:18px;margin-top:18px" src="https://maps.google.com/maps?q=${encodeURIComponent(D.events[D.events.length-1].address||'')}&z=15&output=embed"></iframe>` : ''}
+    ${(D.events||[]).length && !P.has('lite') ? `<iframe class="reveal" title="Bản đồ" loading="lazy" style="width:100%;height:240px;border:0;border-radius:18px;margin-top:18px" src="https://maps.google.com/maps?q=${encodeURIComponent(D.events[D.events.length-1].address||'')}&z=15&output=embed"></iframe>` : ''}
     ${v ? `<div class="quick-go card reveal" id="quickGo"><div class="qg-head">Đi đến <b>${esc(v.title)}</b><small>${esc(v.place)} · ${esc(v.address)}</small></div>
       <div class="qg-btns">
         <a class="qg" target="_blank" rel="noopener" href="${esc(dirUrl(v))}"><i>🗺️</i><span>Mở Google Maps</span></a>
@@ -224,7 +231,7 @@ function startCountdown(){
     bs.forEach(b => v.forEach((x,i)=> b[i].textContent = pad(x)));
     if (s === 0) { clearInterval(cdTimer);
       const msg = new Date().toDateString() === new Date(target).toDateString() ? '💍 Hôm nay là ngày trọng đại!' : '💍 Hai bạn đã chính thức về chung một nhà!';
-      boxes.forEach(x => x.insertAdjacentHTML('afterend',`<p class="cd-msg" style="margin-top:14px">${msg}</p>`)); } };
+      boxes.forEach(x => x.nextElementSibling?.classList.contains('cd-msg') || x.insertAdjacentHTML('afterend',`<p class="cd-msg" style="margin-top:14px">${msg}</p>`)); } };   // chỉ chèn 1 lần dù đếm ngược chạy lại
   tick(); cdTimer = setInterval(tick, 1000);
 }
 
@@ -899,7 +906,7 @@ D = load();
 /* ?grp=…: chỉ hiện lịch trình của nhóm khách được mời */
 const group = TH.applyGroup(D, P.get("grp"));
 render();
-if (!isPreview && P.get('id')) TH.guestbook.view(id);
+if (!isPreview && P.get('id') && !P.has('owner')) TH.guestbook.view(id);   // ?owner=1: chủ thiệp xem trước, không tính lượt xem
 
 // Nhận dữ liệu trực tiếp từ trình chỉnh sửa
 let pvJump = null;

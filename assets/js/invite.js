@@ -112,12 +112,13 @@ TH.packInvite = data => {
   if (d.groups) d.groups = d.groups.map(({guests, ...g}) => g);   // không để lộ danh sách tên khách trong link
   Object.values(d.ov || {}).forEach(o => { if (strip(o.img) === '') delete o.img; });
   if (d.layers) d.layers = d.layers.filter(l => strip(l.img) !== '');
+  if (d.bg) d.bg.img = strip(d.bg.img);
   delete d.updated;
   return window.LZString ? LZString.compressToEncodedURIComponent(JSON.stringify(d)) : '';
 };
 TH.unpackInvite = s => { try { return JSON.parse(LZString.decompressFromEncodedURIComponent(s)); } catch { return null; } };
 TH.hasLocalImages = data => [data.cover, ...(data.photos||[]), data.gift?.groom?.qr, data.gift?.bride?.qr,
-  ...Object.values(data.ov || {}).map(o => o.img), ...(data.layers || []).map(l => l.img)].some(v => typeof v === 'string' && v.startsWith('data:'));
+  ...Object.values(data.ov || {}).map(o => o.img), ...(data.layers || []).map(l => l.img), data.bg?.img].some(v => typeof v === 'string' && v.startsWith('data:'));
 
 TH.inviteUrl = (id, data, guest, extra = {}) => {
   const base = new URL('thiep.html', location.href);
