@@ -103,6 +103,51 @@ body{background:#f6eff1;height:100vh;display:flex;flex-direction:column;overflow
 .mini-acc>summary{padding:11px 14px;font-weight:600;cursor:pointer;font-size:.9rem}
 .mini-acc[open]>summary{background:var(--blush);color:var(--rose-d)}
 .mini-acc>.body,.mini-acc>.field{padding:12px 14px;display:grid;gap:10px}
+/* ===== Chỉnh sửa trực tiếp kiểu Canva ===== */
+.stage{padding-top:70px}
+.stage .phone{height:min(780px,calc(100vh - 160px))}
+.stage.desktop{padding-top:70px}
+.stage.desktop .phone{height:calc(100vh - 160px)}
+.live-bar{position:absolute;top:14px;left:18px;z-index:3;display:flex;align-items:center;gap:6px;padding:4px;border-radius:999px;background:rgba(255,255,255,.8);backdrop-filter:blur(8px);border:1px solid var(--line);box-shadow:0 6px 18px rgba(166,58,84,.12)}
+.live-bar button,.live-bar label{display:flex;align-items:center;gap:5px;padding:8px 12px;border:0;border-radius:999px;background:transparent;color:var(--muted);font:600 .8rem var(--f-body);cursor:pointer;white-space:nowrap;transition:background .2s,color .2s}
+.live-bar button:hover,.live-bar label:hover{color:var(--rose-d);background:#fff}
+.live-bar button.on{background:#7c5cff;color:#fff;box-shadow:0 4px 12px rgba(124,92,255,.35)}
+.live-bar button:disabled{opacity:.35;cursor:not-allowed;background:transparent}
+.live-bar .mode{display:flex;background:#f3eef6;border-radius:999px;padding:2px}
+.live-bar .sep{width:1px;height:22px;background:var(--line)}
+.sel-pane{gap:12px}
+.sel-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 14px;border-radius:14px;background:linear-gradient(135deg,#f1edff,#fde8ee)}
+.sel-head span{display:block;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:#6a4fd6;font-weight:700}
+.sel-head b{font-size:1rem;word-break:break-word}
+.cur-font{font-size:1.05rem;font-weight:400;color:var(--ink);margin-left:6px}
+.font-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;max-height:260px;overflow:auto;padding-right:2px}
+.font-grid .fg-h{grid-column:1/-1;font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-top:4px}
+.font-grid button{display:grid;gap:2px;justify-items:center;padding:8px 4px;border:1px solid var(--line);border-radius:10px;background:#fff;cursor:pointer;transition:.15s;min-width:0}
+.font-grid button b{font-size:1.45rem;font-weight:400;line-height:1.1}
+.font-grid button span{font-size:.66rem;color:var(--muted);font-family:var(--f-body);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.font-grid button:hover{border-color:#7c5cff}
+.font-grid button.on{border-color:#7c5cff;background:#f1edff;box-shadow:0 0 0 2px rgba(124,92,255,.25)}
+.rng{display:grid;gap:4px}
+.rng label{display:flex;justify-content:space-between;font-size:.82rem;font-weight:600}
+.rng output{color:#6a4fd6;font-variant-numeric:tabular-nums}
+.rng input{accent-color:#7c5cff;width:100%}
+.sw-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.sw-row input[type=color]{width:38px;height:32px;padding:2px;border-radius:8px}
+.sw{width:26px;height:26px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px var(--line);cursor:pointer}
+.sw:hover{transform:scale(1.12)}
+.tg-row{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.tg-row .sep{width:1px;height:24px;background:var(--line);margin:0 4px}
+.tg{min-width:36px;height:34px;border:1px solid var(--line);border-radius:9px;background:#fff;cursor:pointer;font-size:.95rem}
+.tg.on{background:#7c5cff;border-color:#7c5cff;color:#fff}
+.btn-row{display:flex;flex-wrap:wrap;gap:8px}
+.btn.danger{color:#c33;border-color:#f0c4c4}
+.thumbs.pick{grid-template-columns:repeat(5,1fr)}
+.thumbs.pick button{aspect-ratio:1;border-radius:8px;border:2px solid transparent;background:#eee center/cover;cursor:pointer}
+.thumbs.pick button:hover{border-color:#7c5cff}
+.font-sample{padding:14px;border-radius:12px;background:var(--blush);text-align:center;display:grid;gap:4px}
+.font-sample b{font-family:var(--fa);font-weight:400;font-size:1.9rem;color:var(--rose-d);line-height:1.2}
+.font-sample span{font-family:var(--fb);font-size:.88rem}
+@media(max-width:1100px){.live-bar .lb-t{display:none}}
 @media(max-width:420px){.ed-tabs{grid-template-columns:repeat(2,1fr)}.gift-row{grid-template-columns:1fr}.qr-prev{margin:0 auto}.ed-pane .row{grid-template-columns:1fr}}
 @media(max-width:640px){
   .ed{grid-template-columns:1fr}
@@ -110,6 +155,8 @@ body{background:#f6eff1;height:100vh;display:flex;flex-direction:column;overflow
   .mobile-tabs{display:flex;gap:6px}
   .ed-top .save-state,.ed-top .logo span{display:none}
   .stage .phone{width:100%;max-width:400px}
+  .dev-switch{display:none}
+  .live-bar{left:50%;translate:-50% 0}
 }
 </style>
 </head>
@@ -124,6 +171,16 @@ body{background:#f6eff1;height:100vh;display:flex;flex-direction:column;overflow
 <div class="ed">
   <aside class="panel" id="panel"></aside>
   <main class="stage" id="stage">
+    <div class="live-bar" role="toolbar" aria-label="Chỉnh sửa trực tiếp trên thiệp">
+      <div class="mode" role="group" aria-label="Chế độ khung xem trước">
+        <button data-mode="edit" class="on" aria-pressed="true" title="Bấm vào chữ / ảnh trên thiệp để chỉnh sửa">✏️<span class="lb-t">Sửa trực tiếp</span></button>
+        <button data-mode="view" aria-pressed="false" title="Dùng thử thiệp như khách mời">👁<span class="lb-t">Xem thử</span></button></div>
+      <button id="addText" title="Thêm một dòng chữ mới vào phần đang xem">＋<span>Chữ</span></button>
+      <label title="Thêm ảnh / hình trang trí vào phần đang xem">＋<span>Ảnh</span><input type="file" accept="image/*" hidden id="addImg"></label>
+      <span class="sep"></span>
+      <button id="undoBtn" title="Hoàn tác (Ctrl+Z)" aria-label="Hoàn tác" disabled>↶</button>
+      <button id="redoBtn" title="Làm lại (Ctrl+Y)" aria-label="Làm lại" disabled>↷</button>
+    </div>
     <div class="dev-switch" role="group" aria-label="Chế độ xem trước">
       <button class="dev-btn active" data-dev="phone" aria-pressed="true" title="Xem giao diện điện thoại" data-tip="Xem giao diện điện thoại"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg><span>Điện thoại</span></button>
       <button class="dev-btn" data-dev="desktop" aria-pressed="false" title="Xem giao diện máy tính" data-tip="Xem giao diện máy tính"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M1.5 20h21M9 16l-.5 4M15 16l.5 4"/></svg><span>Máy tính</span></button>

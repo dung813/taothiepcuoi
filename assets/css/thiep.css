@@ -607,3 +607,27 @@ body:has(.use-tpl) .speak-btn{bottom:132px}
 body:has(.use-tpl) .fab-wish{bottom:76px}
 @media (max-width:380px){.use-tpl small{display:none}.use-tpl{padding:11px 18px}}
 .preview-mode .use-tpl{display:none}
+
+/* ===== Chữ / ảnh khách tự thêm (hiện cả trên thiệp thật) ===== */
+.ek-layer{position:absolute;z-index:6;translate:-50% -50%;white-space:pre-wrap;max-width:92%;font-family:var(--t-font),cursive;font-size:2.2rem;line-height:1.2;color:var(--t-accent);text-align:center}
+img.ek-layer{width:140px;max-width:none;height:auto}
+
+/* ===== Chế độ chỉnh sửa tự do trong khung xem trước ===== */
+body.ek-edit #app [data-ek]{cursor:pointer;transition:none!important;animation-play-state:paused}
+body.ek-edit #app .ek-sel{cursor:move;touch-action:none;user-select:none}
+body.ek-edit #app [contenteditable]{cursor:text;user-select:text;-webkit-user-select:text;outline:2px dashed #7c5cff;outline-offset:3px;caret-color:#7c5cff}
+body.ek-edit .ek-hidden{opacity:.22!important;outline:1px dashed currentColor}
+body.ek-edit .t-hero .bg{animation:none}
+.ek-ui{font:600 12px/1 'Be Vietnam Pro',system-ui,sans-serif;color:#2a2230}
+.ek-box,.ek-hov{position:fixed;z-index:9000;pointer-events:none;border-radius:6px}
+.ek-box{border:2px solid #7c5cff;box-shadow:0 0 0 1px rgba(255,255,255,.8)}
+.ek-hov{border:1.5px dashed rgba(124,92,255,.8)}
+.ek-box[hidden],.ek-hov[hidden],.ek-bar[hidden]{display:none}
+.ek-h{position:absolute;width:16px;height:16px;border-radius:50%;background:#fff;border:2px solid #7c5cff;pointer-events:auto;touch-action:none;box-shadow:0 1px 4px rgba(0,0,0,.3)}
+.ek-h.sc{right:-9px;bottom:-9px;cursor:nwse-resize}
+.ek-h.rot{left:50%;top:-34px;translate:-50% 0;cursor:grab}
+.ek-h.rot::after{content:"";position:absolute;left:50%;top:14px;width:2px;height:18px;translate:-50% 0;background:#7c5cff}
+.ek-bar{position:fixed;z-index:9001;display:flex;gap:2px;padding:4px;background:#fff;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.28)}
+.ek-bar button{display:flex;align-items:center;gap:4px;border:0;background:none;padding:7px 8px;border-radius:8px;cursor:pointer;color:#2a2230;font:inherit;white-space:nowrap}
+.ek-bar button:hover{background:#f1edff;color:#5b3fd6}
+@media(max-width:400px){.ek-bar button span{display:none}.ek-bar button{font-size:15px;padding:8px 9px}}

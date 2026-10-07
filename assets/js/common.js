@@ -80,6 +80,25 @@ TH.store = {
   del(k){ try { localStorage.removeItem('th_'+k); } catch {} }
 };
 
+/* ---------- Thư viện phông chữ (Google Fonts, có dấu tiếng Việt) — tải khi cần ---------- */
+TH.FONTS = [
+  ['Chữ ký & bay bướm', 'cursive', ['Great Vibes','Dancing Script','Allura','Alex Brush','Corinthia','Imperial Script','Ephesis','Charm','Parisienne','Pacifico','Lobster']],
+  ['Có chân sang trọng', 'serif', ['Playfair Display','Cormorant Garamond','Lora','EB Garamond','Prata','Noto Serif','Merriweather']],
+  ['Không chân hiện đại', 'sans-serif', ['Be Vietnam Pro','Montserrat','Quicksand','Nunito','Josefin Sans','Lexend','Roboto','Oswald']],
+  ['Vui nhộn', 'cursive', ['Patrick Hand','Comfortaa','Mali','Itim','Pattaya','Baloo 2','Bungee']]
+];
+/* Phông chỉ có một độ đậm → không xin thêm 700 (Google trả lỗi nếu xin độ đậm không có) */
+const ONE_WEIGHT = new Set(['Great Vibes','Allura','Alex Brush','Imperial Script','Ephesis','Parisienne','Pacifico','Lobster','Prata','Patrick Hand','Itim','Pattaya','Bungee']);
+TH.fontStack = name => { const g = TH.FONTS.find(x => x[2].includes(name)); return `'${name}', ${g ? g[1] : 'sans-serif'}`; };
+TH.fontsHref = names => 'https://fonts.googleapis.com/css2?' + names.map(n => 'family=' + n.replace(/ /g, '+') + (ONE_WEIGHT.has(n) ? '' : ':wght@400;700')).join('&') + '&display=swap';
+const fontsLoaded = new Set();
+TH.loadFont = (...names) => {
+  const todo = names.filter(n => n && !fontsLoaded.has(n) && TH.FONTS.some(g => g[2].includes(n)));
+  if (!todo.length) return;
+  todo.forEach(n => fontsLoaded.add(n));
+  document.head.append(Object.assign(document.createElement('link'), {rel:'stylesheet', href:TH.fontsHref(todo)}));
+};
+
 /* ---------- Toast & modal ---------- */
 TH.toast = msg => {
   let t = $('.toast'); if (!t) { t = document.createElement('div'); t.className = 'toast'; document.body.append(t); }

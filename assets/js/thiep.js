@@ -48,6 +48,8 @@ function render(){
   const b = document.body;
   b.style.setProperty('--t-bg', t.bg); b.style.setProperty('--t-fg', t.fg);
   b.style.setProperty('--t-accent', accent); b.style.setProperty('--t-font', `'${font}'`);
+  TH.loadFont(font, D.fontBody);
+  D.fontBody ? b.style.setProperty('--f-body', TH.fontStack(D.fontBody)) : b.style.removeProperty('--f-body');
   b.classList.toggle('dark', lum(t.fg) > .6);
   b.classList.toggle('preview-mode', isPreview);
   document.title = `${D.groom.nick} & ${D.bride.nick} – Thiệp cưới`;
@@ -85,37 +87,37 @@ function render(){
     <div class="envelope" id="envelope" role="button" tabindex="0" aria-label="Mở thiệp"><div class="env-body"></div><div class="env-letter"><span>Save the date</span><b>${esc(D.groom.nick)}<i>&amp;</i>${esc(D.bride.nick)}</b><span>${dateStr}</span></div><div class="env-flap"></div><div class="env-seal">♥</div></div>
     <button class="t-btn" id="openEnv">💌 Mở thiệp</button></div>` : ''}
 
-  <section class="t-hero${isPreview ? '' : ' intro'}" id="hero"><div class="bg" style="background-image:url('${esc(D.cover || photos[0] || '')}')"></div><div class="flash"></div>
+  <section class="t-hero${isPreview ? '' : ' intro'}" id="hero"><div class="bg" data-bimg="cover" style="background-image:url('${esc(D.cover || photos[0] || '')}')"></div><div class="flash"></div>
     <div class="in">${guest ? `<div class="guest-pill">Thân mời <b>${esc(guest)}</b>${table ? ` · Bàn ${esc(table)}` : ''}</div>` : ''}<div class="t-sub kick" style="margin-bottom:10px">We're getting married</div>
-    <div class="names"><span class="nm g">${esc(D.groom.nick)}</span><span class="amp">&amp;</span><span class="nm b">${esc(D.bride.nick)}</span></div><div class="date">${dateStr}</div>${o.countdown !== false ? `<div class="hero-cd" id="cdHero" aria-label="Đếm ngược đến ngày cưới">${["Ngày","Giờ","Phút","Giây"].map(l => `<div><b>0</b><small>${l}</small></div>`).join("")}</div>` : ""}</div><div class="scroll"></div></section>
+    <div class="names"><span class="nm g" data-b="groom.nick">${esc(D.groom.nick)}</span><span class="amp">&amp;</span><span class="nm b" data-b="bride.nick">${esc(D.bride.nick)}</span></div><div class="date">${dateStr}</div>${o.countdown !== false ? `<div class="hero-cd" id="cdHero" aria-label="Đếm ngược đến ngày cưới">${["Ngày","Giờ","Phút","Giây"].map(l => `<div><b>0</b><small>${l}</small></div>`).join("")}</div>` : ""}</div><div class="scroll"></div></section>
 
   <section class="sec-couple">
     <div class="couple-photo reveal left" style="background-image:url('${esc(photos[1] || D.cover || photos[0] || '')}')" aria-hidden="true"></div>
     <div class="couple-info">
-    ${D.quote ? `<p class="reveal" style="font-style:italic;opacity:.8;max-width:380px;margin:0 auto">“${esc(D.quote)}”</p><div class="divider"></div>` : ''}
+    ${D.quote ? `<p class="reveal" style="font-style:italic;opacity:.8;max-width:380px;margin:0 auto">“<span data-b="quote">${esc(D.quote)}</span>”</p><div class="divider"></div>` : ''}
     <div class="couple">
       <div class="p reveal left"><div class="role">Nhà trai</div><small>${esc(D.groom.father)}<br>${esc(D.groom.mother)}</small></div><span></span>
       <div class="p reveal right"><div class="role">Nhà gái</div><small>${esc(D.bride.father)}<br>${esc(D.bride.mother)}</small></div>
     </div>
     <p class="reveal" style="margin:30px 0 8px;letter-spacing:.2em;font-size:.78rem;text-transform:uppercase;opacity:.7">Trân trọng báo tin lễ thành hôn của</p>
     <div class="couple reveal zoom" style="margin-top:6px">
-      <div class="p"><div class="role">Chú rể</div><b>${esc(D.groom.nick)}</b><small>${esc(D.groom.name)}</small></div>
+      <div class="p"><div class="role">Chú rể</div><b data-b="groom.nick">${esc(D.groom.nick)}</b><small data-b="groom.name">${esc(D.groom.name)}</small></div>
       <div class="amp">&amp;</div>
-      <div class="p"><div class="role">Cô dâu</div><b>${esc(D.bride.nick)}</b><small>${esc(D.bride.name)}</small></div>
+      <div class="p"><div class="role">Cô dâu</div><b data-b="bride.nick">${esc(D.bride.nick)}</b><small data-b="bride.name">${esc(D.bride.name)}</small></div>
     </div>
     ${guest ? `<div class="guest-line reveal"><small style="letter-spacing:.2em;text-transform:uppercase;font-size:.7rem;opacity:.7">Kính mời</small><b>${esc(guest)}</b>${table ? `<span class="guest-table">🎟 Bàn số ${esc(table)}</span>` : ''}</div>` : ''}
-    <p class="reveal" style="margin-top:24px;opacity:.85;line-height:1.8">${esc(D.message)}</p>
+    <p class="reveal" style="margin-top:24px;opacity:.85;line-height:1.8" data-b="message">${esc(D.message)}</p>
     </div>
   </section>
 
   ${o.countdown !== false ? `<section class="sec-countdown" style="padding-top:20px"><h2 class="t-title reveal">Đếm ngược</h2><div class="t-sub reveal">Đến ngày chung đôi</div>
     <div class="countdown reveal zoom" id="cd"><div><b>0</b><small>Ngày</small></div><div><b>0</b><small>Giờ</small></div><div><b>0</b><small>Phút</small></div><div><b>0</b><small>Giây</small></div></div></section>` : ''}
 
-  ${o.calendar !== false && !isNaN(wd) ? `<section style="padding-top:10px"><div class="card cal reveal">${calendar(wd)}</div></section>` : ''}
+  ${o.calendar !== false && !isNaN(wd) ? `<section class="sec-cal" style="padding-top:10px"><div class="card cal reveal">${calendar(wd)}</div></section>` : ''}
 
   <section class="sec-events"><h2 class="t-title reveal">Sự kiện cưới</h2><div class="t-sub reveal">Thời gian & địa điểm</div>
-    <div class="events">${(D.events||[]).filter(e=>e.title).map((e,i)=>`<div class="card event reveal ${i%2?'right':'left'}">
-      <h3>${esc(e.title)}</h3><div class="when">${fmtTime(e.time)}</div><div class="where"><b>${esc(e.place)}</b><br>${esc(e.address)}</div>
+    <div class="events">${(D.events||[]).filter(e=>e.title).map((e,i,_,n=D.events.indexOf(e))=>`<div class="card event reveal ${i%2?'right':'left'}">
+      <h3 data-b="events.${n}.title">${esc(e.title)}</h3><div class="when">${fmtTime(e.time)}</div><div class="where"><b data-b="events.${n}.place">${esc(e.place)}</b><br><span data-b="events.${n}.address">${esc(e.address)}</span></div>
       <div class="acts"><a class="t-btn" target="_blank" href="${esc(mapUrl(e))}">📍 Chỉ đường</a><a class="t-btn ghost" target="_blank" href="${esc(gcal(e))}">📅 Lưu lịch</a></div></div>`).join('')}</div>
     ${(D.events||[]).length ? `<iframe class="reveal" title="Bản đồ" loading="lazy" style="width:100%;height:240px;border:0;border-radius:18px;margin-top:18px" src="https://maps.google.com/maps?q=${encodeURIComponent(D.events[D.events.length-1].address||'')}&z=15&output=embed"></iframe>` : ''}
     ${v ? `<div class="quick-go card reveal" id="quickGo"><div class="qg-head">Đi đến <b>${esc(v.title)}</b><small>${esc(v.place)} · ${esc(v.address)}</small></div>
@@ -127,10 +129,10 @@ function render(){
   </section>
 
   ${o.story !== false && (D.story||[]).length ? `<section class="sec-story"><h2 class="t-title reveal">Chuyện tình yêu</h2><div class="t-sub reveal">Our love story</div>
-    <div class="timeline">${D.story.filter(s=>s.title).map(s=>`<div class="tl-item reveal"><div class="y">${esc(s.date)}</div><h4>${esc(s.title)}</h4><p>${esc(s.text)}</p></div>`).join('')}</div></section>` : ''}
+    <div class="timeline">${D.story.map((s,n)=>!s.title ? '' : `<div class="tl-item reveal"><div class="y" data-b="story.${n}.date">${esc(s.date)}</div><h4 data-b="story.${n}.title">${esc(s.title)}</h4><p data-b="story.${n}.text">${esc(s.text)}</p></div>`).join('')}</div></section>` : ''}
 
   ${o.album !== false && photos.length ? `<section class="sec-album"><h2 class="t-title reveal">Album ảnh cưới</h2><div class="t-sub reveal">Khoảnh khắc hạnh phúc</div>
-    <div class="album">${photos.map((p,i)=>`<img class="reveal zoom" loading="lazy" src="${esc(p)}" data-i="${i}" alt="Ảnh cưới ${i+1}">`).join('')}</div></section>` : ''}
+    <div class="album">${photos.map((p,i)=>`<img class="reveal zoom" loading="lazy" src="${esc(p)}" data-i="${i}" data-bimg="photos.${D.photos.indexOf(p)}" alt="Ảnh cưới ${i+1}">`).join('')}</div></section>` : ''}
 
   ${o.rsvp !== false ? `<section class="sec-rsvp"><h2 class="t-title reveal">Xác nhận tham dự</h2><div class="t-sub reveal">Vui lòng phản hồi trước ngày cưới</div>
     <form class="t-form card reveal" id="rsvp" novalidate>
@@ -192,6 +194,7 @@ function render(){
   ${o.gift !== false ? '<button class="fab fab-gift" id="giftBtn" aria-label="Mừng cưới">🎁</button>' : ''}
   <div class="lightbox" id="lb"><div class="lb-stage"><img alt="" draggable="false"></div><button class="lb-prev" aria-label="Ảnh trước">‹</button><button class="lb-next" aria-label="Ảnh sau">›</button><div class="lb-tools"><button class="lb-zout" aria-label="Thu nhỏ" title="Thu nhỏ (−)">−</button><span class="lb-zv">100%</span><button class="lb-zin" aria-label="Phóng to" title="Phóng to (+)">+</button><button class="lb-fs" aria-label="Toàn màn hình" title="Toàn màn hình"><svg class="ic-in" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><svg class="ic-out" viewBox="0 0 24 24"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg></button><button class="lb-x" aria-label="Đóng">×</button></div><span class="lb-n"></span></div>`;
 
+  TH.ek?.apply(D);   // chỉnh sửa tự do (vị trí, phông, màu, ảnh thay thế, chữ/ảnh thêm) — xem thiep-edit.js
   bind(photos);
   if (stage === 'today') drawTicketQr();
   TH.reveal();

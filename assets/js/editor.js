@@ -8,6 +8,7 @@ let id = P.get('id');
 let D = id && TH.invites.get(id);
 if (!D) { id = TH.uid(); D = TH.defaultInvite(P.get('template') || P.get('tpl') || 'hong-pastel'); history.replaceState(null, '', '?id=' + id); }
 D.events = D.events || []; D.photos = D.photos || []; D.story = D.story || []; D.gift = D.gift || {groom:{}, bride:{}};
+D.ov = D.ov || {}; D.layers = D.layers || [];
 let dirty = false;
 
 /* ---------- Tiện ích đường dẫn "a.b.0.c" ---------- */
@@ -49,8 +50,11 @@ const BODY = {
     <p class="hint">Chọn giao diện cho thiệp — nội dung bạn đã nhập được giữ nguyên khi đổi mẫu.</p>
     <div class="tpl-pick">${TH.TEMPLATES.map(x=>`<button data-tpl="${x.id}" class="${x.id===D.tpl?'on':''}" title="${x.name}">${TH.miniTpl(x,{groom:'A',bride:'B'})}<small>${x.name}${x.tier==='premium'?' ★':''}</small></button>`).join('')}</div>
     <div class="row"><div class="field"><label>Màu nhấn</label><input type="color" data-p="accent" value="${D.accent || t.accent}"></div>
-    <div class="field"><label>Phông chữ tiêu đề</label><select data-p="font">${['','Great Vibes','Dancing Script','Parisienne','Playfair Display'].map(x=>`<option value="${x}" ${x===D.font?'selected':''}>${x||'Theo mẫu ('+t.font+')'}</option>`).join('')}</select></div></div>
-    <button class="btn btn-ghost btn-sm" data-act="resetColor" style="justify-self:start">↺ Dùng màu mặc định của mẫu</button>`; },
+    <div class="field"><label>Phông chữ tiêu đề</label>${fontSelect('data-p="font"', D.font, 'Theo mẫu (' + t.font + ')')}</div></div>
+    <div class="field"><label>Phông chữ nội dung</label>${fontSelect('data-p="fontBody"', D.fontBody, 'Theo mẫu (Be Vietnam Pro)')}</div>
+    <div class="font-sample" style="--fa:${esc(TH.fontStack(D.font || t.font))};--fb:${esc(D.fontBody ? TH.fontStack(D.fontBody) : 'var(--f-body)')}"><b>${esc(D.groom.nick)} &amp; ${esc(D.bride.nick)}</b><span>Trân trọng kính mời quý khách đến dự lễ cưới</span></div>
+    <button class="btn btn-ghost btn-sm" data-act="resetColor" style="justify-self:start">↺ Dùng màu mặc định của mẫu</button>
+    <p class="hint">💡 Muốn đổi phông, cỡ chữ, màu hay vị trí của <b>từng dòng chữ / từng ảnh</b>? Bấm thẳng vào nó trên thiệp bên cạnh.</p>`; },
 
   couple: () => `
     <div class="card-box"><b class="box-h">🤵 Chú rể</b>
@@ -110,6 +114,10 @@ const BODY = {
         <option value="none" ${D.music.type==='none'?'selected':''}>Không dùng nhạc</option></select></div>
       ${D.music.type==='url' ? f('Link file .mp3','music.url','url','placeholder="https://.../bai-hat.mp3"') : ''}
       <p class="hint">Nhạc phát khi khách bấm “Mở thiệp”. Chỉ dùng bài hát bạn có quyền sử dụng.</p></div></details>
+    <details class="mini-acc" open><summary>🪄 Chỉnh sửa tự do</summary><div class="body">
+      <p class="hint">${Object.keys(D.ov).length} phần tử đã chỉnh · ${D.layers.length} chữ/ảnh thêm · ${Object.values(D.ov).filter(o => o.hide).length} phần tử đang ẩn</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-outline btn-sm" data-act="unhideAll">👁 Hiện lại mọi phần đã ẩn</button>
+      <button class="btn btn-ghost btn-sm" data-act="resetFree">↺ Xoá mọi chỉnh sửa tự do</button></div></div></details>
     <details class="mini-acc"><summary>⚙️ Bật / tắt mục</summary><div class="body"><div class="toggles">${[['envelope','Phong bì mở thiệp'],['countdown','Đếm ngược'],['calendar','Lịch tháng'],['story','Chuyện tình'],['album','Album ảnh'],['rsvp','Xác nhận tham dự'],['wishes','Sổ lời chúc'],['gift','Hộp mừng cưới'],['petals','Hoa rơi']]
       .map(([k,l])=>`<label><input type="checkbox" data-opt="${k}" ${D.opts[k]!==false?'checked':''}>${l}</label>`).join('')}</div></div></details>`
 };
@@ -118,6 +126,10 @@ const BODY = {
 function build(){
   const i = TABS.findIndex(x => x.k === tab), next = TABS[i + 1];
   const y = $('#panel').scrollTop;
+  if (sel) { $('#panel').innerHTML = `
+    <nav class="ed-tabs" role="tablist" aria-label="Các mục chỉnh sửa">${TABS.map(x => `<button role="tab" aria-selected="false" data-tab-k="${x.k}"><i>${x.ic}</i><span>${x.name}</span></button>`).join('')}</nav>
+    <section class="ed-pane sel-pane" aria-label="Phần tử đang chọn">${selPane()}</section>`;
+    $('#panel').scrollTop = sel._keepScroll ? y : 0; sel._keepScroll = true; return; }
   $('#panel').innerHTML = `
     <nav class="ed-tabs" role="tablist" aria-label="Các mục chỉnh sửa">${TABS.map((x, n) => `<button role="tab" aria-selected="${x.k === tab}" data-tab-k="${x.k}" class="${x.k === tab ? 'on' : ''}${n < i ? ' done' : ''}"><i>${x.ic}</i><span>${x.name}</span></button>`).join('')}</nav>
     <section class="ed-pane" role="tabpanel" aria-label="${TABS[i].name}">
@@ -136,6 +148,7 @@ function build(){
   if (tab === 'gift') ['groom','bride'].forEach(drawQr);
 }
 function goTab(k){
+  if (sel) { sel = null; pvPost({type:'th-select', key:null}); }
   tab = k; try { sessionStorage.setItem('ed_tab', k); } catch {}
   build(); $('#panel').scrollTop = 0;
   scrollPreview();
@@ -156,12 +169,13 @@ function drawQr(k){
 
 /* ---------- Đồng bộ xem trước (real-time) & lưu tự động ---------- */
 let pvTimer;
-const push = () => { clearTimeout(pvTimer); pvTimer = setTimeout(() => $('#pv').contentWindow.postMessage({type:'th-preview', data:D}, location.origin), 120); };
-const touch = (rebuild) => { dirty = true; $('#saveState').textContent = 'Đang lưu…'; if (rebuild) build(); push(); autosave(); };
+const pvPost = m => $('#pv').contentWindow.postMessage(m, location.origin);
+const push = () => { clearTimeout(pvTimer); pvTimer = setTimeout(() => pvPost({type:'th-preview', data:D}), 120); };
+const touch = (rebuild, noPush) => { dirty = true; $('#saveState').textContent = 'Đang lưu…'; if (rebuild) build(); if (!noPush) push(); autosave(); recordSoon(); };
 let saveTimer;
 const autosave = () => { clearTimeout(saveTimer); saveTimer = setTimeout(save, 800); };
 function save(){ clearTimeout(saveTimer); if (TH.invites.save(id, D)) { dirty = false; $('#saveState').textContent = '✓ Đã lưu ' + new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'}); } }
-addEventListener('message', e => { if (e.origin === location.origin && e.data?.type === 'th-ready') { push(); setTimeout(scrollPreview, 400); } });
+addEventListener('message', e => { if (e.origin === location.origin && e.data?.type === 'th-ready') { pvPost({type:'th-mode', edit:liveEdit}); push(); setTimeout(scrollPreview, 400); } });
 addEventListener('beforeunload', () => { if (dirty) save(); });
 addEventListener('pagehide', () => { if (dirty) save(); });
 document.addEventListener('visibilitychange', () => { if (document.hidden && dirty) save(); });
@@ -184,6 +198,7 @@ function setQuick(key, val){
 const panel = $('#panel');
 panel.addEventListener('input', e => {
   const el = e.target;
+  if (el.dataset.s) return selInput(el);
   if (el.dataset.q) { if (el.type !== 'date') touch(setQuick(el.dataset.q, el.value)); return; }
   const p = el.dataset.p; if (!p) return;
   setP(D, p, el.value); touch(false);
@@ -192,6 +207,7 @@ panel.addEventListener('input', e => {
 });
 panel.addEventListener('change', e => {
   const el = e.target;
+  if (el.dataset.simg && el.files[0]) return TH.readImage(el.files[0], 1400, .82).then(url => selImage(url));
   if (el.dataset.q === 'date') touch(setQuick('date', el.value));
   if (el.dataset.p === 'music.type') { setP(D, 'music.type', el.value); touch(true); }
   if (el.dataset.opt) { D.opts[el.dataset.opt] = el.checked; touch(false); }
@@ -201,6 +217,7 @@ panel.addEventListener('change', e => {
 });
 panel.addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b) return;
+  if (sel && selClick(b)) return;
   if (b.dataset.tabK) return goTab(b.dataset.tabK);
   if (b.dataset.go) return goTab(b.dataset.go);
   if (b.dataset.tpl) {
@@ -217,9 +234,227 @@ panel.addEventListener('click', e => {
   if (b.dataset.add === 'events') { D.events.unshift({title:'Lễ Vu Quy', time:shiftDays(D.date, -1), place:'Tư gia nhà gái', address:'', map:''}); touch(true); }
   if (b.dataset.add === 'story') { D.story.push({date:'', title:'', text:''}); touch(true); }
   if (b.dataset.act === 'resetColor') { D.accent = ''; touch(true); }
+  if (b.dataset.act === 'unhideAll') { Object.entries(D.ov).forEach(([k, o]) => { delete o.hide; if (!Object.keys(o).length) delete D.ov[k]; }); touch(true); TH.toast('Đã hiện lại các phần đã ẩn'); }
+  if (b.dataset.act === 'resetFree' && confirm('Xoá mọi chỉnh sửa tự do (vị trí, phông, màu, chữ/ảnh thêm…)? Thông tin cặp đôi vẫn được giữ.')) { D.ov = {}; D.layers = []; touch(true); }
   if (b.dataset.act === 'addPhoto') { const u = $('#photoUrl').value.trim(); if (u) { D.photos.push(u); if (!D.cover) D.cover = u; touch(true); } }
   if (b.dataset.act === 'finish') { save(); TH.toast('Đã lưu thiệp 💕'); setTimeout(() => $('#btnView').click(), 400); }
 });
+
+/* ====================== Chỉnh sửa tự do kiểu Canva ======================
+   Khách bấm trực tiếp vào chữ / ảnh trong khung xem trước (xem thiep-edit.js);
+   bảng bên trái chuyển sang "phần tử đang chọn" để đổi phông, cỡ, màu, ảnh, vị trí… */
+const ALL_FONTS = TH.FONTS.flatMap(g => g[2]);
+document.head.append(Object.assign(document.createElement('link'), {rel:'stylesheet', href:TH.fontsHref(ALL_FONTS)}));
+function fontSelect(attr, cur, defLabel){
+  return `<select ${attr}><option value="">${esc(defLabel)}</option>${TH.FONTS.map(([g, , list]) => `<optgroup label="${g}">${list.map(n => `<option value="${n}" ${n === cur ? 'selected' : ''}>${n}</option>`).join('')}</optgroup>`).join('')}</select>`;
+}
+let sel = null;   // thông tin phần tử đang chọn (do khung xem trước gửi sang)
+const SWATCH = () => [...new Set([D.accent || TH.findTemplate(D.tpl).accent, '#ffffff', '#2b2326', '#c9a45c', '#b23a48', '#e8a0ae', '#6b4f3a', '#1f3a5f', '#2d7a43'])];
+const KIND = {text:'✏️ Chữ', image:'🖼 Hình ảnh', box:'▢ Khối'};
+const fmtNum = x => +(+x).toFixed(2);
+
+function selPane(){
+  const s = sel, o = s.o || {}, cs = s.cs || {}, v = (k, d) => o[k] ?? cs[k] ?? d;
+  const im = s.img || s.under, io = im?.o || {};
+  const rng = (k, label, min, max, step, val, unit = '') => `<div class="rng"><label>${label}<output data-out="${k}">${fmtNum(val)}${unit}</output></label>
+    <input type="range" data-s="${k}" data-unit="${unit}" min="${min}" max="${max}" step="${step}" value="${val}"></div>`;
+  const tog = (k, ic, t) => `<button type="button" class="tg ${v(k) ? 'on' : ''}" data-stog="${k}" title="${t}" aria-pressed="${!!v(k)}">${ic}</button>`;
+  const al = a => `<button type="button" class="tg ${v('ta', 'center') === a ? 'on' : ''}" data-sset="ta" data-val="${a}" title="Căn ${{left:'trái', center:'giữa', right:'phải', justify:'đều'}[a]}">${{left:'⇤', center:'≡', right:'⇥', justify:'☰'}[a]}</button>`;
+  const curFont = o.ff || cs.ff;
+  return `
+  <div class="sel-head"><div><span>${KIND[s.kind]}${s.section ? ' · ' + esc(s.section) : ''}</span><b>${esc(s.label)}</b></div>
+    <button class="btn btn-primary btn-sm" data-sact="done">✓ Xong</button></div>
+  <p class="hint">Kéo để di chuyển · kéo chấm tròn để xoay / đổi kích thước · bấm đúp để sửa chữ · phím mũi tên để dịch từng chút.</p>
+  ${s.kind === 'text' ? `
+  <div class="card-box"><b class="box-h">Nội dung</b>
+    <textarea data-s="text" rows="${Math.min(6, Math.max(2, Math.ceil((s.text || '').length / 34)))}">${esc(s.text)}</textarea>
+    ${s.bound ? '<p class="hint">Đồng bộ với thông tin thiệp — sửa ở đây thì mọi chỗ hiện nội dung này đều đổi theo.</p>' : ''}</div>
+  <div class="card-box"><b class="box-h">Phông chữ <small class="cur-font" style="font-family:${esc(TH.fontStack(curFont))}">${esc(curFont)}</small></b>
+    <div class="font-grid">${TH.FONTS.map(([g, , list]) => `<small class="fg-h">${g}</small>${list.map(n => `<button type="button" data-sfont="${n}" class="${n === o.ff ? 'on' : ''}" style="font-family:${esc(TH.fontStack(n))}" title="${n}"><b>Aa</b><span>${n}</span></button>`).join('')}`).join('')}</div>
+    ${o.ff ? '<button type="button" class="link-btn" data-sclear="ff" style="justify-self:start;float:none">↺ Dùng phông của mẫu</button>' : ''}</div>
+  <div class="card-box"><b class="box-h">Kiểu chữ</b>
+    ${rng('fs', 'Cỡ chữ', 8, 140, 1, v('fs', 16), 'px')}
+    <div class="sw-row"><input type="color" data-s="color" value="${esc(v('color', '#333333'))}" title="Chọn màu bất kỳ">${SWATCH().map(c => `<button type="button" class="sw" data-scolor="${c}" style="background:${c}" title="${c}"></button>`).join('')}</div>
+    <div class="tg-row">${tog('b', '<b>B</b>', 'In đậm')}${tog('i', '<i>I</i>', 'In nghiêng')}${tog('u', '<u>U</u>', 'Gạch chân')}${tog('tt', 'AA', 'Viết hoa')}<span class="sep"></span>${['left', 'center', 'right', 'justify'].map(al).join('')}</div>
+    ${rng('ls', 'Giãn chữ', -.1, .6, .01, fmtNum(v('ls', 0)), 'em')}
+    ${rng('lh', 'Giãn dòng', .8, 2.6, .05, fmtNum(v('lh', 1.4)))}
+    <div class="field"><label>Đổ bóng chữ</label><select data-s="sh">${[['', 'Không'], ['soft', 'Nhẹ'], ['strong', 'Đậm (dễ đọc trên ảnh)'], ['glow', 'Phát sáng trắng']].map(([k, n]) => `<option value="${k}" ${(o.sh || '') === k ? 'selected' : ''}>${n}</option>`).join('')}</select></div>
+  </div>` : ''}
+  ${im ? `
+  <div class="card-box"><b class="box-h">${s.img ? 'Ảnh' : 'Ảnh phía sau'}${im.bimg === 'cover' ? ' bìa' : ''}</b>
+    <div class="img-prev" style="background-image:url('${esc(im.src)}');background-position:${io.px ?? 50}% ${io.py ?? 50}%"></div>
+    <div class="upload"><label class="btn btn-primary btn-sm" style="flex:1;justify-content:center">📤 Tải ảnh khác lên<input type="file" accept="image/*" hidden data-simg="1"></label></div>
+    <div class="upload"><input type="url" id="selImgUrl" placeholder="Hoặc dán link ảnh online"><button type="button" class="btn btn-outline btn-sm" data-sact="imgUrl">Dùng</button></div>
+    ${D.photos.length ? `<small class="hint">Hoặc chọn từ album:</small><div class="thumbs pick">${D.photos.map((p, i) => `<button type="button" data-spick="${i}" style="background-image:url('${esc(p)}')" aria-label="Dùng ảnh ${i + 1}"></button>`).join('')}</div>` : ''}
+    ${rng('img.px', 'Căn khung ngang', 0, 100, 1, io.px ?? 50, '%')}
+    ${rng('img.py', 'Căn khung dọc', 0, 100, 1, io.py ?? 50, '%')}
+    ${rng('img.br', 'Độ sáng', 40, 160, 1, io.br ?? 100, '%')}
+    ${rng('img.rad', 'Bo góc', 0, 200, 1, io.rad ?? 0, 'px')}
+    ${io.img ? '<button type="button" class="link-btn" data-sact="imgOrig" style="justify-self:start;float:none">↺ Dùng lại ảnh gốc</button>' : ''}
+  </div>` : ''}
+  <div class="card-box"><b class="box-h">Bố cục</b>
+    ${rng('sc', 'Kích thước', .2, 3, .05, o.sc ?? 1, '×')}
+    ${rng('rot', 'Xoay', -180, 180, 1, o.rot ?? 0, '°')}
+    ${rng('op', 'Độ trong suốt', .05, 1, .05, o.op ?? 1)}
+    <div class="btn-row">
+      <button type="button" class="btn btn-outline btn-sm" data-sact="center" ${o.dx || o.dy || o.rot || (o.sc && o.sc !== 1) ? '' : 'disabled'}>⌖ Về vị trí gốc</button>
+      ${s.layer ? `<button type="button" class="btn btn-outline btn-sm" data-sact="dup">⧉ Nhân bản</button><button type="button" class="btn btn-outline btn-sm danger" data-sact="del">🗑 Xoá</button>`
+               : `<button type="button" class="btn btn-outline btn-sm" data-sact="hide">${o.hide ? '👁 Hiện lại' : '🚫 Ẩn đi'}</button>`}
+      ${Object.keys(o).length ? '<button type="button" class="btn btn-ghost btn-sm" data-sact="reset">↺ Khôi phục mặc định</button>' : ''}
+    </div></div>`;
+}
+
+/* Ghi một thay đổi thuộc tính → áp ngay vào khung xem trước, không dựng lại cả thiệp */
+function setOv(key, patch){
+  const o = {...(D.ov[key] || {})};
+  Object.entries(patch).forEach(([k, v]) => v == null || v === '' ? delete o[k] : o[k] = v);
+  Object.keys(o).length ? D.ov[key] = o : delete D.ov[key];
+  pvPost({type:'th-ov-set', key, o:D.ov[key] || null});
+  if (sel) [sel, sel.img, sel.under].forEach(x => { if (x?.key === key) x.o = D.ov[key] || {}; });
+  touch(false, true);
+}
+const DEFAULTS = {sc:1, rot:0, op:1, 'img.br':100};
+function selInput(el){
+  const k = el.dataset.s, raw = el.value;
+  const out = $(`[data-out="${k}"]`, panel); if (out) out.textContent = fmtNum(raw) + (el.dataset.unit || '');
+  if (k === 'text') {
+    if (sel.bound) { setP(D, sel.bound, raw); sel.text = raw; touch(false); }
+    else if (sel.layer) { const l = D.layers.find(x => 'L:' + x.id === sel.key); if (l) { l.text = raw; touch(false); } }
+    else setOv(sel.key, {text: raw});
+    return;
+  }
+  if (k.startsWith('img.')) { const im = sel.img || sel.under, p = k.slice(4), val = +raw;
+    if (p === 'px' || p === 'py') { const prev = $('.sel-pane .img-prev'); if (prev) prev.style.backgroundPosition = `${p === 'px' ? val : im.o?.px ?? 50}% ${p === 'py' ? val : im.o?.py ?? 50}%`; }
+    return setOv(im.key, {[p]: val === DEFAULTS[k] ? null : val}); }
+  if (k === 'color' || k === 'sh') return setOv(sel.key, {[k]: raw});
+  const val = +raw;
+  setOv(sel.key, {[k]: val === DEFAULTS[k] ? null : val});
+}
+function selImage(url){
+  const im = sel?.img || sel?.under; if (!im) return;
+  if (im.bimg) {
+    const old = getP(D, im.bimg);
+    setP(D, im.bimg, url);
+    if (im.bimg.startsWith('photos.') && old === D.cover) D.cover = url;   // ảnh bìa trùng ảnh album → đổi theo
+    im.src = url; touch(true);
+  } else if (im.key.startsWith('L:')) { const l = D.layers.find(x => 'L:' + x.id === im.key); if (l) { l.img = url; im.src = url; touch(true); } }
+  else { setOv(im.key, {img:url}); im.src = url; build(); }
+  TH.toast('Đã đổi ảnh');
+}
+function selClick(b){
+  const d = b.dataset;
+  if (d.sfont) { setOv(sel.key, {ff: d.sfont}); $$('[data-sfont]', panel).forEach(x => x.classList.toggle('on', x === b));
+    const cf = $('.cur-font', panel); if (cf) { cf.textContent = d.sfont; cf.style.fontFamily = TH.fontStack(d.sfont); } return true; }
+  if (d.sclear) { setOv(sel.key, {[d.sclear]: null}); build(); return true; }
+  if (d.scolor) { setOv(sel.key, {color: d.scolor}); const c = $('[data-s="color"]', panel); if (c) c.value = d.scolor; return true; }
+  if (d.stog) { const cur = sel.o?.[d.stog] ?? sel.cs?.[d.stog]; setOv(sel.key, {[d.stog]: cur ? 0 : 1}); build(); return true; }
+  if (d.sset) { setOv(sel.key, {[d.sset]: d.val}); build(); return true; }
+  if (d.spick != null) { selImage(D.photos[+d.spick]); return true; }
+  const a = d.sact; if (!a) return false;
+  if (a === 'done') { sel = null; pvPost({type:'th-select', key:null}); build(); if (matchMedia('(max-width:640px)').matches) $('[data-tab="preview"]').click(); }
+  if (a === 'imgUrl') { const u = $('#selImgUrl').value.trim(); if (u) selImage(u); }
+  if (a === 'imgOrig') { const im = sel.img || sel.under; setOv(im.key, {img:null}); build(); }
+  if (a === 'center') { setOv(sel.key, {dx:null, dy:null, rot:null, sc:null}); build(); }
+  if (a === 'hide') { setOv(sel.key, {hide: sel.o?.hide ? null : 1}); build(); }
+  if (a === 'reset') { delete D.ov[sel.key]; sel.o = {}; pvPost({type:'th-ov-set', key:sel.key, o:null}); touch(true, true); }
+  if (a === 'del' || a === 'dup') {
+    const i = D.layers.findIndex(x => 'L:' + x.id === sel.key); if (i < 0) return true;
+    if (a === 'del') { D.layers.splice(i, 1); delete D.ov[sel.key]; sel = null; touch(true); }
+    else { const n = {...D.layers[i], id:TH.uid(), y:D.layers[i].y + 40}; D.layers.push(n);
+      if (D.ov[sel.key]) D.ov['L:' + n.id] = {...D.ov[sel.key]};
+      pvPost({type:'th-want', key:'L:' + n.id}); touch(false); }
+  }
+  return true;
+}
+
+/* ---------- Thêm chữ / ảnh mới ---------- */
+const pending = {};
+function addLayer(kind, img){
+  const req = TH.uid(); pending[req] = {kind, img};
+  if (matchMedia('(max-width:640px)').matches) $('[data-tab="preview"]').click();
+  pvPost({type:'th-place', req});
+}
+
+/* ---------- Hoàn tác / làm lại ---------- */
+const hist = {stack:[], i:-1};
+function record(){
+  const s = JSON.stringify(D);
+  if (hist.stack[hist.i] === s) return;
+  hist.stack = hist.stack.slice(0, hist.i + 1); hist.stack.push(s);
+  if (hist.stack.length > 40) hist.stack.shift();
+  hist.i = hist.stack.length - 1; updUndo();
+}
+let recTimer;
+function recordSoon(){ clearTimeout(recTimer); recTimer = setTimeout(record, 400); }
+function stepHist(dir){
+  clearTimeout(recTimer); record();
+  const n = hist.i + dir; if (n < 0 || n >= hist.stack.length) return;
+  hist.i = n; D = JSON.parse(hist.stack[n]);
+  sel = null; dirty = true; build(); push(); autosave(); updUndo();
+  TH.toast(dir < 0 ? '↶ Đã hoàn tác' : '↷ Đã làm lại');
+}
+function updUndo(){ $('#undoBtn').disabled = hist.i <= 0; $('#redoBtn').disabled = hist.i >= hist.stack.length - 1; }
+$('#undoBtn').onclick = () => stepHist(-1);
+$('#redoBtn').onclick = () => stepHist(1);
+addEventListener('keydown', e => {
+  if (!(e.ctrlKey || e.metaKey) || e.target.matches('input,textarea,select')) return;
+  const k = e.key.toLowerCase();
+  if (k === 'z') { e.preventDefault(); stepHist(e.shiftKey ? 1 : -1); }
+  if (k === 'y') { e.preventDefault(); stepHist(1); }
+});
+
+/* ---------- Nhận tin từ khung xem trước ---------- */
+addEventListener('message', e => {
+  if (e.origin !== location.origin) return;
+  const m = e.data || {};
+  if (m.type === 'th-sel') {
+    const prev = sel; sel = m.info;
+    if (!sel) { if (prev) build(); return; }
+    if (prev?.key === sel.key) sel._keepScroll = true;
+    // Đang gõ / kéo thanh trượt trong bảng thì không dựng lại (tránh mất con trỏ)
+    const ae = document.activeElement;
+    if (prev?.key === sel.key && panel.contains(ae) && ae.matches('input,textarea,select')) return;
+    build();
+  }
+  if (m.type === 'th-ov') { m.o ? D.ov[m.key] = m.o : delete D.ov[m.key]; if (sel?.key === m.key) sel.o = m.o || {}; touch(false, true); }
+  if (m.type === 'th-bind') {
+    const old = getP(D, m.path); setP(D, m.path, m.value);
+    if (m.path.startsWith('photos.') && old === D.cover) D.cover = m.value;
+    touch(!sel);
+  }
+  if (m.type === 'th-layer') {
+    const i = D.layers.findIndex(x => x.id === m.id); if (i < 0) return;
+    if (m.remove) { D.layers.splice(i, 1); delete D.ov['L:' + m.id]; sel = null; touch(true); }
+    else { Object.assign(D.layers[i], m.patch); touch(false); }
+  }
+  if (m.type === 'th-placed' && pending[m.req]) {
+    const {kind, img} = pending[m.req]; delete pending[m.req];
+    const l = {id:TH.uid(), sec:m.sec, kind, x:m.x, y:m.y, ...(kind === 'img' ? {img} : {text:'Nhập chữ của bạn'})};
+    D.layers.push(l);
+    pvPost({type:'th-want', key:'L:' + l.id, edit: kind === 'text'});
+    touch(false);
+  }
+  if (m.type === 'th-panel' && matchMedia('(max-width:640px)').matches) $('[data-tab="edit"]').click();
+  if (m.type === 'th-undo') stepHist(-1);
+  if (m.type === 'th-redo') stepHist(1);
+});
+
+/* ---------- Thanh "Sửa trực tiếp" trên khung xem trước ---------- */
+let liveEdit = (() => { try { return localStorage.getItem('ed_live') !== '0'; } catch { return true; } })();
+function setLive(on){
+  liveEdit = on;
+  $$('[data-mode]').forEach(b => { const x = (b.dataset.mode === 'edit') === on; b.classList.toggle('on', x); b.setAttribute('aria-pressed', x); });
+  if (!on && sel) { sel = null; build(); }
+  try { localStorage.setItem('ed_live', on ? '1' : '0'); } catch {}
+  pvPost({type:'th-mode', edit:on});
+}
+$$('[data-mode]').forEach(b => b.onclick = () => setLive(b.dataset.mode === 'edit'));
+$('#addText').onclick = () => { if (!liveEdit) setLive(true); addLayer('text'); };
+$('#addImg').onchange = e => { const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+  if (!liveEdit) setLive(true);
+  TH.readImage(f, 900, .85).then(url => addLayer('img', url)); };
+setLive(liveEdit);
+if (!TH.store.get('liveHint')) { TH.store.set('liveHint', 1); setTimeout(() => TH.toast('Mẹo: bấm vào chữ hoặc ảnh trên thiệp để chỉnh sửa trực tiếp ✨'), 1200); }
 
 /* ---------- Thanh công cụ ---------- */
 $('#btnView').onclick = () => { save(); location.href = TH.inviteUrl(id, null); };
@@ -249,5 +484,5 @@ $$('[data-dev]').forEach(b => b.onclick = () => setDev(b.dataset.dev));
 try { if (localStorage.getItem('ed_dev') === 'desktop') setDev('desktop'); } catch {}
 $$('[data-tab]').forEach(b => b.onclick = () => { $$('[data-tab]').forEach(x=>x.classList.toggle('active', x===b)); document.body.classList.toggle('show-preview', b.dataset.tab==='preview'); push(); setTimeout(scrollPreview, 300); });
 
-build(); save();
+build(); save(); record();
 })();
