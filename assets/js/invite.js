@@ -102,7 +102,156 @@ TH.guestbook = {
 };
 
 /* Đường dẫn chia sẻ: đóng gói dữ liệu vào URL (#d=) để mở được trên máy khác mà không cần server.
-   Ảnh tải lên từ máy (data:) quá lớn nên được lược bỏ — hãy dùng link ảnh online nếu muốn chia sẻ. */
+   Ảnh tải lên từ máy (data:) quá lớn nên được lược bỏ — hãy dùng link ảnh online nếu muốn chia sẻ.
+   Bản v2 (đánh dấu "~" ở đầu) nén gọn hơn: tên trường -> mã ngắn, chữ mẫu có sẵn -> số thứ tự, ảnh mẫu -> "@".
+   PK_KEYS và PK_TEXTS CHỈ ĐƯỢC THÊM VÀO CUỐI, không sửa/xoá/đổi thứ tự — link đã gửi dựa vào vị trí. */
+const PK_KEYS = ["tpl","accent","font","groom","name","nick","father","mother","bride","date","message","quote","events","title","time","place","address","map","hall","lat","lng","parking","cover","photos","story","text","music","type","url","hotlines","role","phone","thanks","gift","bank","acc","owner","qr","opts","countdown","calendar","album","rsvp","wishes","petals","envelope","id","groups","side","guests"];
+const PK_TEXTS = [
+  "Nguyễn Minh Khôi",
+  "Ông Nguyễn Văn Hải",
+  "Bà Trần Thị Lan",
+  "Ông Lê Quang Vinh",
+  "Bà Phạm Thị Mai",
+  "Trân trọng kính mời quý khách đến dự buổi tiệc chung vui cùng gia đình chúng tôi. Sự hiện diện của quý khách là niềm vinh hạnh lớn lao cho hai gia đình.",
+  "Yêu nhau không phải là nhìn nhau, mà là cùng nhau nhìn về một hướng.",
+  "Tư gia nhà gái",
+  "12 Nguyễn Trãi, Quận 1, TP. Hồ Chí Minh",
+  "Tư gia nhà trai",
+  "45 Lê Lợi, Quận 3, TP. Hồ Chí Minh",
+  "Trung tâm Hội nghị Tiệc cưới",
+  "Sảnh Hoa Hồng · Tầng 2",
+  "88 Điện Biên Phủ, Bình Thạnh, TP. Hồ Chí Minh",
+  "Xe máy: gửi miễn phí tại hầm B1, lối vào bên phải sảnh chính.\nÔ tô: bãi đỗ phía sau tòa nhà (khoảng 40 chỗ), có bảo vệ hướng dẫn.\nĐi taxi/xe công nghệ: chọn điểm đón trả trước cổng chính để thuận tiện nhất.",
+  "Lần đầu gặp gỡ",
+  "Một buổi chiều mưa ở quán cà phê nhỏ, hai người lạ ngồi chung bàn vì hết chỗ.",
+  "Chính thức hẹn hò",
+  "Sau hai năm làm bạn, anh lấy hết can đảm để nói lời thương.",
+  "Dưới bầu trời Đà Lạt đầy sao, cô ấy đã nói “Đồng ý”.",
+  "Anh trai chú rể · Nhà trai",
+  "Chị gái cô dâu · Nhà gái",
+  "NGUYEN MINH KHOI",
+  "Ông Đỗ Văn Khải",
+  "Bà Phạm Thị Thanh",
+  "Ông Ngô Quang Định",
+  "Bà Lý Thị Hương",
+  "Ông Hoàng Văn Phúc",
+  "Bà Trần Thị Duyên",
+  "Ông Lâm Hữu Tài",
+  "Bà Nguyễn Thị Diệu",
+  "Ông Lê Minh Châu",
+  "Ông Vũ Văn Thành",
+  "Bà Hoàng Thị Thu",
+  "Trần Quang Huy",
+  "Ông Trần Văn Bình",
+  "Bà Nguyễn Thị Hoa",
+  "Ông Phạm Đức Toàn",
+  "Bà Lê Thị Hằng",
+  "TRAN QUANG HUY",
+  "Huỳnh Quốc Bảo",
+  "Ông Huỳnh Văn Lợi",
+  "Ông Tô Minh Đức",
+  "Bà Phan Thị Hà",
+  "HUYNH QUOC BAO",
+  "Bùi Trọng Hiếu",
+  "Ông Bùi Văn Thịnh",
+  "Bà Đặng Thị Xuân",
+  "Ông Mai Xuân Trường",
+  "Bà Cao Thị Lụa",
+  "BUI TRONG HIEU",
+  "Ông Vũ Đình Lâm",
+  "Bà Nguyễn Thị Hạnh",
+  "Ông Hồ Văn Nghĩa",
+  "Bà Trần Thị Bích",
+  "Nguyễn Đức Thắng",
+  "Ông Nguyễn Văn Tâm",
+  "Bà Trịnh Thị Loan",
+  "Đặng Phương Linh",
+  "Ông Đặng Quốc Hùng",
+  "Bà Bùi Thị Liên",
+  "NGUYEN DUC THANG",
+  "DANG PHUONG LINH",
+  "Phạm Duy Khánh",
+  "Ông Phạm Văn Quý",
+  "Bà Hà Thị Oanh",
+  "Đinh Lan Hương",
+  "Ông Đinh Công Thành",
+  "PHAM DUY KHANH",
+  "DINH LAN HUONG",
+  "toi-gian-trang",
+  "Trịnh Thành Long",
+  "Ông Trịnh Văn Hòa",
+  "Bà Phùng Thị Mến",
+  "Lương Ngọc Ánh",
+  "Ông Lương Đức Hậu",
+  "Bà Đào Thị Ngọc",
+  "TRINH THANH LONG",
+  "LUONG NGOC ANH",
+  "Ông Võ Hữu Nghĩa",
+  "Bà Châu Thị Lệ",
+  "Ông Dương Văn Tấn",
+  "Ông Đặng Văn Tiến",
+  "Bà Ngô Thị Yến",
+  "Kiều Quỳnh Chi",
+  "Ông Kiều Minh Tuấn",
+  "Bà Phạm Thị Quỳnh",
+  "KIEU QUYNH CHI",
+  "Ông Lý Văn Sang",
+  "Bà Tạ Thị Hồng",
+  "Ông Thái Thanh Bình",
+  "Bà Nguyễn Thị Trúc",
+  "Cao Hoàng Hiệp",
+  "Ông Cao Văn Thắng",
+  "Bà Doãn Thị Hoài",
+  "Ông Lưu Đức Mạnh",
+  "Bà Tăng Thị Hiền",
+  "CAO HOANG HIEP",
+  "Ông Hà Đình Phong",
+  "Bà Lại Thị Nguyệt",
+  "Ông Quách Văn Hưng",
+  "Bà Mạc Thị Yến",
+  "Ông Ngô Gia Bảo",
+  "Bà Từ Thị Tuyết",
+  "Đoàn Tuyết Mai",
+  "Ông Đoàn Văn Kiên",
+  "Bà Lâm Thị Hoa",
+  "DOAN TUYET MAI",
+  "Ông Tạ Văn Biển",
+  "Bà Nông Thị Hải",
+  "Chu Thùy Trang",
+  "Ông Chu Minh Khang",
+  "Bà Vương Thị Thủy",
+  "CHU THUY TRANG",
+  "Ông Mạc Văn Cường",
+  "Bà Đàm Thị Thu",
+  "Tôn Hồng Nhung",
+  "Ông Tôn Thất Hòa",
+  "Bà Phạm Thị Nhàn",
+  "TON HONG NHUNG",
+  "Nguyễn Khắc Việt",
+  "Ông Nguyễn Khắc Hiếu",
+  "Bà Lê Thị Minh",
+  "Ông Trần Văn Thuận",
+  "Bà Hoàng Thị Mận",
+  "NGUYEN KHAC VIET",
+  "Phan Hoàng Nam",
+  "Ông Phan Thanh Sơn",
+  "Trương Khánh Vy",
+  "Ông Trương Văn Lộc",
+  "Bà Huỳnh Thị Ngọc",
+  "PHAN HOANG NAM",
+  "TRUONG KHANH VY"
+];
+const PK_IMG = 'assets/img/mau/';
+const pkCode = i => String.fromCharCode(65 + i % 26) + (i >= 26 ? Math.floor(i / 26) - 1 : '');   // A..Z, A0..Z0, A1..
+const K2C = Object.fromEntries(PK_KEYS.map((k, i) => [k, pkCode(i)])), C2K = Object.fromEntries(PK_KEYS.map((k, i) => [pkCode(i), k]));
+const T2I = new Map(PK_TEXTS.map((t, i) => [t, i]));
+const encStr = v => T2I.has(v) ? '§' + T2I.get(v).toString(36) : v.startsWith(PK_IMG) ? '@' + v.slice(PK_IMG.length) : /^[§@!]/.test(v) ? '!' + v : v;
+const decStr = v => v[0] === '§' ? PK_TEXTS[parseInt(v.slice(1), 36)] ?? '' : v[0] === '@' ? PK_IMG + v.slice(1) : v[0] === '!' ? v.slice(1) : v;
+const encKey = k => K2C[k] || (k in C2K || k[0] === '_' ? '_' + k : k);
+const decKey = k => k[0] === '_' ? k.slice(1) : C2K[k] || k;
+const pkMap = (v, fk, fs) => Array.isArray(v) ? v.map(x => pkMap(x, fk, fs))
+  : v && typeof v === 'object' ? Object.fromEntries(Object.entries(v).map(([k, x]) => [fk(k), pkMap(x, fk, fs)]))
+  : typeof v === 'string' ? fs(v) : v;
 TH.packInvite = data => {
   const strip = v => typeof v === 'string' && v.startsWith('data:') ? '' : v;
   const d = JSON.parse(JSON.stringify(data));
@@ -114,9 +263,12 @@ TH.packInvite = data => {
   if (d.layers) d.layers = d.layers.filter(l => strip(l.img) !== '');
   if (d.bg) d.bg.img = strip(d.bg.img);
   delete d.updated;
-  return window.LZString ? LZString.compressToEncodedURIComponent(JSON.stringify(d)) : '';
+  return window.LZString ? '~' + LZString.compressToEncodedURIComponent(JSON.stringify(pkMap(d, encKey, encStr))) : '';
 };
-TH.unpackInvite = s => { try { return JSON.parse(LZString.decompressFromEncodedURIComponent(s)); } catch { return null; } };
+TH.unpackInvite = s => { try {
+  if (s[0] !== '~') return JSON.parse(LZString.decompressFromEncodedURIComponent(s));   // link cũ (v1)
+  return pkMap(JSON.parse(LZString.decompressFromEncodedURIComponent(s.slice(1))), decKey, decStr);
+} catch { return null; } };
 TH.hasLocalImages = data => [data.cover, ...(data.photos||[]), data.gift?.groom?.qr, data.gift?.bride?.qr,
   ...Object.values(data.ov || {}).map(o => o.img), ...(data.layers || []).map(l => l.img), data.bg?.img].some(v => typeof v === 'string' && v.startsWith('data:'));
 
@@ -169,33 +321,86 @@ TH.MusicBox = class {
   }
   stop(){ this.on = false; clearInterval(this.timer); if (this.gain) { const g = this.gain; g.gain.setTargetAtTime(0, this.ctx.currentTime, .2); setTimeout(()=>g.disconnect(), 800); } }
 };
-/* ---------- Hộp thoại chia sẻ (dùng chung với trang quản lý) ---------- */
+/* ---------- Ảnh QR để tải về: thẻ có tên cô dâu chú rể + mã QR lớn, in thiệp giấy hay gửi Zalo đều quét được ---------- */
+TH.qrCard = async (url, D, guest) => {
+  const box = document.createElement('div');
+  new QRCode(box, {text:url, width:880, height:880, correctLevel:QRCode.CorrectLevel.L});
+  const qr = box.querySelector('canvas');
+  const W = 1080, H = 1400, c = document.createElement('canvas'); c.width = W; c.height = H;
+  const x = c.getContext('2d'), t = TH.findTemplate(D.tpl), accent = D.accent || t.accent, font = TH.fixFont(D.font || t.font);
+  try { await Promise.all([document.fonts.load(`80px '${font}'`), document.fonts.load("600 34px 'Be Vietnam Pro'"), document.fonts.load("500 32px 'Be Vietnam Pro'")]); } catch {}
+  x.fillStyle = '#fffaf8'; x.fillRect(0, 0, W, H);
+  x.strokeStyle = accent; x.lineWidth = 3; x.strokeRect(28, 28, W - 56, H - 56);
+  x.textAlign = 'center'; x.fillStyle = '#7a6a70';
+  x.font = "600 30px 'Be Vietnam Pro',sans-serif"; x.fillText(guest ? `KÍNH MỜI: ${guest.toUpperCase()}` : 'THIỆP CƯỚI', W / 2, 120);
+  x.fillStyle = accent; x.font = `86px '${font}',${TH.fontFallback(font)}`;
+  x.fillText(`${D.groom.nick} & ${D.bride.nick}`, W / 2, 220, W - 120);
+  const dt = new Date(D.date);
+  if (!isNaN(dt)) { x.fillStyle = '#7a6a70'; x.font = "500 32px 'Be Vietnam Pro',sans-serif"; x.fillText(dt.toLocaleDateString('vi-VN', {day:'2-digit', month:'2-digit', year:'numeric'}), W / 2, 280); }
+  x.fillStyle = '#fff'; x.fillRect(80, 330, 920, 920);
+  x.imageSmoothingEnabled = false; x.drawImage(qr, 100, 350, 880, 880);
+  x.fillStyle = '#2b2226'; x.font = "600 34px 'Be Vietnam Pro',sans-serif"; x.fillText('Quét mã để xem thiệp mời', W / 2, 1310);
+  return c;
+};
+
+/* ---------- Hộp thoại chia sẻ (dùng chung với trang quản lý) ----------
+   Link gửi đi là link trực tiếp của website (dữ liệu nén sau #d=) — không qua dịch vụ rút gọn,
+   vì Zalo chặn các tên miền rút gọn như tinyurl.com. */
 function shareDialog(id, D){
   const m = TH.modal(`<h3 style="font-size:1.5rem;margin-bottom:6px">Chia sẻ thiệp cưới</h3>
     <p class="hint" style="margin-bottom:14px">Nhập tên khách để tạo lời mời riêng — thiệp sẽ hiện “Kính mời: [tên]”.</p>
-    <div class="field" style="margin-bottom:10px"><label>Tên khách mời</label><input id="gName" placeholder="VD: Anh Tuấn & Người thương"></div>
-    <div class="field"><label>Đường dẫn</label><textarea id="gLink" readonly style="min-height:80px;font-size:.8rem"></textarea></div>
-    ${TH.hasLocalImages(D) ? '<p class="hint" style="color:#b25;margin-top:6px">⚠ Thiệp có ảnh tải lên từ máy: ảnh đó sẽ không hiển thị khi mở trên máy khác. Hãy dùng link ảnh online.</p>' : ''}
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin:14px 0">
-      <button class="btn btn-primary btn-sm" id="gCopy">Sao chép</button>
-      <a class="btn btn-outline btn-sm" id="gFb" target="_blank">Facebook</a>
-      <a class="btn btn-outline btn-sm" id="gMs" target="_blank">Messenger</a>
-      <a class="btn btn-outline btn-sm" id="gSms">SMS</a>
-      <button class="btn btn-outline btn-sm" id="gNative">Zalo / khác…</button></div>
-    <div id="gQr" style="width:150px;margin:0 auto"></div>`);
+    <div class="field" style="margin-bottom:14px"><label>Tên khách mời</label><input id="gName" placeholder="VD: Anh Tuấn & Người thương"></div>
+    <div class="share-opt">
+      <b class="share-opt-h">① Gửi link qua Zalo / Facebook</b>
+      <input id="gLink" readonly aria-label="Link thiệp">
+      <button class="btn btn-primary btn-sm" id="gCopy" style="width:100%">Sao chép link gửi Zalo/Facebook</button>
+      <p class="share-safe">🔒 Link trực tiếp an toàn, tương thích 100% với Zalo &amp; Messenger</p>
+      <div class="share-btns">
+        <button class="btn btn-outline btn-sm" id="gNative">Zalo / khác…</button>
+        <a class="btn btn-outline btn-sm" id="gFb" target="_blank">Facebook</a>
+        <a class="btn btn-outline btn-sm" id="gMs" target="_blank">Messenger</a>
+        <a class="btn btn-outline btn-sm" id="gSms">SMS</a></div>
+    </div>
+    <div class="share-opt share-qr">
+      <b class="share-opt-h">② Mã QR — quét là xem được ngay</b>
+      <div id="gQr"></div>
+      <button class="btn btn-outline btn-sm" id="gQrDl">⬇ Tải ảnh QR</button>
+      <p class="hint">Gửi ảnh QR qua Zalo hoặc in lên thiệp giấy.</p>
+    </div>
+    ${TH.hasLocalImages(D) ? '<p class="hint" style="color:#b25;margin-top:10px">⚠ Thiệp có ảnh tải lên từ máy: ảnh đó sẽ không hiển thị khi mở trên máy khác. Hãy dùng link ảnh online.</p>' : ''}`);
   m.querySelector('.modal-box').style.maxWidth = '520px';
-  const upd = () => {
-    const url = TH.inviteUrl(id, D, document.querySelector('#gName').value.trim()); document.querySelector('#gLink').value = url;
-    const txt = `Trân trọng kính mời bạn đến dự lễ cưới của ${D.groom.nick} & ${D.bride.nick}: ${url}`;
-    document.querySelector('#gFb').href = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url);
-    document.querySelector('#gMs').href = 'fb-messenger://share/?link=' + encodeURIComponent(url);
-    document.querySelector('#gSms').href = 'sms:?&body=' + encodeURIComponent(txt);
-    document.querySelector('#gNative').onclick = () => navigator.share ? navigator.share({title:'Thiệp cưới', text:txt, url}).catch(()=>{}) : navigator.clipboard.writeText(txt).then(()=>TH.toast('Đã sao chép lời mời — dán vào Zalo nhé'));
-    const q = document.querySelector('#gQr'); q.innerHTML = '';
-    if (window.QRCode) try { new QRCode(q, {text:url, width:150, height:150, correctLevel:QRCode.CorrectLevel.L}); } catch { q.innerHTML = '<p class="hint">Link quá dài để tạo QR.</p>'; }
+  const $m = s => m.querySelector(s);
+  let url = '', timer;
+  const guest = () => $m('#gName').value.trim();
+  const drawQr = () => {
+    const q = $m('#gQr'); q.innerHTML = '';
+    if (!window.QRCode) { q.innerHTML = '<p class="hint">Chưa tải được thư viện QR.</p>'; return; }
+    try { new QRCode(q, {text:url, width:220, height:220, correctLevel:QRCode.CorrectLevel.L}); }
+    catch { q.innerHTML = '<p class="hint">Nội dung thiệp quá dài để tạo mã QR — hãy rút bớt chữ.</p>'; }
   };
-  document.querySelector('#gName').oninput = upd; upd();
-  document.querySelector('#gCopy').onclick = () => navigator.clipboard.writeText(document.querySelector('#gLink').value).then(()=>TH.toast('Đã sao chép đường dẫn'));
+  const upd = () => {
+    url = TH.inviteUrl(id, D, guest());
+    $m('#gLink').value = url;
+    const txt = `Trân trọng kính mời bạn đến dự lễ cưới của ${D.groom.nick} & ${D.bride.nick}: ${url}`;
+    $m('#gFb').href = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url);
+    $m('#gMs').href = 'fb-messenger://share/?link=' + encodeURIComponent(url);
+    $m('#gSms').href = 'sms:?&body=' + encodeURIComponent(txt);
+    $m('#gNative').onclick = () => navigator.share ? navigator.share({title:'Thiệp cưới', text:txt, url}).catch(()=>{}) : navigator.clipboard.writeText(txt).then(()=>TH.toast('Đã sao chép lời mời — dán vào Zalo nhé'));
+    clearTimeout(timer); timer = setTimeout(drawQr, 250);   // vẽ lại QR khi ngừng gõ tên
+  };
+  $m('#gName').oninput = upd; upd(); drawQr();
+  $m('#gLink').onfocus = e => e.target.select();
+  $m('#gCopy').onclick = () => navigator.clipboard.writeText(url).then(() => TH.toast('Đã sao chép link — dán vào Zalo/Facebook để gửi nhé!'), () => prompt('Sao chép thủ công:', url));
+  $m('#gQrDl').onclick = async () => {
+    if (!window.QRCode) return TH.toast('Chưa tải được thư viện QR');
+    try {
+      const c = await TH.qrCard(url, D, guest());
+      const slug = s => (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-|-$/g, '').toLowerCase();
+      const a = Object.assign(document.createElement('a'), {href:c.toDataURL('image/png'), download:`qr-thiep-cuoi-${slug(D.groom.nick)}-${slug(D.bride.nick)}${guest() ? '-' + slug(guest()) : ''}.png`});
+      document.body.append(a); a.click(); a.remove();
+      TH.toast('Đã tải ảnh QR');
+    } catch { TH.toast('Nội dung thiệp quá dài để tạo mã QR'); }
+  };
 }
 TH.shareDialog = shareDialog;
 })();

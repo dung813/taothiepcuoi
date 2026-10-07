@@ -17,22 +17,29 @@ const ICON = {
 };
 TH.LOGO = LOGO;
 
+/* Hotline & Zalo tư vấn — đổi số thật tại đây */
+TH.HOTLINE = '0900000000'; TH.HOTLINE_TEXT = '0900 000 000'; TH.ZALO = 'https://zalo.me/' + TH.HOTLINE;
+
+// So khớp trang cho menu: chấp nhận cả /bang-gia.html, /bang-gia (Vercel cleanUrls) và /
+const pageKey = p => (p.split(/[?#]/)[0].split('/').pop() || 'index').replace(/.html$/, '');
+const NAV_ALIAS = {'bai-viet':'cam-nang'};
+
 const NAV = [
   ['index.html','Trang chủ'],
   ['mau-thiep.html','Mẫu thiệp'],
   ['bang-gia.html','Bảng giá'],
   ['cam-nang.html','Cẩm nang'],
-  ['bang-gia.html#tron-goi','Tạo thiệp trọn gói <span class="hot">HOT</span>','nav-hl']
+  ['dich-vu-tron-goi.html','Tạo thiệp trọn gói <span class="hot">HOT</span>','nav-hl']
 ];
 
 function header(){
-  const page = location.pathname.split('/').pop() || 'index.html';
+  const page = NAV_ALIAS[pageKey(location.pathname)] || pageKey(location.pathname);
   const user = TH.store.get('user');
   const el = document.createElement('header');
   el.className = 'header';
   el.innerHTML = `<div class="container">
     <a href="index.html" class="logo" aria-label="WEDSTORY – Trang chủ">${LOGO}<span class="brand">WED<em>STORY</em></span></a>
-    <nav class="nav">${NAV.map(([h,t,c])=>`<a href="${h}" class="${c||''} ${h===page||(page.startsWith('bai-viet')&&h==='cam-nang.html')?'active':''}">${t}</a>`).join('')}</nav>
+    <nav class="nav">${NAV.map(([h,t,c])=>`<a href="${h}" class="${c||''} ${pageKey(h)===page?'active':''}"${pageKey(h)===page?' aria-current="page"':''}>${t}</a>`).join('')}</nav>
     <div class="header-actions">
       ${user ? `<a href="thiep-da-tao.html?mine=1" class="btn btn-ghost btn-sm">👋 ${TH.esc(user.name)}</a><button class="btn btn-ghost btn-sm" data-logout>Đăng xuất</button>`
              : `<button class="btn btn-ghost btn-sm" data-auth="login">Đăng nhập</button><button class="btn btn-primary btn-sm" data-auth="register">Đăng ký</button>`}
@@ -55,7 +62,7 @@ function footer(){
       <div class="socials"><a href="#" aria-label="Facebook">${ICON.fb}</a><a href="#" aria-label="Instagram">${ICON.ig}</a><a href="#" aria-label="TikTok">${ICON.tt}</a></div></div>
     <div><h4>Sản phẩm</h4><ul>
       <li><a href="mau-thiep.html">Mẫu thiệp</a></li><li><a href="thiep-da-tao.html">Thiệp khách hàng</a></li>
-      <li><a href="bang-gia.html#tron-goi">Thiệp trọn gói</a></li><li><a href="bang-gia.html">Bảng giá</a></li>
+      <li><a href="dich-vu-tron-goi.html">Thiết kế trọn gói</a></li><li><a href="bang-gia.html">Bảng giá</a></li>
       <li><a href="lien-he.html">Chương trình đối tác</a></li></ul></div>
     <div><h4>Cẩm nang</h4><ul>${TH.POSTS.slice(0,5).map(p=>`<li><a href="bai-viet.html?slug=${p.slug}">${TH.esc(p.title.length>38?p.title.slice(0,38)+'…':p.title)}</a></li>`).join('')}</ul></div>
     <div><h4>Hỗ trợ &amp; chính sách</h4><ul>
@@ -82,14 +89,20 @@ TH.store = {
 
 /* ---------- Thư viện phông chữ (Google Fonts, có dấu tiếng Việt) — tải khi cần ---------- */
 TH.FONTS = [
-  ['Chữ ký & bay bướm', 'cursive', ['Great Vibes','Dancing Script','Allura','Alex Brush','Corinthia','Imperial Script','Ephesis','Charm','Pacifico','Lobster']],
+  ['Chữ ký & bay bướm', 'cursive', ['Great Vibes','Dancing Script','Pinyon Script','Allura','Alex Brush','Corinthia','Imperial Script','Ephesis','Charm','Pacifico','Lobster']],
   ['Có chân sang trọng', 'serif', ['Playfair Display','Cormorant Garamond','Lora','EB Garamond','Prata','Noto Serif','Merriweather']],
   ['Không chân hiện đại', 'sans-serif', ['Be Vietnam Pro','Montserrat','Quicksand','Nunito','Josefin Sans','Lexend','Roboto','Oswald']],
   ['Vui nhộn', 'cursive', ['Patrick Hand','Comfortaa','Mali','Itim','Pattaya','Baloo 2','Bungee']]
 ];
 /* Phông chỉ có một độ đậm → không xin thêm 700 (Google trả lỗi nếu xin độ đậm không có) */
-const ONE_WEIGHT = new Set(['Great Vibes','Allura','Alex Brush','Imperial Script','Ephesis','Parisienne','Pacifico','Lobster','Prata','Patrick Hand','Itim','Pattaya','Bungee']);
-TH.fontStack = name => { const g = TH.FONTS.find(x => x[2].includes(name)); return `'${name}', ${g ? g[1] : 'sans-serif'}`; };
+const ONE_WEIGHT = new Set(['Great Vibes','Allura','Alex Brush','Imperial Script','Ephesis','Pinyon Script','Parisienne','Pacifico','Lobster','Prata','Patrick Hand','Itim','Pattaya','Bungee']);
+/* Font cũ không có dấu tiếng Việt -> font thay thế; chuỗi dự phòng an toàn theo loại font */
+const FONT_ALIAS = {'Parisienne':'Pinyon Script'};
+const FALLBACK = {cursive:"'Dancing Script','Brush Script MT',cursive", serif:"'Times New Roman',Georgia,serif",
+  'sans-serif':"-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif"};
+TH.fixFont = f => FONT_ALIAS[f] || f;
+TH.fontFallback = f => { const g = TH.FONTS.find(x => x[2].includes(f)); return FALLBACK[g ? g[1] : /Playfair|Garamond|Serif/.test(f) ? 'serif' : 'cursive']; };
+TH.fontStack = name => { name = TH.fixFont(name); return `'${name}',${TH.fontFallback(name)}`; };
 TH.fontsHref = names => 'https://fonts.googleapis.com/css2?' + names.map(n => 'family=' + n.replace(/ /g, '+') + (ONE_WEIGHT.has(n) ? '' : ':wght@400;700')).join('&') + '&display=swap';
 const fontsLoaded = new Set();
 TH.loadFont = (...names) => {
@@ -137,7 +150,7 @@ const DECO = {
   petal: c => `<svg class="deco" style="top:-10px;right:-10px;width:90px" viewBox="0 0 100 100"><g fill="${c}" opacity=".55"><ellipse cx="60" cy="30" rx="18" ry="9" transform="rotate(30 60 30)"/><ellipse cx="80" cy="55" rx="14" ry="7" transform="rotate(-20 80 55)"/><ellipse cx="45" cy="60" rx="10" ry="5" transform="rotate(60 45 60)"/></g></svg><svg class="deco" style="bottom:-10px;left:-10px;width:80px;transform:rotate(180deg)" viewBox="0 0 100 100"><g fill="${c}" opacity=".45"><ellipse cx="60" cy="30" rx="18" ry="9" transform="rotate(30 60 30)"/><ellipse cx="80" cy="55" rx="14" ry="7"/></g></svg>`,
   leaf: c => `<svg class="deco" style="top:0;left:0;width:100%" viewBox="0 0 200 60" fill="none" stroke="${c}" stroke-width="1.5" opacity=".7"><path d="M0 30 Q50 0 100 30 T200 30"/><path d="M30 18q8-12 18-6-6 12-18 6zM90 28q8-12 18-6-6 12-18 6zM150 18q8-12 18-6-6 12-18 6z" fill="${c}" opacity=".5"/></svg>`,
   gold: c => `<div class="deco" style="inset:10px;border:1px solid ${c};border-radius:6px"></div><div class="deco" style="inset:16px;border:1px solid ${c};opacity:.5;border-radius:4px"></div>`,
-  hy:   c => `<div class="deco" style="top:12px;font-size:2.2rem;color:${c};font-family:serif;opacity:.9">囍</div><div class="deco" style="inset:10px;border:2px solid ${c};border-radius:8px;opacity:.6"></div>`,
+  hy:   c => `<div class="deco" style="top:12px;font-size:2.2rem;color:${c};font-family:'Noto Serif SC','Songti SC','SimSun',serif;opacity:.9">囍</div><div class="deco" style="inset:10px;border:2px solid ${c};border-radius:8px;opacity:.6"></div>`,
   wave: c => `<svg class="deco" style="bottom:0;left:0;width:100%" viewBox="0 0 200 40"><path d="M0 20 Q25 5 50 20 T100 20 T150 20 T200 20 V40 H0z" fill="${c}" opacity=".3"/><path d="M0 28 Q25 15 50 28 T100 28 T150 28 T200 28 V40 H0z" fill="${c}" opacity=".35"/></svg>`,
   star: c => `<div class="deco" style="inset:0;background-image:radial-gradient(${c} 1px,transparent 1.5px);background-size:22px 22px;opacity:.35"></div>`,
   line: c => `<div class="deco" style="top:20%;left:50%;width:1px;height:28px;background:${c}"></div><div class="deco" style="bottom:18%;left:50%;width:1px;height:28px;background:${c}"></div>`
@@ -148,7 +161,7 @@ TH.miniTpl = (t, o={}) => {
   const photo = src ? `<div class="tm-photo" style="background-image:url('${src}')"></div>` : '';
   return `<div class="tpl-mini" style="background:${t.bg};color:${t.fg}">${(DECO[t.deco]||DECO.line)(t.accent)}
     ${photo}<div class="tm-top">Save the date</div>
-    <div class="tm-names" style="font-family:'${t.font}',serif">${TH.esc(o.groom||'Minh Khôi')}<span class="tm-amp" style="color:${t.accent}">&amp;</span>${TH.esc(o.bride||'Thu Hà')}</div>
+    <div class="tm-names" style="font-family:${TH.fontStack(t.font)}">${TH.esc(o.groom||'Minh Khôi')}<span class="tm-amp" style="color:${t.accent}">&amp;</span>${TH.esc(o.bride||'Thu Hà')}</div>
     <div class="tm-date">${String(d.getDate()).padStart(2,'0')} · ${String(d.getMonth()+1).padStart(2,'0')} · ${d.getFullYear()}</div></div>`;
 };
 /* ---------- Thả tim mẫu thiệp ----------

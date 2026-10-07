@@ -105,24 +105,41 @@ TH.pageShowcase = () => {
   TH.reveal();
 };
 
-/* ---------- Bảng giá ---------- */
+/* ---------- Bảng giá: 2 gói tự tạo thiệp ---------- */
 TH.pagePricing = () => {
+  if (location.hash === '#tron-goi') { location.replace('dich-vu-tron-goi.html'); return; }   // link cũ
   TH.initPage();
+  const nBasic = TH.TEMPLATES.filter(t => t.tier !== 'premium').length, nAll = TH.TEMPLATES.length;
   const PLANS = [
-    {name:'Cơ bản', desc:'Đủ dùng cho hầu hết cặp đôi', m:0, feats:[['Mẫu thiệp BASIC',1],['Nhạc nền, album 12 ảnh',1],['Bản đồ, đếm ngược',1],['Xác nhận tham dự & lời chúc',1],['Tên khách mời riêng',1],['Mẫu PREMIUM',0],['Ẩn logo WEDSTORY',0],['Thống kê nâng cao & xuất CSV',0]]},
-    {name:'Premium', desc:'Nổi bật và riêng tư hơn', m:199000, hot:1, feats:[['Tất cả tính năng gói Cơ bản',1],['Toàn bộ mẫu PREMIUM',1],['Album không giới hạn + video',1],['Ẩn logo WEDSTORY',1],['Hộp mừng cưới hiệu ứng',1],['Thống kê nâng cao & xuất CSV',1],['Lưu trữ thiệp 2 năm',1],['Tên miền riêng',0]]},
-    {name:'Trọn gói', desc:'Chúng tôi làm giúp từ A–Z', m:599000, feats:[['Tất cả tính năng Premium',1],['Nhà thiết kế làm thiệp giúp bạn',1],['Thiết kế theo yêu cầu riêng',1],['Tên miền riêng (.com/.vn)',1],['Chỉnh sửa không giới hạn',1],['Hỗ trợ ưu tiên 24/7',1],['Lưu trữ trọn đời',1],['Bàn giao trong 48 giờ',1]]}
+    {name:'Cơ bản', desc:'Miễn phí trải nghiệm — đủ dùng cho hầu hết cặp đôi', m:0, feats:[[`${nBasic} mẫu thiệp BASIC`,1],['Nhạc nền, album 12 ảnh',1],['Bản đồ, đếm ngược',1],['Xác nhận tham dự & lời chúc',1],['Tên khách mời riêng',1],['Mẫu PREMIUM',0],['Ẩn logo WEDSTORY',0],['Thống kê nâng cao & xuất CSV',0]]},
+    {name:'Tự tạo VIP', desc:'Mở khóa toàn bộ tính năng cao cấp', m:199000, hot:1, feats:[['Tất cả tính năng gói Cơ bản',1],[`Toàn bộ ${nAll} mẫu, gồm PREMIUM`,1],['Album không giới hạn + video',1],['Ẩn logo WEDSTORY',1],['Hộp mừng cưới hiệu ứng',1],['Thống kê nâng cao & xuất CSV',1],['Sơ đồ bàn tiệc & vé mời',1],['Lưu trữ thiệp 2 năm',1]]}
+  ];
+  const ROWS = [
+    ['Số mẫu thiệp', nBasic, nAll],
+    ['Ảnh trong album', '12', 'Không giới hạn'],
+    ['Video trong album', '—', '✓'],
+    ['Nhạc nền', '✓', '✓'],
+    ['Bản đồ & đếm ngược', '✓', '✓'],
+    ['Xác nhận tham dự (RSVP)', '✓', '✓'],
+    ['Tên khách mời riêng & mã QR', '✓', '✓'],
+    ['Hộp mừng cưới QR', '✓', '✓ + hiệu ứng'],
+    ['Sơ đồ bàn tiệc & vé mời', '—', '✓'],
+    ['Thống kê & xuất danh sách CSV', '—', '✓'],
+    ['Ẩn logo WEDSTORY', '—', '✓'],
+    ['Thời gian lưu trữ', '6 tháng', '2 năm']
   ];
   let yearly = false;
   const vnd = n => n.toLocaleString('vi-VN') + 'đ';
   const render = () => $('#plans').innerHTML = PLANS.map((p,i) => {
     const price = yearly && p.m ? Math.round(p.m*0.8/1000)*1000 : p.m;
-    return `<div class="plan reveal in ${p.hot?'hot':''}" ${i===2?'id="tron-goi"':''}>${p.hot?'<span class="ribbon">Phổ biến nhất</span>':''}
+    return `<div class="plan reveal in ${p.hot?'hot':''}">${p.hot?'<span class="ribbon">Phổ biến nhất</span>':''}
       <h3>${p.name}</h3><p class="desc">${p.desc}</p>
       <div class="old">${yearly&&p.m?vnd(p.m):''}</div><div class="price">${p.m?vnd(price):'0đ'} <small>${p.m?'/ thiệp':'mãi mãi'}</small></div>
       <ul>${p.feats.map(([f,ok])=>`<li class="${ok?'':'no'}">${f}</li>`).join('')}</ul>
       <button class="btn ${p.hot?'btn-primary':'btn-outline'}" data-plan="${i}">${p.m?'Chọn gói '+p.name:'Bắt đầu miễn phí'}</button></div>`; }).join('');
   render();
+  $('#compare').innerHTML = `<thead><tr><th>Tính năng</th><th>Cơ bản<small>0đ</small></th><th class="hl">Tự tạo VIP<small>199.000đ</small></th></tr></thead>
+    <tbody>${ROWS.map(([f, a, b]) => `<tr><td>${f}</td><td class="${a === '—' ? 'no' : ''}">${a}</td><td class="hl">${b}</td></tr>`).join('')}</tbody>`;
   $('#sw').onclick = () => { yearly = !yearly; $('#sw').classList.toggle('on', yearly); render(); };
   $('#plans').onclick = e => { const b = e.target.closest('[data-plan]'); if (!b) return; const p = PLANS[+b.dataset.plan];
     if (!p.m) { location.href = 'mau-thiep.html'; return; }
@@ -133,11 +150,32 @@ TH.pagePricing = () => {
   };
   TH.faq($('#faq'), [
     ['Gói trả phí tính theo tháng hay theo thiệp?','Tính theo từng thiệp và chỉ thanh toán một lần. Thiệp được lưu trữ theo thời hạn của gói.'],
-    ['Tôi có thể nâng cấp sau khi đã tạo thiệp miễn phí không?','Có. Toàn bộ nội dung được giữ nguyên khi nâng cấp.'],
+    ['Tôi có thể nâng cấp sau khi đã tạo thiệp miễn phí không?','Có. Toàn bộ nội dung được giữ nguyên khi nâng cấp lên gói Tự tạo VIP.'],
+    ['Tôi không có thời gian tự làm thì sao?','Hãy chọn dịch vụ Trọn gói 599.000đ — đội ngũ WEDSTORY thiết kế giúp bạn từ A–Z. <a href="dich-vu-tron-goi.html" style="color:var(--rose);font-weight:600">Xem dịch vụ →</a>'],
     ['Có hoàn tiền không?','Hoàn tiền 100% trong 7 ngày nếu bạn chưa gửi thiệp cho khách mời.'],
     ['Thanh toán bằng cách nào?','Chuyển khoản ngân hàng, ví điện tử hoặc thẻ quốc tế.']]);
   TH.reveal();
-  if (location.hash === '#tron-goi') setTimeout(()=>$('#tron-goi').scrollIntoView({block:'center'}), 200);
+};
+
+/* ---------- Dịch vụ thiết kế trọn gói (Done-For-You) ---------- */
+TH.pageService = () => {
+  TH.initPage();
+  $$('[data-zalo]').forEach(a => a.href = TH.ZALO);
+  $$('[data-hotline]').forEach(s => s.textContent = TH.HOTLINE_TEXT);
+  $('#dvForm').onsubmit = e => {
+    e.preventDefault();
+    const f = Object.fromEntries(new FormData(e.target));
+    const leads = TH.store.get('leads', []); leads.unshift({...f, type:'tron-goi', at:Date.now()}); TH.store.set('leads', leads.slice(0, 200));
+    e.target.reset();
+    const ok = $('#dvOk'); ok.hidden = false; ok.innerHTML = `✓ Cảm ơn <b>${TH.esc(f.name)}</b>! Chuyên viên sẽ gọi lại số <b>${TH.esc(f.phone)}</b> trong 15 phút.`;
+    TH.toast('Đã nhận đăng ký tư vấn, cảm ơn bạn!');
+  };
+  TH.faq($('#faq'), [
+    ['Tôi cần chuẩn bị những gì?','Chỉ cần ảnh cưới (5–30 ảnh), tên cô dâu chú rể, ngày giờ và địa điểm tổ chức. Phần còn lại WEDSTORY lo.'],
+    ['Tên miền riêng là gì?','Thiệp có địa chỉ riêng theo tên hai bạn, ví dụ duclinh.wedstory.vn — dễ nhớ, dễ gửi qua Zalo và in lên thiệp giấy.'],
+    ['Có được chỉnh sửa sau khi bàn giao không?','Có. Bạn được chỉnh sửa không giới hạn cả trước và sau khi bàn giao, đến hết ngày cưới.'],
+    ['Thanh toán thế nào?','Đặt cọc 50% khi bắt đầu thiết kế, phần còn lại thanh toán khi bạn hài lòng với bản hoàn chỉnh.']]);
+  TH.reveal();
 };
 
 /* ---------- Liên hệ ---------- */

@@ -44,10 +44,10 @@ const lum = hex => { const m = hex.replace('#','').match(/.{2}/g); if (!m) retur
 /* ---------- Dựng giao diện ---------- */
 function render(){
   const t = TH.findTemplate(D.tpl), o = D.opts || {};
-  const accent = D.accent || t.accent, font = D.font || t.font;
+  const accent = D.accent || t.accent, font = TH.fixFont(D.font || t.font);
   const b = document.body;
   b.style.setProperty('--t-bg', t.bg); b.style.setProperty('--t-fg', t.fg);
-  b.style.setProperty('--t-accent', accent); b.style.setProperty('--t-font', `'${font}'`);
+  b.style.setProperty('--t-accent', accent); b.style.setProperty('--t-font', `'${font}'`); b.style.setProperty('--t-font-fb', TH.fontFallback(font));
   TH.loadFont(font, D.fontBody);
   D.fontBody ? b.style.setProperty('--f-body', TH.fontStack(D.fontBody)) : b.style.removeProperty('--f-body');
   /* Nền thiệp do khách chọn: màu đơn, dải màu hoặc ảnh */
@@ -858,7 +858,7 @@ function bind(photos){
 /* Thẻ QR mừng cưới — dùng trong hộp mừng cưới và nhánh "Không tham dự" của RSVP */
 function giftCards(){
   const card = (who, g) => !g || !g.acc ? '' : `<div class="gift-card card" style="color:#333;background:#fff8f8">
-    <b style="font-family:var(--t-font),cursive;font-size:1.7rem;color:var(--t-accent);font-weight:400">Mừng cưới ${who}</b>
+    <b style="font-family:var(--t-font),var(--t-font-fb);font-size:1.7rem;color:var(--t-accent);font-weight:400">Mừng cưới ${who}</b>
     ${g.qr ? `<img src="${esc(g.qr)}" alt="QR">` : `<div class="qr-box" data-bank="${esc(g.bank)}" data-acc="${esc(g.acc)}" data-owner="${esc(g.owner)}"></div>`}
     <div>${esc(g.bank)}</div><div class="acc">${esc(g.acc)}</div><div style="font-size:.85rem;opacity:.8">${esc(g.owner)}</div>
     <button type="button" class="t-btn" style="margin-top:10px;padding:8px 16px;font-size:.85rem" data-copy="${esc(g.acc)}">Sao chép số tài khoản</button></div>`;
