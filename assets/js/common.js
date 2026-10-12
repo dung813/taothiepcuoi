@@ -189,8 +189,69 @@ document.addEventListener('click', e => {
   });
 });
 
+/* ---------- Khung thẻ mẫu: mỗi mẫu một kiểu khung riêng (vòm, baroque, bát giác, hoa lá, polaroid, tem thư) ----------
+   Bảng dưới được chọn để hai thẻ cạnh nhau không trùng kiểu khung khi xếp theo lượt xem (mặc định) và theo tên A–Z.
+   Thêm mẫu mới hoặc đổi lượt xem thì kiểm tra lại thứ tự này. */
+const FRAME_OF = {
+  'hong-pastel':'arch', 'oai-huong':'arch', 'nang-vang':'arch', 'thanh-lich':'arch',
+  'hoang-kim':'baroque', 'co-dien':'baroque', 'be-kem':'baroque',
+  'song-hy':'orient', 'mau-don':'orient', 'anh-bac':'orient',
+  'tiec-vuon':'botanic', 'rung-thong':'botanic', 'la-non':'botanic',
+  'vuon-xanh':'polaroid', 'giay-kraft':'polaroid', 'toi-gian-trang':'polaroid', 'ngay-nang':'polaroid',
+  'bien-xanh':'stamp', 'dem-sao':'stamp', 'hoang-hon':'stamp'
+};
+const HY = new Set(['song-hy', 'mau-don']);
+const ddmmyyyy = d => `${String(d.getDate()).padStart(2,'0')} · ${String(d.getMonth()+1).padStart(2,'0')} · ${d.getFullYear()}`;
+// Góc hoa văn baroque (vẽ ở góc trên-trái, các góc khác lật bằng CSS)
+const BAROQUE_CORNER = g => `<svg class="fr-corner" viewBox="0 0 60 60" aria-hidden="true"><g fill="none" stroke="url(#${g})" stroke-width="2.2" stroke-linecap="round">
+  <path d="M4 56V22Q4 4 22 4h34"/><path d="M10 50V25q0-15 15-15h25" stroke-width="1.2"/>
+  <path d="M26 10c-1 9 3 15 11 15 6 0 8-6 4-9-3-2-7 1-5 4"/><path d="M10 26c9 1 15-3 15-11 0-6-6-8-9-4-2 3 1 7 4 5"/>
+  <path d="M40 4c4 3 9 3 13 0M4 40c3 4 3 9 0 13" stroke-width="1.4"/></g><circle cx="16" cy="16" r="3.2" fill="url(#${g})"/></svg>`;
+const BAROQUE_CREST = g => `<svg class="fr-crest" viewBox="0 0 120 34" aria-hidden="true"><g fill="none" stroke="url(#${g})" stroke-width="1.8" stroke-linecap="round">
+  <path d="M60 30C48 30 40 22 40 14c0-6 5-9 9-6 3 2 2 7-2 7"/><path d="M60 30c12 0 20-8 20-16 0-6-5-9-9-6-3 2-2 7 2 7"/>
+  <path d="M38 18C26 22 14 18 4 22M82 18c12 4 24 0 34 4"/></g><path d="M60 4l5 9-5 9-5-9z" fill="url(#${g})"/></svg>`;
+const GOLD_DEFS = g => `<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="${g}" x1="0" y1="0" x2="1" y2="1">
+  <stop offset="0" stop-color="#f6e3a5"/><stop offset=".45" stop-color="#c9a24f"/><stop offset=".7" stop-color="#e9cf86"/><stop offset="1" stop-color="#9c7a34"/></linearGradient></defs></svg>`;
+// Cụm lá & hoa màu nước (khung hoa lá)
+const BOTANIC = (c, cls) => `<svg class="fr-leaves ${cls}" viewBox="0 0 120 120" aria-hidden="true"><g style="mix-blend-mode:multiply">
+  <path d="M10 70C20 40 45 22 78 18 62 34 44 54 10 70z" fill="#8db596" opacity=".75"/><path d="M14 64C40 50 58 36 76 20" stroke="#5f8f6c" stroke-width="1.2" fill="none" opacity=".8"/>
+  <path d="M30 96C30 70 44 52 66 44 60 62 52 80 30 96z" fill="#a9c9a4" opacity=".7"/><path d="M4 40C18 26 30 10 52 4 46 22 30 34 4 40z" fill="#6f9f7b" opacity=".6"/>
+  <path d="M50 110c4-22 18-36 40-40-8 18-20 32-40 40z" fill="#c2d8b5" opacity=".65"/>
+  <g opacity=".9"><circle cx="58" cy="58" r="11" fill="${c}" opacity=".55"/><circle cx="66" cy="52" r="9" fill="${c}" opacity=".5"/><circle cx="52" cy="50" r="8" fill="${c}" opacity=".45"/>
+  <circle cx="58" cy="54" r="4" fill="#f6d77c" opacity=".9"/></g>
+  <circle cx="84" cy="36" r="6" fill="${c}" opacity=".45"/><circle cx="24" cy="84" r="5" fill="${c}" opacity=".4"/><circle cx="90" cy="30" r="2.5" fill="#f6d77c"/></g></svg>`;
+const POSTMARK = c => `<svg class="fr-postmark" viewBox="0 0 120 70" aria-hidden="true"><g fill="none" stroke="${c}" stroke-width="2" opacity=".55">
+  <circle cx="35" cy="35" r="28"/><circle cx="35" cy="35" r="21" stroke-width="1"/>
+  <path d="M66 18q9-6 18 0t18 0 18 0M66 30q9-6 18 0t18 0 18 0M66 42q9-6 18 0t18 0 18 0M66 54q9-6 18 0t18 0 18 0"/></g>
+  <text x="35" y="31" text-anchor="middle" font-size="8" font-weight="700" fill="${c}" opacity=".6" letter-spacing="1">LOVE</text>
+  <text x="35" y="44" text-anchor="middle" font-size="8" font-weight="700" fill="${c}" opacity=".6">♥</text></svg>`;
+
+TH.frameTpl = (t, o = {}) => {
+  const kind = FRAME_OF[t.id] || 'arch';
+  const d = o.date ? new Date(o.date) : new Date(Date.now() + 60*864e5);
+  const src = o.photo === undefined ? t.thumb : o.photo;
+  const g = 'gold-' + t.id;
+  const names = `<div class="fr-names">${TH.esc(o.groom || 'Minh Khôi')}<i>&amp;</i>${TH.esc(o.bride || 'Thu Hà')}</div>`;
+  const photo = src ? `<div class="fr-photo" style="background-image:url('${src}')"></div>` : '';
+  const top = `<div class="fr-top">Save the date</div>`, date = `<div class="fr-date">${ddmmyyyy(d)}</div>`;
+  let deco = '', body = `${photo}${top}${names}${date}`;
+  if (kind === 'baroque') deco = GOLD_DEFS(g) + BAROQUE_CREST(g) + ['tl','tr','bl','br'].map(p => BAROQUE_CORNER(g).replace('class="fr-corner"', `class="fr-corner ${p}"`)).join('');
+  if (kind === 'orient') { deco = `<div class="fr-in"></div>`; body = `<div class="fr-sym">${HY.has(t.id) ? '囍' : '◆'}</div>${photo}${names}${date}`; }
+  if (kind === 'botanic') deco = BOTANIC(t.accent, 'tl') + BOTANIC(t.accent, 'br');
+  if (kind === 'polaroid') { deco = `<span class="fr-tape"></span>`; body = `${photo}${names}${date}`; }
+  if (kind === 'stamp') { deco = `<div class="fr-in"></div>${POSTMARK(t.accent)}<span class="fr-val">${d.getFullYear()}</span>`; }
+  return `<div class="fr fr-${kind}" style="--ac:${t.accent};--fg:${t.fg};--bg:${t.bg};--ff:${TH.fontStack(t.font)}">
+    <div class="fr-card"><div class="fr-paper"></div>${deco}<div class="fr-body">${body}</div></div></div>`;
+};
+/* Nhãn Hot (4 mẫu nhiều lượt xem nhất) / Mới (4 mẫu thêm gần nhất) */
+TH.tplBadge = t => {
+  const hot = [...TH.TEMPLATES].sort((a, b) => b.views - a.views).slice(0, 4).some(x => x.id === t.id);
+  if (hot) return '<span class="tpl-badge hot">🔥 Hot</span>';
+  return TH.TEMPLATES.slice(-4).some(x => x.id === t.id) ? '<span class="tpl-badge new">✨ Mới</span>' : '';
+};
+
 TH.tplCard = t => `<article class="tpl-card reveal" data-cat="${t.cat}" data-tpl="${t.id}">
-  <div class="tpl-thumb"><span class="tier ${t.tier}">${t.tier==='premium'?'PREMIUM':'BASIC'}</span>${TH.miniTpl(t, t.couple)}
+  <div class="tpl-thumb"><span class="tier ${t.tier}">${t.tier==='premium'?'PREMIUM':'BASIC'}</span>${TH.tplBadge(t)}${TH.frameTpl(t, t.couple)}
     <span class="tpl-peek" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>Xem mẫu</span></div>
   <a class="card-link" href="thiep.html?template=${t.id}" aria-label="Xem mẫu ${t.name}"></a>
   <div class="tpl-info"><h3>${t.name}</h3><div class="tpl-stats">${likeBtn(t)}<small title="Lượt xem">👁 ${t.views.toLocaleString('vi-VN')}</small></div></div></article>`;

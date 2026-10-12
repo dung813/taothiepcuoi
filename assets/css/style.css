@@ -504,3 +504,86 @@ body.tm-open{overflow:hidden}
 .dv-form .hint{color:#2e7d4f}
 @media(max-width:900px){.dv-steps,.dv-grid{grid-template-columns:repeat(2,1fr)}.dv-steps::before{display:none}.dv-cta{grid-template-columns:1fr;padding:28px 20px}}
 @media(max-width:520px){.dv-steps,.dv-grid{grid-template-columns:1fr}.dv-cta .btn-lg{width:100%}}
+
+/* ===== Khung thẻ mẫu: 6 kiểu khung khác nhau ===== */
+.tpl-thumb{container-type:inline-size}
+.fr{position:absolute;inset:0;display:grid;place-items:center;overflow:hidden;background:#f6f1ec}
+.fr-card{position:relative;width:76%;height:84%;display:flex;transition:transform .6s,rotate .6s;filter:drop-shadow(0 10px 18px rgba(43,34,38,.18))}
+.tpl-card:hover .fr-card{transform:scale(1.045)}
+.fr-paper{position:absolute;inset:0}
+.fr-body{position:relative;z-index:2;flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:var(--fg);padding:9% 8%}
+.fr-photo{width:66%;aspect-ratio:3/3.7;flex:0 0 auto;background:#ddd center/cover}
+.fr-top{font:600 2.3cqw var(--f-body);letter-spacing:.32em;text-transform:uppercase;opacity:.75;margin-top:3.4cqw}
+.fr-names{font-family:var(--ff);font-size:7cqw;line-height:1.08;margin:1cqw 0 1.4cqw;max-width:100%;overflow-wrap:anywhere}
+.fr-names i{font-style:normal;display:block;font-size:.62em;line-height:1;color:var(--ac)}
+.fr-date{font:600 2.5cqw var(--f-body);letter-spacing:.2em;opacity:.85}
+.tpl-badge{position:absolute;top:12px;right:12px;z-index:6;padding:4px 10px;border-radius:999px;font:700 .72rem var(--f-body);letter-spacing:.03em;color:#fff;box-shadow:0 4px 12px rgba(0,0,0,.15)}
+.tpl-badge.hot{background:linear-gradient(135deg,#ffb020,#ff5a36)}
+.tpl-badge.new{background:linear-gradient(135deg,#34c3a0,#1e9bd7)}
+
+/* 1. Vòm nghệ thuật: đỉnh vòm + đáy cắt răng cưa lượn sóng */
+.fr-arch{background:linear-gradient(170deg,color-mix(in srgb,var(--ac) 16%,#fff),#fbf7f3)}
+.fr-arch .fr-paper{--s:4.4cqw;background:var(--bg);border-radius:50% 50% 0 0/34% 34% 0 0;
+  -webkit-mask:linear-gradient(#000 0 0) top/100% calc(100% - var(--s)) no-repeat,radial-gradient(circle at 50% 0,#000 69%,#0000 71%) bottom/calc(var(--s)*2) var(--s) repeat-x;
+  mask:linear-gradient(#000 0 0) top/100% calc(100% - var(--s)) no-repeat,radial-gradient(circle at 50% 0,#000 69%,#0000 71%) bottom/calc(var(--s)*2) var(--s) repeat-x}
+.fr-arch .fr-paper::after{content:"";position:absolute;inset:3.2cqw 3.2cqw 6.4cqw;border:1px solid var(--ac);border-radius:inherit;opacity:.7}
+.fr-arch .fr-body{padding-top:15%;padding-bottom:12%}
+.fr-arch .fr-photo{width:62%;border-radius:999px 999px 6px 6px;box-shadow:0 0 0 1.2cqw rgba(255,255,255,.75)}
+
+/* 2. Cổ điển châu Âu: viền kép dát vàng, hoa văn baroque ở góc */
+.fr-baroque{background:radial-gradient(circle at 50% 30%,#fdf9f0,#ecdfc6)}
+.fr-baroque .fr-paper{background:var(--bg);border:1.1cqw solid transparent;border-image:linear-gradient(135deg,#f6e3a5,#c9a24f,#e9cf86,#9c7a34) 1}
+.fr-baroque .fr-paper::after{content:"";position:absolute;inset:2.2cqw;border:1px solid #c9a24f;opacity:.85}
+.fr-corner{position:absolute;z-index:3;width:17cqw;height:17cqw;top:1.4cqw;left:1.4cqw}
+.fr-corner.tr{left:auto;right:1.4cqw;transform:scaleX(-1)}.fr-corner.bl{top:auto;bottom:1.4cqw;transform:scaleY(-1)}.fr-corner.br{top:auto;left:auto;right:1.4cqw;bottom:1.4cqw;transform:scale(-1)}
+.fr-crest{position:absolute;z-index:3;top:-3.6cqw;left:50%;width:34cqw;translate:-50% 0;filter:drop-shadow(0 1px 1px rgba(0,0,0,.15))}
+.fr-baroque .fr-body{padding:16% 13% 12%}
+.fr-baroque .fr-photo{width:58%;aspect-ratio:3/3.6;border-radius:50%;border:.9cqw solid #d7b866;box-shadow:0 0 0 .5cqw #fff8e6,0 0 0 1cqw #b8913f}
+.fr-baroque .fr-names{font-size:6.4cqw}
+
+/* 3. Ô cửa Á Đông: khung bát giác nhiều lớp vàng, ảnh tròn kiểu cửa trăng */
+.fr-orient{background:color-mix(in srgb,var(--ac) 10%,#f8f1ea);background-image:repeating-linear-gradient(45deg,color-mix(in srgb,var(--ac) 14%,transparent) 0 1px,transparent 1px 14px),repeating-linear-gradient(-45deg,color-mix(in srgb,var(--ac) 14%,transparent) 0 1px,transparent 1px 14px)}
+.fr-orient .fr-card{width:80%;height:80%}
+.fr-orient .fr-paper,.fr-orient .fr-paper::before,.fr-orient .fr-paper::after,.fr-orient .fr-in{clip-path:polygon(28% 0,72% 0,100% 20%,100% 80%,72% 100%,28% 100%,0 80%,0 20%)}
+.fr-orient .fr-paper{background:linear-gradient(135deg,#f6e3a5,#c9a24f 45%,#e9cf86 70%,#9c7a34)}
+.fr-orient .fr-paper::before{content:"";position:absolute;inset:1.3cqw;background:var(--bg)}
+.fr-orient .fr-paper::after{content:"";position:absolute;inset:2.5cqw;background:linear-gradient(135deg,#e9cf86,#b8913f)}
+.fr-orient .fr-in{position:absolute;inset:3cqw;background:var(--bg);z-index:1}
+.fr-orient .fr-body{padding:10% 12%}
+.fr-sym{font:400 7cqw 'Noto Serif SC','Songti SC','SimSun',serif;color:#e7c66f;line-height:1;margin-bottom:2cqw;text-shadow:0 1px 2px rgba(0,0,0,.25)}
+.fr-orient .fr-photo{width:52%;aspect-ratio:1;border-radius:50%;border:1cqw solid #d9b860;box-shadow:0 0 0 .6cqw var(--bg),0 0 0 1.1cqw #b8913f}
+.fr-orient .fr-names{margin-top:2.4cqw;font-size:6.6cqw}
+
+/* 4. Hoa lá màu nước: khung mở, cành lá tràn ra ngoài mép thiệp */
+.fr-botanic{background:radial-gradient(circle at 20% 15%,#e9f1e3,transparent 55%),radial-gradient(circle at 85% 90%,color-mix(in srgb,var(--ac) 18%,transparent),transparent 55%),#f7f8f2}
+.fr-botanic .fr-card{filter:drop-shadow(0 6px 14px rgba(60,80,50,.14))}
+.fr-botanic .fr-paper{border-radius:3px;background:radial-gradient(ellipse at 0 0,color-mix(in srgb,var(--ac) 22%,transparent),transparent 45%),radial-gradient(ellipse at 100% 100%,rgba(141,181,150,.3),transparent 45%),var(--bg)}
+.fr-leaves{position:absolute;z-index:3;width:40cqw;height:40cqw;pointer-events:none}
+.fr-leaves.tl{top:-11cqw;left:-12cqw}
+.fr-leaves.br{bottom:-11cqw;right:-12cqw;transform:rotate(180deg)}
+.fr-botanic .fr-photo{width:60%;border-radius:48% 48% 46% 46%/40% 40% 36% 36%;box-shadow:0 0 0 1cqw #fff}
+
+/* 5. Polaroid: ảnh vuông, đáy giấy dày, nghiêng nhẹ, dán băng keo */
+.fr-polaroid{background:linear-gradient(160deg,color-mix(in srgb,var(--ac) 22%,#e8e0d6),#f3eee8);background-image:radial-gradient(rgba(0,0,0,.05) 1px,transparent 1.2px);background-size:9px 9px}
+.fr-polaroid .fr-card{width:74%;height:auto;aspect-ratio:3.5/4.5;rotate:-3.5deg}
+.tpl-card:hover .fr-polaroid .fr-card{rotate:0deg}
+.fr-polaroid .fr-paper{background:#fffefb;border-radius:2px}
+.fr-polaroid .fr-body{justify-content:flex-start;padding:6.5% 6.5% 0;color:#3b3236}
+.fr-polaroid .fr-photo{width:100%;aspect-ratio:1/.98;filter:saturate(.95) contrast(1.03)}
+.fr-polaroid .fr-names{font-size:5.6cqw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:2.6cqw 0 .4cqw;color:color-mix(in srgb,var(--ac) 70%,#3b3236)}
+.fr-polaroid .fr-names i{display:inline;margin:0 .25em;font-size:.8em}
+.fr-polaroid .fr-date{font-family:var(--ff);font-size:3.4cqw;letter-spacing:.06em;opacity:.7}
+.fr-tape{position:absolute;z-index:3;top:-3cqw;left:50%;width:24cqw;height:7cqw;translate:-50% 0;rotate:2deg;background:rgba(240,226,190,.75);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+
+/* 6. Tem thư: mép răng cưa đục lỗ, dấu bưu điện, mệnh giá */
+.fr-stamp{background:#efe6d8;background-image:repeating-linear-gradient(0deg,transparent 0 22px,rgba(120,90,60,.07) 22px 23px)}
+.fr-stamp .fr-card{width:74%;height:80%;rotate:1.5deg}
+.fr-stamp .fr-paper{--r:2.6cqw;background:radial-gradient(var(--r),#0000 97%,#fffdf7) round calc(-1.5*var(--r)) calc(-1.5*var(--r))/calc(3*var(--r)) calc(3*var(--r)),linear-gradient(#fffdf7 0 0) no-repeat 50%/calc(100% - 3*var(--r)) calc(100% - 3*var(--r))}
+.fr-stamp .fr-in{position:absolute;z-index:1;inset:6cqw;background:var(--bg);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}
+.fr-stamp .fr-body{margin:6cqw;padding:7% 6% 6%}
+.fr-stamp .fr-photo{width:100%;aspect-ratio:4/3.4}
+.fr-stamp .fr-top{margin-top:2.6cqw}
+.fr-stamp .fr-names{font-size:6.4cqw}
+.fr-postmark{position:absolute;z-index:3;top:-5cqw;right:-15cqw;width:40cqw;rotate:-14deg;pointer-events:none}
+.fr-val{position:absolute;z-index:3;left:8.5cqw;bottom:7.6cqw;font:700 3.2cqw var(--f-head);color:var(--ac);background:#fffdf7;padding:.3cqw 1.4cqw;border-radius:2px}
+@media (prefers-reduced-motion:reduce){.fr-card{transition:none}}
