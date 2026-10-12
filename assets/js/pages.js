@@ -43,6 +43,32 @@ TH.pageTemplates = () => {
   $('#tier').onchange = e => { tier = e.target.value; render(); };
   $('#sort').onchange = e => { sort = e.target.value; render(); };
   $('#q').oninput = e => { q = e.target.value.trim().toLowerCase(); render(); };
+  // Gợi ý mẫu thiệp mới: khách chia sẻ ý tưởng cho bộ sưu tập sắp tới
+  const sb = $('#suggestBtn');
+  if (sb) sb.onclick = () => {
+    const STYLES = ['Tối giản', 'Lãng mạn', 'Sang trọng', 'Truyền thống', 'Vintage', 'Hàn Quốc', 'Botanical'];
+    const PLANE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4z"/></svg>';
+    TH.modal(`<form id="sgForm" class="sg-form">
+      <header class="sg-head"><h3 id="sgTitle">Cùng tạo nên mẫu thiệp trong mơ của bạn</h3>
+        <p>Chia sẻ ý tưởng hoặc phong cách riêng của hai bạn. Team thiết kế sẽ biến nó thành hiện thực cho bộ sưu tập sắp tới.</p></header>
+      <fieldset class="sg-group"><legend>Phong cách yêu thích</legend>
+        <div class="sg-styles">${STYLES.map(s => `<label class="sg-chip"><input type="checkbox" name="style" value="${s}"><span>${s}</span></label>`).join('')}</div></fieldset>
+      <label class="sg-field"><span>Ý tưởng của bạn <em>*</em></span>
+        <textarea name="idea" required minlength="5" rows="4" placeholder="VD: Tone xanh pastel, khung vòm uốn lượn, nhiều hoa lá, ảnh polaroid..."></textarea></label>
+      <div class="sg-row">
+        <label class="sg-field"><span>Tên của bạn</span><input name="name" autocomplete="name" placeholder="VD: Thu Hà"></label>
+        <label class="sg-field"><span>Số điện thoại / Zalo để nhận thông báo</span><input name="contact" type="tel" inputmode="tel" autocomplete="tel" pattern="[0-9 +.]{9,15}" placeholder="VD: 0912 345 678"></label>
+      </div>
+      <button class="sg-submit">${PLANE}Gửi ý tưởng cho Team</button>
+    </form>`, 'sg-box').querySelector('.modal-box').setAttribute('aria-labelledby', 'sgTitle');
+    $('#sgForm').onsubmit = e => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      const item = {styles: fd.getAll('style'), idea: fd.get('idea').trim(), name: fd.get('name').trim(), contact: fd.get('contact').trim(), at: Date.now()};
+      const list = TH.store.get('tplSuggest', []); list.unshift(item); TH.store.set('tplSuggest', list.slice(0, 100));
+      TH.closeModal(); TH.toast('Cảm ơn bạn! Team đã nhận ý tưởng mẫu thiệp 💌');
+    };
+  };
   render();
   TH.openTplFromHash();   // link chia sẻ dạng mau-thiep.html#mau=<id> mở thẳng cửa sổ chi tiết mẫu
 };

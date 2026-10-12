@@ -360,7 +360,9 @@ h1,h2,h3{font-family:var(--f-head);line-height:1.2;font-weight:600}
 .share-qr{justify-items:center;text-align:center}
 .share-qr #gQr{padding:10px;background:#fff;border-radius:12px;box-shadow:0 2px 12px rgba(43,34,38,.08)}
 .share-qr #gQr img,.share-qr #gQr canvas{display:block;width:220px;height:220px}
-.modal-close{position:absolute;right:14px;top:10px;font-size:1.6rem;color:var(--muted)}
+.modal-close{position:absolute;right:14px;top:14px;z-index:2;display:grid;place-items:center;width:36px;height:36px;border-radius:50%;color:var(--muted);transition:.2s}
+.modal-close svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round}
+.modal-close:hover{background:#f3eff1;color:var(--ink)}
 @keyframes fade{from{opacity:0}}
 @keyframes pop{from{transform:scale(.9);opacity:0}}
 .toast{position:fixed;bottom:26px;left:50%;translate:-50% 0;background:var(--ink);color:#fff;padding:12px 22px;border-radius:999px;z-index:600;font-size:.92rem;opacity:0;transform:translateY(20px);transition:.35s;pointer-events:none}
@@ -587,3 +589,41 @@ body.tm-open{overflow:hidden}
 .fr-postmark{position:absolute;z-index:3;top:-5cqw;right:-15cqw;width:40cqw;rotate:-14deg;pointer-events:none}
 .fr-val{position:absolute;z-index:3;left:8.5cqw;bottom:7.6cqw;font:700 3.2cqw var(--f-head);color:var(--ac);background:#fffdf7;padding:.3cqw 1.4cqw;border-radius:2px}
 @media (prefers-reduced-motion:reduce){.fr-card{transition:none}}
+
+/* ===== Khối "Chưa thấy mẫu ưng ý?" (trang Mẫu thiệp) ===== */
+.suggest-card{max-width:760px;margin:0 auto;padding:44px 32px;border-radius:24px;background:#f4f4f6;text-align:center;display:grid;justify-items:center;gap:12px}
+.suggest-ico{display:grid;place-items:center;width:64px;height:64px;border-radius:50%;background:#fde4ee;color:#e8336f;margin-bottom:4px}
+.suggest-ico svg{width:30px;height:30px}
+.suggest-card h2{font-family:var(--f-body);font-weight:700;font-size:clamp(1.4rem,2.6vw,1.75rem);color:#22202a}
+.suggest-card p{max-width:540px;color:#6b6874;line-height:1.65}
+.btn-suggest{display:inline-flex;align-items:center;gap:10px;margin-top:8px;padding:14px 28px;border:0;border-radius:12px;background:#e8336f;color:#fff;font:600 1rem var(--f-body);cursor:pointer;box-shadow:0 10px 24px rgba(232,51,111,.3);transition:.25s}
+.btn-suggest:hover{background:#d42460;transform:translateY(-2px);box-shadow:0 14px 28px rgba(232,51,111,.38)}
+.btn-suggest:focus-visible{outline:3px solid #fbb6cd;outline-offset:3px}
+.btn-suggest svg{width:20px;height:20px}
+/* Popup "Gợi ý mẫu thiệp" */
+.modal-box.sg-box{max-width:560px;padding:40px 38px 34px;border-radius:28px;box-shadow:0 30px 80px rgba(20,12,18,.28),0 2px 8px rgba(20,12,18,.08)}
+.sg-form{display:grid;gap:20px}
+.sg-head{text-align:center;padding:0 12px}
+.sg-head h3{font-family:var(--f-head);font-weight:600;font-size:clamp(1.45rem,3.4vw,1.85rem);line-height:1.25;color:#2a2226}
+.sg-head p{margin-top:10px;font-size:.92rem;line-height:1.65;color:#8a7d76}
+.sg-group{border:0;padding:0;margin:0;display:grid;gap:10px}
+.sg-group legend,.sg-field>span{font:600 .82rem var(--f-body);color:#4a4045;margin-bottom:10px;padding:0}
+.sg-field>span em{color:#e8336f;font-style:normal}
+.sg-styles{display:flex;flex-wrap:wrap;gap:8px}
+.sg-chip input{position:absolute;opacity:0;pointer-events:none}
+.sg-chip span{display:inline-block;padding:8px 16px;border:1px solid #e6e1e3;border-radius:999px;background:#fff;font-size:.86rem;color:#5d5358;cursor:pointer;transition:.2s}
+.sg-chip span:hover{border-color:#f3a3c0;color:#c21f5b}
+.sg-chip input:checked+span{background:#fde8f0;border-color:#e8336f;color:#c21f5b;font-weight:600}
+.sg-chip input:focus-visible+span{outline:2px solid #fbb6cd;outline-offset:2px}
+.sg-field{display:grid}
+.sg-field textarea,.sg-field input{width:100%;min-width:0;padding:13px 16px;border:1px solid #e6e1e3;border-radius:16px;background:#fcfbfb;font:400 .95rem var(--f-body);color:var(--ink);outline:none;transition:.2s}
+.sg-field textarea{min-height:120px;resize:vertical;line-height:1.55}
+.sg-field textarea::placeholder,.sg-field input::placeholder{color:#b9aeb2}
+.sg-field textarea:focus,.sg-field input:focus{border-color:#e8336f;background:#fff;box-shadow:0 0 0 4px #fde4ee}
+.sg-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:end}
+.sg-submit{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;margin-top:4px;padding:15px 24px;border:0;border-radius:999px;background:linear-gradient(135deg,#f0477f,#d81b60);color:#fff;font:600 1rem var(--f-body);cursor:pointer;box-shadow:0 12px 26px rgba(216,27,96,.32);transition:.25s}
+.sg-submit:hover{transform:translateY(-2px);box-shadow:0 16px 30px rgba(216,27,96,.4)}
+.sg-submit:focus-visible{outline:3px solid #fbb6cd;outline-offset:3px}
+.sg-submit svg{width:20px;height:20px}
+@media(max-width:600px){.modal-box.sg-box{padding:34px 20px 24px;border-radius:24px}.sg-row{grid-template-columns:1fr}}
+@media(max-width:600px){.suggest-card{padding:34px 20px;border-radius:20px}}

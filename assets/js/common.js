@@ -117,10 +117,12 @@ TH.toast = msg => {
   let t = $('.toast'); if (!t) { t = document.createElement('div'); t.className = 'toast'; document.body.append(t); }
   t.textContent = msg; t.classList.add('show'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('show'), 2600);
 };
-TH.modal = html => {
+TH.modal = (html, cls = '') => {
   let m = $('#th-modal');
-  if (!m) { m = document.createElement('div'); m.id = 'th-modal'; m.className = 'modal'; m.innerHTML = '<div class="modal-box"><button class="modal-close">&times;</button><div class="modal-body"></div></div>'; document.body.append(m);
-    m.onclick = e => { if (e.target === m || e.target.classList.contains('modal-close')) m.classList.remove('open'); }; }
+  if (!m) { m = document.createElement('div'); m.id = 'th-modal'; m.className = 'modal';
+    m.innerHTML = '<div class="modal-box" role="dialog" aria-modal="true"><button class="modal-close" aria-label="Đóng"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button><div class="modal-body"></div></div>'; document.body.append(m);
+    m.onclick = e => { if (e.target === m || e.target.closest('.modal-close')) m.classList.remove('open'); }; }
+  const box = $('.modal-box', m); box.className = 'modal-box ' + cls; box.style.cssText = '';   // mỗi lần mở là một hộp thoại "sạch"
   $('.modal-body', m).innerHTML = html; m.classList.add('open'); return m;
 };
 TH.closeModal = () => { const m = $('#th-modal'); if (m) m.classList.remove('open'); };
