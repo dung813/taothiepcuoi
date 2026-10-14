@@ -41,7 +41,7 @@ function header(){
     <a href="index.html" class="logo" aria-label="WEDSTORY – Trang chủ">${LOGO}<span class="brand">WED<em>STORY</em></span></a>
     <nav class="nav">${NAV.map(([h,t,c])=>`<a href="${h}" class="${c||''} ${pageKey(h)===page?'active':''}"${pageKey(h)===page?' aria-current="page"':''}>${t}</a>`).join('')}</nav>
     <div class="header-actions">
-      ${user ? `<a href="thiep-da-tao.html?mine=1" class="btn btn-ghost btn-sm">👋 ${TH.esc(user.name)}</a><button class="btn btn-ghost btn-sm" data-logout>Đăng xuất</button>`
+      ${user ? `<a href="thiep-da-tao.html?mine=1" class="btn btn-ghost btn-sm">👋 ${TH.esc(user.name)}${TH.store.get('vipAccounts', []).includes(String(user.email || '').trim().toLowerCase()) ? ' <span class="vip-tag">VIP</span>' : ''}</a><button class="btn btn-ghost btn-sm" data-logout>Đăng xuất</button>`
              : `<button class="btn btn-ghost btn-sm" data-auth="login">Đăng nhập</button><button class="btn btn-primary btn-sm" data-auth="register">Đăng ký</button>`}
       <button class="burger" aria-label="Menu"><span></span></button>
     </div></div>`;

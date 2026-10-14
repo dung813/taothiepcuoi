@@ -627,3 +627,6 @@ body.tm-open{overflow:hidden}
 .sg-submit svg{width:20px;height:20px}
 @media(max-width:600px){.modal-box.sg-box{padding:34px 20px 24px;border-radius:24px}.sg-row{grid-template-columns:1fr}}
 @media(max-width:600px){.suggest-card{padding:34px 20px;border-radius:20px}}
+
+/* Huy hiệu VIP (header tài khoản, trang quản lý) */
+.vip-tag{display:inline-block;font-family:var(--f-body);font-size:.68rem;font-weight:700;letter-spacing:.08em;line-height:1.5;padding:2px 9px;border-radius:999px;background:linear-gradient(135deg,#e7c77f,var(--gold));color:#fff;vertical-align:middle}

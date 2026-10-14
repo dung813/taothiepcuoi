@@ -10,17 +10,32 @@ const slug = s => fold(s).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
    Khi có backend: thay isVip / activate bằng API kiểm tra đơn hàng — mã tạo ở trình duyệt thì ai đọc code cũng tạo được. */
 const SALT = 'wedstory-vip-2026';
 const hash = s => { let h = 5381; for (const ch of s) h = (h * 33 + ch.charCodeAt(0)) >>> 0; return h; };
-// Mã thử dùng cho mọi thiệp — CHỈ khi chạy trên máy (localhost), lên tên miền thật thì vô hiệu
-const DEV_CODE = 'VIP-TEST2026', isLocal = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+// Mã thử — CHỈ dùng được khi chạy trên máy (localhost), lên tên miền thật thì vô hiệu
+const isLocal = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+const DEV_CODE = 'VIP-TEST2026', DEV_ACC_CODE = 'VIPACC-TEST2026';
+const mail = () => String(TH.store.get('user')?.email || '').trim().toLowerCase();
+const short = s => hash(SALT + '|' + s).toString(36).toUpperCase().padStart(6, '0').slice(-6);
+/* Hai loại VIP:
+   - theo thiệp (plan_<id>): mã VIP-XXXXXX, chỉ mở thiệp đó;
+   - theo tài khoản (vipAccounts = [email]): mã VIPACC-XXXXXX gắn với email, mở mọi thiệp khi đăng nhập email đó. */
 TH.plan = {
   key: id => 'plan_' + id,
-  isVip: id => TH.store.get(TH.plan.key(id), {}).tier === 'vip',
-  codeFor: id => 'VIP-' + hash(SALT + '|' + id).toString(36).toUpperCase().padStart(6, '0').slice(-6),
+  accountVip: () => !!mail() && TH.store.get('vipAccounts', []).includes(mail()),
+  isVip: id => TH.store.get(TH.plan.key(id), {}).tier === 'vip' || TH.plan.accountVip(),
+  codeFor: id => 'VIP-' + short(id),
+  accountCodeFor: email => 'VIPACC-' + short('acc|' + String(email).trim().toLowerCase()),
+  /* Trả về 'invite' | 'account' | 'login' (mã tài khoản nhưng chưa đăng nhập) | '' (sai mã) */
   activate(id, code){
     const c = String(code || '').toUpperCase().replace(/\s+/g, '');
-    const ok = c === TH.plan.codeFor(id) || (isLocal && c === DEV_CODE);
-    if (ok) TH.store.set(TH.plan.key(id), {tier:'vip', at:Date.now()});
-    return ok;
+    if (c.startsWith('VIPACC-')) {
+      if (!mail()) return 'login';
+      if (c !== TH.plan.accountCodeFor(mail()) && !(isLocal && c === DEV_ACC_CODE)) return '';
+      TH.store.set('vipAccounts', [...new Set([...TH.store.get('vipAccounts', []), mail()])]);
+      return 'account';
+    }
+    if (c !== TH.plan.codeFor(id) && !(isLocal && c === DEV_CODE)) return '';
+    TH.store.set(TH.plan.key(id), {tier:'vip', at:Date.now()});
+    return 'invite';
   }
 };
 
@@ -181,7 +196,12 @@ TH.adminGuests = (root, id, D, {onGroups} = {}) => {
       <form class="gl-code"><span class="muted">Đã thanh toán?</span><input name="c" required placeholder="Mã kích hoạt, VD: VIP-AB12CD" aria-label="Mã kích hoạt VIP"><button class="btn btn-outline btn-sm">Kích hoạt</button></form>
     </div>`;
     $('.gl-code', root).onsubmit = e => { e.preventDefault();
-      if (TH.plan.activate(id, e.target.elements.c.value)) { TH.toast('🎉 Đã kích hoạt gói VIP cho thiệp này'); draw(); } else TH.toast('Mã kích hoạt không đúng — kiểm tra lại giúp bạn nhé'); };
+      const r = TH.plan.activate(id, e.target.elements.c.value);
+      if (r === 'login') return TH.openAuth('login'), TH.toast('Đây là mã VIP tài khoản — hãy đăng nhập trước rồi nhập lại mã');
+      if (!r) return TH.toast('Mã kích hoạt không đúng — kiểm tra lại giúp bạn nhé');
+      TH.toast(r === 'account' ? '👑 Tài khoản của bạn đã là VIP — mọi thiệp đều được mở khoá' : '🎉 Đã kích hoạt gói VIP cho thiệp này');
+      if (r === 'account') setTimeout(() => location.reload(), 900);   // tải lại để header hiện huy hiệu VIP
+      else draw(); };
   };
 
   const ACCEPT = '.xlsx,.xls,.ods,.csv,.txt';
