@@ -92,8 +92,60 @@
 .tb.full .tb-fill i{background:var(--rose)}
 .tb.over{border-color:#e57373}.tb.over .tb-fill i{background:#d9534f}.tb.over .tb-shape{border-color:#e57373}
 .tb ul:empty::before{content:"Thả khách vào đây";display:block;text-align:center;color:var(--muted);font-size:.8rem;border:1.5px dashed var(--line);border-radius:10px;padding:10px}
+/* Danh sách khách mời & gửi thiệp (VIP) */
+.vip-tag{margin-right:auto;font-family:var(--f-body);font-size:.68rem;font-weight:700;letter-spacing:.08em;padding:3px 10px;border-radius:999px;background:linear-gradient(135deg,#e7c77f,var(--gold));color:#fff}
+.gl-tools,.gl-bulk{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.gl-sp{flex:1}
+.gl-up{cursor:pointer}
+.gl-q,.gl-f{border:1px solid var(--line);border-radius:999px;padding:8px 14px;font:inherit;font-size:.88rem;background:#fff}
+.gl-q{min-width:220px}
+.gl-sum{margin-bottom:14px}
+.gl-wrap{max-height:60vh;overflow:auto;border:1px solid var(--line);border-radius:12px;margin-bottom:14px}
+.gl-tbl th{position:sticky;top:0;background:#fff;z-index:1;white-space:nowrap}
+.gl-tbl td{padding:5px 6px;vertical-align:middle}
+.gl-tbl td input:not([type=checkbox]),.gl-tbl td select{width:100%;min-width:120px;border:1px solid transparent;border-radius:8px;padding:7px 8px;font:inherit;font-size:.9rem;color:var(--ink);background:transparent}
+.gl-tbl td input[data-f=name]{min-width:170px}.gl-tbl td input[data-f=email]{min-width:150px}.gl-tbl td input[data-f=phone]{min-width:112px}
+.gl-tbl td [data-f=grp]{min-width:150px}.gl-tbl td [data-f=via]{min-width:84px}
+.gl-tbl td input::placeholder{color:#c9b8bd;font-style:italic}
+.gl-tbl td input:not([type=checkbox]):hover,.gl-tbl td input:focus,.gl-tbl td select:hover,.gl-tbl td select:focus{border-color:var(--line);background:#fff;outline:none}
+.gl-tbl td .bad.bad,.gl-tbl td .bad.bad:hover{border-color:#e8a1a1;background:#fff5f5}
+.gl-tbl input[type=checkbox]{accent-color:var(--rose);width:16px;height:16px}
+.gl-tbl tr.on td{background:#fff7f8}
+.gl-act{white-space:nowrap}.gl-st{min-width:110px}.gl-st .pill{display:inline-block;margin:1px 0;white-space:nowrap}
+.gl-act .ic-btn:not([data-act=del]):hover{border-color:var(--rose);color:var(--rose)}
+.pill.sent{background:#e6effc;color:#2456a6}.pill.wait{background:#f3eef0;color:var(--muted)}
+.gl-drop{display:grid;gap:6px;justify-items:center;text-align:center;border:2px dashed #e8c4cc;border-radius:16px;padding:34px 16px;background:var(--blush);cursor:pointer;margin-bottom:14px;transition:.2s}
+.gl-drop:hover,.gl-over .gl-drop{border-color:var(--rose);background:#fff7f8}
+.gl-drop i{font-style:normal;font-size:2rem}.gl-drop span{color:var(--muted);font-size:.88rem}
+.gl-over .gl-wrap{outline:2px dashed var(--rose);outline-offset:2px}
+.gl-msg summary{cursor:pointer;font-weight:600;margin-bottom:8px}
+.gl-msg textarea,.gl-lbl textarea{width:100%;border:1px solid var(--line);border-radius:12px;padding:10px 12px;font:inherit;font-size:.92rem;color:var(--ink);resize:vertical}
+.gl-keys{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px}
+.gl-keys .chip{padding:4px 12px;font-size:.8rem;cursor:pointer}
+.gl-lock{display:grid;gap:12px;justify-items:center;text-align:center;border:1.5px dashed #e7c77f;border-radius:16px;padding:26px 18px;background:linear-gradient(160deg,#fffaf0,#fff)}
+.gl-lock-ico{font-size:2.2rem}.gl-lock h4{font-family:var(--f-head);font-size:1.25rem}
+.gl-lock ul{list-style:none;display:grid;gap:6px;text-align:left;max-width:560px;font-size:.92rem}
+.gl-lock li::before{content:"✓ ";color:#2d7a43;font-weight:700}
+.gl-code{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:center}
+.gl-code input{width:270px;max-width:100%;border:1px solid var(--line);border-radius:999px;padding:8px 14px;font:inherit;font-size:.88rem;text-transform:uppercase}
+.gl-mh{font-size:1.4rem;margin-bottom:4px;padding-right:36px}
+.gl-imp{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.gl-imp span{background:var(--blush);border-radius:999px;padding:5px 12px;font-size:.85rem}
+.gl-mbtn{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.gl-prog{display:flex;justify-content:space-between;font-size:.88rem;color:var(--muted);margin:0 44px 8px 0}
+.gl-bar{height:5px;border-radius:5px;background:var(--line);margin-bottom:16px;overflow:hidden}
+.gl-bar i{display:block;height:100%;background:var(--rose);transition:width .3s}
+.gl-auto{width:100%;justify-content:center}.gl-or{text-align:center;margin:8px 0 14px}
+.gl-lbl{display:grid;gap:6px;font-size:.82rem;color:var(--muted);font-weight:600;margin:12px 0}
+.gl-ch{display:flex;gap:8px;flex-wrap:wrap}
+.gl-ch .btn[disabled]{opacity:.4;cursor:not-allowed;box-shadow:none}
+.gl-hint{color:var(--muted);font-size:.82rem;margin-top:8px}
+.gl-nav{display:flex;justify-content:space-between;margin-top:14px}
+.gl-nav .btn[disabled]{opacity:.4;cursor:not-allowed}
+.gl-done{text-align:center;display:grid;gap:8px;justify-items:center;padding:10px 0}.gl-done div{font-size:2.6rem}
 @media(max-width:760px){.kpis{grid-template-columns:repeat(2,1fr)}.ksum{grid-template-columns:repeat(2,1fr)}
-  .ev-grid{grid-template-columns:1fr}.seat-wrap{grid-template-columns:1fr}.seat-pool{position:static;max-height:none}.seat-add{margin-left:0}}
+  .ev-grid{grid-template-columns:1fr}.seat-wrap{grid-template-columns:1fr}.seat-pool{position:static;max-height:none}.seat-add{margin-left:0}
+  .gl-q{min-width:0;flex:1}.gl-sp{display:none}}
 </style>
 </head>
 <body>
@@ -101,6 +153,9 @@
 <h1 id="ttl">Quản lý thiệp</h1><div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:16px" id="acts"></div></div></section>
 <section class="container" style="padding-top:30px">
   <div class="kpis" id="kpis"></div>
+  <div class="panel2"><h3>📨 Danh sách khách mời &amp; gửi thiệp <span class="vip-tag">VIP</span></h3>
+    <p class="khint">Tải lên file Excel / CSV danh sách khách, chỉnh sửa trực tiếp trên bảng rồi gửi link thiệp mời riêng (có tên từng khách) qua Zalo, SMS hoặc Email. Nhóm khách dùng chung với mục <b>Sự kiện &amp; nhóm khách mời</b> bên dưới.</p>
+    <div id="glAdmin"></div></div>
   <div class="panel2"><h3>Khách xác nhận tham dự <button class="btn btn-outline btn-sm" id="csv">⬇ Xuất CSV đầy đủ</button></h3><div class="table-wrap"><table class="tbl" id="rsvpT"></table></div></div>
   <div class="panel2 kitchen"><h3>🍽 Danh sách cho nhà hàng
       <span class="kx"><button class="btn btn-primary btn-sm" id="kCsv">⬇ Xuất .CSV</button><button class="btn btn-outline btn-sm" id="kXlsx">⬇ Xuất Excel (.xlsx)</button></span></h3>
@@ -121,6 +176,7 @@
 <script src="assets/js/common.js"></script>
 <script src="assets/js/invite.js"></script>
 <script src="assets/js/admin.js"></script>
+<script src="assets/js/guests.js"></script>
 <script>
 (function(){
   TH.initPage();
@@ -129,7 +185,7 @@
   $('#ttl').textContent = `${D.groom.nick} & ${D.bride.nick}`;
   $('#acts').innerHTML = `<a class="btn btn-primary btn-sm" href="editor.html?id=${id}">✏️ Chỉnh sửa</a><a class="btn btn-outline btn-sm" href="thiep.html?id=${id}">👁 Xem thiệp</a><button class="btn btn-outline btn-sm" id="share">🔗 Chia sẻ</button><button class="btn btn-ghost btn-sm" id="del" style="color:#b33">🗑 Xoá</button>`;
   $('#share').onclick = () => TH.shareDialog(id, D);
-  $('#del').onclick = () => { if (confirm('Xoá thiệp này? Không thể hoàn tác.')) { TH.invites.remove(id); TH.store.del('gb_'+id); location.href = 'thiep-da-tao.html'; } };
+  $('#del').onclick = () => { if (confirm('Xoá thiệp này? Không thể hoàn tác.')) { TH.invites.remove(id); ['gb_', 'guests_', 'plan_'].forEach(k => TH.store.del(k + id)); location.href = 'thiep-da-tao.html'; } };
 
   const side = r => r.side === 'bride' ? 'Nhà gái' : 'Nhà trai';
   /* Bảng cho bếp: khách sẽ đến + dòng tổng */
@@ -177,8 +233,7 @@
   $('#kXlsx').onclick = async () => { if (noGuests()) return;
     const btn = $('#kXlsx'), label = btn.textContent; btn.disabled = true; btn.textContent = 'Đang tạo file…';
     try {
-      if (!window.XLSX) await new Promise((ok, fail) => { const s = document.createElement('script');
-        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'; s.onload = ok; s.onerror = fail; document.head.append(s); });
+      await TH.loadXlsx();
       const k = kitchen(), when = new Date(D.date);
       const title = [[`DANH SÁCH SUẤT ĂN – TIỆC CƯỚI ${D.groom.nick.toUpperCase()} & ${D.bride.nick.toUpperCase()}`], [`Ngày: ${isNaN(when) ? '' : when.toLocaleDateString('vi-VN')} · Xuất lúc ${new Date().toLocaleString('vi-VN')}`], []];
       const ws = XLSX.utils.aoa_to_sheet([...title, k.head, ...k.rows, k.total]);
@@ -191,7 +246,9 @@
   };
   render();
   const grpName = g => (D.groups || []).find(x => x.id === g)?.name || '';
-  TH.adminEvents($('#evAdmin'), id, D);
+  let gl;
+  const ev = TH.adminEvents($('#evAdmin'), id, D, () => gl?.refresh());
+  gl = TH.adminGuests($('#glAdmin'), id, D, {onGroups: () => ev.refresh()});
   TH.adminSeating($('#seatAdmin'), id, D, grpName);
 })();
 </script>

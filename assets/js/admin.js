@@ -14,10 +14,10 @@ const EVENT_PRESETS = [
 const SIDES = {bride:'Nhà gái', groom:'Nhà trai', both:'Chung'};
 const guessSide = e => e.side || (/vu quy/i.test(e.title) ? 'bride' : /thành hôn/i.test(e.title) ? 'groom' : 'both');
 
-TH.adminEvents = (root, id, D) => {
+TH.adminEvents = (root, id, D, onChange) => {
   if (TH.ensureEventIds(D)) TH.invites.save(id, D);
   D.groups = D.groups || [];
-  const save = () => TH.invites.save(id, D);
+  const save = () => { TH.invites.save(id, D); onChange?.(); };   // báo cho danh sách khách mời cập nhật ô chọn nhóm
 
   const draw = () => {
     root.innerHTML = `
@@ -90,6 +90,7 @@ TH.adminEvents = (root, id, D) => {
     if (act === 'copy-all') copy((g.guests || '').split('\n').map(s => s.trim()).filter(Boolean).map(n => `${n}: ${linkFor(g, n)}`).join('\n'), 'Đã sao chép toàn bộ link của nhóm');
   });
   draw();
+  return {refresh: draw};
 };
 
 /* ---------- 2. Sơ đồ bàn tiệc (kéo – thả, hoặc chạm để chọn rồi chạm bàn trên điện thoại) ---------- */

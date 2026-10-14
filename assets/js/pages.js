@@ -137,8 +137,8 @@ TH.pagePricing = () => {
   TH.initPage();
   const nBasic = TH.TEMPLATES.filter(t => t.tier !== 'premium').length, nAll = TH.TEMPLATES.length;
   const PLANS = [
-    {name:'Cơ bản', desc:'Miễn phí trải nghiệm — đủ dùng cho hầu hết cặp đôi', m:0, feats:[[`${nBasic} mẫu thiệp BASIC`,1],['Nhạc nền, album 12 ảnh',1],['Bản đồ, đếm ngược',1],['Xác nhận tham dự & lời chúc',1],['Tên khách mời riêng',1],['Mẫu PREMIUM',0],['Ẩn logo WEDSTORY',0],['Thống kê nâng cao & xuất CSV',0]]},
-    {name:'Tự tạo VIP', desc:'Mở khóa toàn bộ tính năng cao cấp', m:199000, hot:1, feats:[['Tất cả tính năng gói Cơ bản',1],[`Toàn bộ ${nAll} mẫu, gồm PREMIUM`,1],['Album không giới hạn + video',1],['Ẩn logo WEDSTORY',1],['Hộp mừng cưới hiệu ứng',1],['Thống kê nâng cao & xuất CSV',1],['Sơ đồ bàn tiệc & vé mời',1],['Lưu trữ thiệp 2 năm',1]]}
+    {name:'Cơ bản', desc:'Miễn phí trải nghiệm — đủ dùng cho hầu hết cặp đôi', m:0, feats:[[`${nBasic} mẫu thiệp BASIC`,1],['Nhạc nền, album 12 ảnh',1],['Bản đồ, đếm ngược',1],['Xác nhận tham dự & lời chúc',1],['Tên khách mời riêng',1],['Mẫu PREMIUM',0],['Ẩn logo WEDSTORY',0],['Gửi thiệp hàng loạt từ file danh sách khách',0],['Thống kê nâng cao & xuất CSV',0]]},
+    {name:'Tự tạo VIP', desc:'Mở khóa toàn bộ tính năng cao cấp', m:199000, hot:1, feats:[['Tất cả tính năng gói Cơ bản',1],[`Toàn bộ ${nAll} mẫu, gồm PREMIUM`,1],['Album không giới hạn + video',1],['Ẩn logo WEDSTORY',1],['Tải danh sách khách & gửi thiệp hàng loạt',1],['Hộp mừng cưới hiệu ứng',1],['Thống kê nâng cao & xuất CSV',1],['Sơ đồ bàn tiệc & vé mời',1],['Lưu trữ thiệp 2 năm',1]]}
   ];
   const ROWS = [
     ['Số mẫu thiệp', nBasic, nAll],
@@ -148,6 +148,7 @@ TH.pagePricing = () => {
     ['Bản đồ & đếm ngược', '✓', '✓'],
     ['Xác nhận tham dự (RSVP)', '✓', '✓'],
     ['Tên khách mời riêng & mã QR', '✓', '✓'],
+    ['Tải danh sách khách (Excel/CSV) & gửi link hàng loạt', '—', '✓'],
     ['Hộp mừng cưới QR', '✓', '✓ + hiệu ứng'],
     ['Sơ đồ bàn tiệc & vé mời', '—', '✓'],
     ['Thống kê & xuất danh sách CSV', '—', '✓'],
