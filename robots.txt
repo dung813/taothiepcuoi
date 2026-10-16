@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /editor
+Disallow: /editor.html
+Disallow: /quan-ly
+Disallow: /quan-ly.html
+
+Sitemap: https://taothiepcuoi-one.vercel.app/sitemap.xml
