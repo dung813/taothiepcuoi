@@ -19,6 +19,9 @@ TH.LOGO = LOGO;
 
 /* Hotline & Zalo tư vấn — đổi số thật tại đây */
 TH.HOTLINE = '0389507128'; TH.HOTLINE_TEXT = '0389 507 128'; TH.ZALO = 'https://zalo.me/' + TH.HOTLINE;
+/* Thông tin liên hệ dùng chung: footer, trang Liên hệ, trang Dịch vụ trọn gói đều đọc từ đây (qua data-c="…") */
+TH.CONTACT = {email:'wedstoryok@gmail.com', hotline:TH.HOTLINE, hotlineText:TH.HOTLINE_TEXT, zalo:TH.ZALO, address:'Hà Nội, Việt Nam',
+  hours:['Thứ 2 – Thứ 7: 8:00 – 22:30', 'Chủ nhật & ngày lễ: 9:00 – 21:00'], hoursShort:'T2–T7: 8:00–22:30, CN: 9:00–21:00'};
 
 /* Bản demo trình bày: mọi người dùng được toàn bộ tính năng VIP. Đặt false khi bán thật để quay về kiểm tra tài khoản VIP. */
 TH.DEMO = true;
@@ -63,7 +66,7 @@ function footer(){
   el.innerHTML = `<div class="container"><div class="footer-grid">
     <div><a href="index.html" class="logo" aria-label="WEDSTORY – Trang chủ">${LOGO}<span class="brand">WED<em>STORY</em></span></a>
       <p style="font-size:.92rem;max-width:300px">Nền tảng tạo thiệp cưới online miễn phí — đẹp, hiện đại và đầy cảm xúc. Kể câu chuyện tình yêu của bạn theo cách riêng.</p>
-      <div class="socials"><a href="#" aria-label="Facebook">${ICON.fb}</a><a href="#" aria-label="Instagram">${ICON.ig}</a><a href="#" aria-label="TikTok">${ICON.tt}</a></div></div>
+      <div class="socials"><a href="#" data-soon aria-label="Facebook">${ICON.fb}</a><a href="#" data-soon aria-label="Instagram">${ICON.ig}</a><a href="#" data-soon aria-label="TikTok">${ICON.tt}</a></div></div>
     <div><h4>Sản phẩm</h4><ul>
       <li><a href="mau-thiep.html">Mẫu thiệp</a></li><li><a href="thiep-da-tao.html">Thiệp khách hàng</a></li>
       <li><a href="dich-vu-tron-goi.html">Thiết kế trọn gói</a></li><li><a href="bang-gia.html">Bảng giá</a></li>
@@ -73,7 +76,7 @@ function footer(){
       <li><a href="lien-he.html" class="ft-contact">Liên hệ với chúng tôi →</a></li>
       <li><a href="chinh-sach.html#bao-mat">Chính sách bảo mật</a></li><li><a href="chinh-sach.html#dieu-khoan">Điều khoản dịch vụ</a></li>
       <li><a href="chinh-sach.html#thanh-toan">Thanh toán &amp; hoàn tiền</a></li><li><a href="chinh-sach.html#noi-dung">Chính sách nội dung</a></li>
-      <li><a href="mailto:wedstoryok@gmail.com">wedstoryok@gmail.com</a></li></ul></div>
+      <li><a href="mailto:${TH.CONTACT.email}" data-c="email">${TH.CONTACT.email}</a></li></ul></div>
   </div>
   <div class="footer-bottom"><span>© ${new Date().getFullYear()} WEDSTORY. Mọi quyền được bảo lưu.</span><span>Làm bằng ❤ tại Việt Nam</span></div></div>`;
   document.body.append(el);
@@ -464,8 +467,25 @@ TH.petals = (count=18, colors=['#f4b6c2','#f9d3db','#eaa0b0']) => {
 };
 
 /* ---------- Khởi tạo ---------- */
+/* Điền thông tin liên hệ từ TH.CONTACT vào các phần tử data-c / data-zalo / data-hotline */
+TH.fillContact = (root = document) => {
+  const C = TH.CONTACT;
+  $$('[data-c]', root).forEach(el => {
+    const k = el.dataset.c;
+    if (k === 'email') { el.textContent = C.email; if (el.tagName === 'A') el.href = 'mailto:' + C.email; }
+    else if (k === 'hotline') { el.textContent = C.hotlineText; if (el.tagName === 'A') el.href = 'tel:' + C.hotline; }
+    else if (k === 'zalo') { if (el.tagName === 'A') el.href = C.zalo; }
+    else if (k === 'hours') el.innerHTML = C.hours.map(TH.esc).join('<br>');
+    else if (C[k] != null) el.textContent = C[k];
+  });
+  $$('[data-zalo]', root).forEach(a => a.href = C.zalo);
+  $$('[data-hotline]', root).forEach(s => s.textContent = C.hotlineText);
+};
+/* Link mạng xã hội chưa có trang: không nhảy về đầu trang, báo đang cập nhật */
+document.addEventListener('click', e => { if (e.target.closest('[data-soon]')) { e.preventDefault(); TH.toast('Trang mạng xã hội đang được cập nhật'); } });
 TH.initPage = (opts={}) => {
   if (!opts.bare) { header(); footer(); }
+  TH.fillContact();
   TH.reveal(); countUp();
 };
 })();
