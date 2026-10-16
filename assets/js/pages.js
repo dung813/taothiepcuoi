@@ -129,6 +129,9 @@ TH.pageShowcase = () => {
     : `<div class="empty">Bạn chưa tạo thiệp nào. <a href="mau-thiep.html" style="color:var(--rose);font-weight:600">Chọn mẫu để bắt đầu →</a></div>`;
   $('#gallery').innerHTML = TH.SHOWCASE.map(s => showCard(s).replace('class="show-card"','class="show-card reveal" style="width:auto"')).join('');
   TH.reveal();
+  // ?mine=1 (nút tên người dùng trên header): cuộn mượt tới "Thiệp của tôi", chừa chỗ cho header cố định
+  if (new URLSearchParams(location.search).get('mine') === '1') requestAnimationFrame(() => {
+    const box = $('#mine').parentElement; scrollTo({top: box.getBoundingClientRect().top + scrollY - 90, behavior:'smooth'}); });
 };
 
 /* ---------- Bảng giá: 2 gói tự tạo thiệp ---------- */
