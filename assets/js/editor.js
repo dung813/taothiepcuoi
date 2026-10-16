@@ -242,6 +242,7 @@ function buildDrawer(){
   body.scrollTop = y;
   drBuiltAt = Date.now();
   ['groom','bride'].forEach(drawQr);
+  $$('input', body).forEach(dateWarn);   // báo ngay cả giá trị sai đã lưu từ trước
 }
 function openDrawer(k){
   drawer = drawer === k ? '' : k;
@@ -569,6 +570,15 @@ document.addEventListener('scroll', e => { if (!e.target.closest?.('.fdd-pop')) 
 
 /* ======================== SỰ KIỆN NHẬP LIỆU (ngăn kéo + bảng tuỳ chỉnh) ======================== */
 const root = $('#ed');
+/* Cảnh báo nhỏ dưới ô ngày/giờ khi giá trị không hợp lệ hoặc bị xoá trống — chỉ nhắc, không chặn lưu */
+function dateWarn(el){
+  if (!['date', 'time', 'datetime-local'].includes(el.type)) return;
+  const bad = el.validity.badInput || !el.value || (el.type !== 'time' && isNaN(new Date(el.type === 'date' ? el.value + 'T00:00' : el.value)));
+  const w = el.parentElement.querySelector('.date-warn');
+  if (bad && !w) el.insertAdjacentHTML('afterend', '<small class="hint date-warn" role="status">⚠ Ngày/giờ chưa hợp lệ — thiệp sẽ tạm ẩn phần liên quan (đếm ngược, lưu lịch) cho tới khi bạn sửa.</small>');
+  else if (!bad && w) w.remove();
+}
+['input', 'change', 'focusout'].forEach(t => root.addEventListener(t, e => dateWarn(e.target)));
 root.addEventListener('input', e => {
   const el = e.target;
   if (el.dataset.s) return sel && selInput(el);

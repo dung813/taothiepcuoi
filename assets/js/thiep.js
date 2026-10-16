@@ -37,7 +37,9 @@ const pad = n => String(n).padStart(2,'0');
 const DOW = ['Chủ Nhật','Thứ Hai','Thứ Ba','Thứ Tư','Thứ Năm','Thứ Sáu','Thứ Bảy'];
 const fmtTime = s => { const d = new Date(s); return isNaN(d) ? '' : `${pad(d.getHours())}:${pad(d.getMinutes())} · ${DOW[d.getDay()]}, ${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()}`; };
 const mapUrl = e => e.map || 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(e.address || e.place);
+// Giờ sự kiện không hợp lệ → '' (ẩn nút "Lưu lịch"); toISOString() trên ngày sai ném RangeError làm trắng cả trang
 const gcal = e => { const s = new Date(e.time), en = new Date(+s + 3*36e5), f = x => x.toISOString().replace(/[-:]|\.\d{3}/g,'');
+  if (isNaN(s)) return '';
   return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + encodeURIComponent(`${e.title} – ${D.groom.nick} & ${D.bride.nick}`) + `&dates=${f(s)}/${f(en)}&location=` + encodeURIComponent(e.place + ', ' + e.address); };
 const lum = hex => { const m = hex.replace('#','').match(/.{2}/g); if (!m) return 0; const [r,g,b] = m.map(x=>parseInt(x,16)/255); return .2126*r+.7152*g+.0722*b; };
 
@@ -123,9 +125,10 @@ function render(){
   ${o.calendar !== false && !isNaN(wd) ? `<section class="sec-cal" style="padding-top:10px"><div class="card cal reveal">${calendar(wd)}</div></section>` : ''}
 
   <section class="sec-events"><h2 class="t-title reveal">Sự kiện cưới</h2><div class="t-sub reveal">Thời gian & địa điểm</div>
-    <div class="events">${(D.events||[]).filter(e=>e.title).map((e,i,_,n=D.events.indexOf(e))=>`<div class="card event reveal ${i%2?'right':'left'}">
+    <div class="events">${(D.events||[]).filter(e=>e.title).map((e,i,_,n=D.events.indexOf(e))=>{ try { const cal = gcal(e); return `<div class="card event reveal ${i%2?'right':'left'}">
       <h3 data-b="events.${n}.title">${esc(e.title)}</h3><div class="when">${fmtTime(e.time)}</div><div class="where"><b data-b="events.${n}.place">${esc(e.place)}</b><br><span data-b="events.${n}.address">${esc(e.address)}</span></div>
-      <div class="acts"><a class="t-btn" target="_blank" href="${esc(mapUrl(e))}">📍 Chỉ đường</a><a class="t-btn ghost" target="_blank" href="${esc(gcal(e))}">📅 Lưu lịch</a></div></div>`).join('')}</div>
+      <div class="acts"><a class="t-btn" target="_blank" href="${esc(mapUrl(e))}">📍 Chỉ đường</a>${cal ? `<a class="t-btn ghost" target="_blank" href="${esc(cal)}">📅 Lưu lịch</a>` : ''}</div></div>`; }
+      catch (err) { console.warn('Bỏ qua sự kiện lỗi', e, err); return ''; } }).join('')}</div>
     ${(D.events||[]).length && !P.has('lite') ? `<iframe class="reveal" title="Bản đồ" loading="lazy" style="width:100%;height:240px;border:0;border-radius:18px;margin-top:18px" src="https://maps.google.com/maps?q=${encodeURIComponent(D.events[D.events.length-1].address||'')}&z=15&output=embed"></iframe>` : ''}
     ${v ? `<div class="quick-go card reveal" id="quickGo"><div class="qg-head">Đi đến <b>${esc(v.title)}</b><small>${esc(v.place)} · ${esc(v.address)}</small></div>
       <div class="qg-btns">
@@ -226,6 +229,7 @@ function startCountdown(){
   const el = $('#cd'), boxes = [el, $('#cdHero')].filter(Boolean);   // #cdHero: đếm ngược trong ảnh bìa (bản máy tính)
   if (!boxes.length) return;
   const target = new Date(D.date).getTime(), bs = boxes.map(x => $$('b', x));
+  if (isNaN(target)) { $$('.sec-countdown').forEach(x => x.hidden = true); boxes.forEach(x => x.hidden = true); return; }   // ngày cưới sai: không hiện NaN, không chạy đồng hồ
   const tick = () => { let s = Math.max(0, Math.floor((target - Date.now())/1000));
     const v = [Math.floor(s/86400), Math.floor(s%86400/3600), Math.floor(s%3600/60), s%60];
     bs.forEach(b => v.forEach((x,i)=> b[i].textContent = pad(x)));
