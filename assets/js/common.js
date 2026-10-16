@@ -69,7 +69,7 @@ function footer(){
       <li><a href="lien-he.html" class="ft-contact">Liên hệ với chúng tôi →</a></li>
       <li><a href="chinh-sach.html#bao-mat">Chính sách bảo mật</a></li><li><a href="chinh-sach.html#dieu-khoan">Điều khoản dịch vụ</a></li>
       <li><a href="chinh-sach.html#thanh-toan">Thanh toán &amp; hoàn tiền</a></li><li><a href="chinh-sach.html#noi-dung">Chính sách nội dung</a></li>
-      <li><a href="lien-he.html">hello@thiephong.vn</a></li></ul></div>
+      <li><a href="mailto:wedstoryok@gmail.com">wedstoryok@gmail.com</a></li></ul></div>
   </div>
   <div class="footer-bottom"><span>© ${new Date().getFullYear()} WEDSTORY. Mọi quyền được bảo lưu.</span><span>Làm bằng ❤ tại Việt Nam</span></div></div>`;
   document.body.append(el);
