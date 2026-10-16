@@ -18,7 +18,7 @@ const ICON = {
 TH.LOGO = LOGO;
 
 /* Hotline & Zalo tư vấn — đổi số thật tại đây */
-TH.HOTLINE = '0900000000'; TH.HOTLINE_TEXT = '0900 000 000'; TH.ZALO = 'https://zalo.me/' + TH.HOTLINE;
+TH.HOTLINE = '0389507128'; TH.HOTLINE_TEXT = '0389 507 128'; TH.ZALO = 'https://zalo.me/' + TH.HOTLINE;
 
 // So khớp trang cho menu: chấp nhận cả /bang-gia.html, /bang-gia (Vercel cleanUrls) và /
 const pageKey = p => (p.split(/[?#]/)[0].split('/').pop() || 'index').replace(/.html$/, '');
