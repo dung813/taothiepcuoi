@@ -21,7 +21,7 @@ const short = s => hash(SALT + '|' + s).toString(36).toUpperCase().padStart(6, '
 TH.plan = {
   key: id => 'plan_' + id,
   accountVip: () => !!mail() && TH.store.get('vipAccounts', []).includes(mail()),
-  isVip: id => TH.store.get(TH.plan.key(id), {}).tier === 'vip' || TH.plan.accountVip(),
+  isVip: id => TH.DEMO || TH.store.get(TH.plan.key(id), {}).tier === 'vip' || TH.plan.accountVip(),   // bản demo: mở cho mọi người
   codeFor: id => 'VIP-' + short(id),
   accountCodeFor: email => 'VIPACC-' + short('acc|' + String(email).trim().toLowerCase()),
   /* Trả về 'invite' | 'account' | 'login' (mã tài khoản nhưng chưa đăng nhập) | '' (sai mã) */

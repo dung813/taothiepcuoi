@@ -20,6 +20,10 @@ TH.LOGO = LOGO;
 /* Hotline & Zalo tư vấn — đổi số thật tại đây */
 TH.HOTLINE = '0389507128'; TH.HOTLINE_TEXT = '0389 507 128'; TH.ZALO = 'https://zalo.me/' + TH.HOTLINE;
 
+/* Bản demo trình bày: mọi người dùng được toàn bộ tính năng VIP. Đặt false khi bán thật để quay về kiểm tra tài khoản VIP. */
+TH.DEMO = true;
+TH.isVip = () => { if (TH.DEMO) return true; const u = TH.store.get('user'); return !!u && TH.store.get('vipAccounts', []).includes(String(u.email || '').trim().toLowerCase()); };
+
 // So khớp trang cho menu: chấp nhận cả /bang-gia.html, /bang-gia (Vercel cleanUrls) và /
 const pageKey = p => (p.split(/[?#]/)[0].split('/').pop() || 'index').replace(/.html$/, '');
 const NAV_ALIAS = {'bai-viet':'cam-nang'};
@@ -41,7 +45,7 @@ function header(){
     <a href="index.html" class="logo" aria-label="WEDSTORY – Trang chủ">${LOGO}<span class="brand">WED<em>STORY</em></span></a>
     <nav class="nav">${NAV.map(([h,t,c])=>`<a href="${h}" class="${c||''} ${pageKey(h)===page?'active':''}"${pageKey(h)===page?' aria-current="page"':''}>${t}</a>`).join('')}</nav>
     <div class="header-actions">
-      ${user ? `<a href="thiep-da-tao.html?mine=1" class="btn btn-ghost btn-sm">👋 ${TH.esc(user.name)}${TH.store.get('vipAccounts', []).includes(String(user.email || '').trim().toLowerCase()) ? ' <span class="vip-tag">VIP</span>' : ''}</a><button class="btn btn-ghost btn-sm" data-logout>Đăng xuất</button>`
+      ${user ? `<a href="thiep-da-tao.html?mine=1" class="btn btn-ghost btn-sm">👋 ${TH.esc(user.name)}${TH.isVip() ? ' <span class="vip-tag">VIP</span>' : ''}</a><button class="btn btn-ghost btn-sm" data-logout>Đăng xuất</button>`
              : `<button class="btn btn-ghost btn-sm" data-auth="login">Đăng nhập</button><button class="btn btn-primary btn-sm" data-auth="register">Đăng ký</button>`}
       <button class="burger" aria-label="Menu"><span></span></button>
     </div></div>`;
