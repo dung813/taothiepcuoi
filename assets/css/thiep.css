@@ -692,3 +692,11 @@ body.ek-edit #app .ek-locked{cursor:not-allowed}
 .ek-bar button.danger:hover{background:#fdecec;color:#c33}
 .ek-bar .only-m{display:none}
 .ek-mobile .ek-bar .only-m{display:flex}
+
+/* Link thiệp lỗi (có ?id= nhưng không có dữ liệu) */
+.nf-wrap{min-height:100vh;display:grid;place-items:center;padding:24px}
+.nf-card{max-width:440px;text-align:center;background:var(--t-card);border:1px solid var(--t-line);border-radius:24px;padding:40px 28px;box-shadow:0 20px 50px rgba(0,0,0,.08)}
+.nf-ico{font-size:2.6rem;margin-bottom:10px}
+.nf-card h1{font-family:var(--f-head);font-size:1.6rem;margin-bottom:10px;color:var(--t-fg)}
+.nf-card p{opacity:.75;line-height:1.6;margin-bottom:22px}
+.nf-acts{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}

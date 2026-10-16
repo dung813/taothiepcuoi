@@ -21,6 +21,9 @@ function load(){
   if (hash) return hash;
   const local = P.get('id') && TH.invites.get(P.get('id'));
   if (local) return local;
+  /* Có ?id= mà không có dữ liệu (máy khác, #d= bị cắt khi sao chép…) → báo "không tìm thấy" thay vì hiện thiệp mẫu như thiệp thật.
+     Khung xem trước của editor (?preview=1) vẫn giữ cách cũ vì dữ liệu được gửi qua postMessage ngay sau đó. */
+  if (P.get('id') && !isPreview) return null;
   const tpl = demoTpl || 'hong-pastel';
   /* Link từ thẻ "Thiệp khách hàng" truyền tên riêng (g/b) → giữ dữ liệu chung; còn lại dùng đúng cặp đôi của mẫu */
   const c = TH.findTemplate(tpl).couple || {};
@@ -907,6 +910,14 @@ function stopMusic(){ music?.stop(); audioEl?.pause(); const b = $('#musicBtn');
 
 /* ---------- Khởi động ---------- */
 D = load();
+if (!D) {
+  document.title = 'Không tìm thấy thiệp cưới – WEDSTORY';
+  $('#app').innerHTML = `<section class="nf-wrap"><div class="nf-card"><div class="nf-ico" aria-hidden="true">💌</div>
+    <h1>Không tìm thấy thiệp cưới</h1>
+    <p>Link có thể bị thiếu khi sao chép. Bạn hãy nhờ người gửi kiểm tra và gửi lại đường link đầy đủ nhé.</p>
+    <div class="nf-acts"><a class="t-btn" href="thiep.html?demo=hong-pastel">Xem thiệp mẫu</a><a class="t-btn ghost" href="index.html">Về trang chủ</a></div></div></section>`;
+  return;
+}
 /* ?grp=…: chỉ hiện lịch trình của nhóm khách được mời */
 const group = TH.applyGroup(D, P.get("grp"));
 render();
