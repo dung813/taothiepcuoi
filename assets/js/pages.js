@@ -173,7 +173,13 @@ TH.pagePricing = () => {
     TH.modal(`<h3 style="font-size:1.5rem;margin-bottom:8px">Đăng ký gói ${p.name}</h3><p style="color:var(--muted);margin-bottom:18px">Để lại thông tin, chúng tôi sẽ liên hệ hướng dẫn thanh toán trong 30 phút.</p>
       <form class="form-grid" style="grid-template-columns:1fr" id="planForm"><div class="field"><label>Họ tên</label><input required name="n"></div><div class="field"><label>Số điện thoại / Zalo</label><input required name="p" pattern="[0-9 +]{9,}"></div>
       <button class="btn btn-primary" style="justify-content:center">Gửi đăng ký</button></form>`);
-    $('#planForm').onsubmit = ev => { ev.preventDefault(); TH.closeModal(); TH.toast('Đã nhận đăng ký, cảm ơn bạn!'); };
+    $('#planForm').onsubmit = ev => { ev.preventDefault();
+      const f = Object.fromEntries(new FormData(ev.target));
+      const leads = TH.store.get('leads', []); leads.unshift({name:f.n.trim(), phone:f.p.trim(), plan:'vip', at:Date.now()}); TH.store.set('leads', leads.slice(0, 200));
+      ev.target.outerHTML = `<div style="text-align:center;display:grid;gap:14px;justify-items:center">
+        <p style="font-weight:600;color:var(--rose-d)">✓ Cảm ơn ${TH.esc(f.n.trim())}! Bản demo đang mở toàn bộ tính năng VIP miễn phí.</p>
+        <a class="btn btn-primary" href="mau-thiep.html">Bắt đầu tạo thiệp</a></div>`;
+      TH.toast('Đã nhận đăng ký, cảm ơn bạn!'); };
   };
   TH.faq($('#faq'), [
     ['Gói trả phí tính theo tháng hay theo thiệp?','Tính theo từng thiệp và chỉ thanh toán một lần. Thiệp được lưu trữ theo thời hạn của gói.'],
