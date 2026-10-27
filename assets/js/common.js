@@ -198,59 +198,164 @@ document.addEventListener('click', e => {
   });
 });
 
-/* ---------- Khung thẻ mẫu: mỗi mẫu một kiểu khung riêng (vòm, baroque, bát giác, hoa lá, polaroid, tem thư) ----------
-   Bảng dưới được chọn để hai thẻ cạnh nhau không trùng kiểu khung khi xếp theo lượt xem (mặc định) và theo tên A–Z.
-   Thêm mẫu mới hoặc đổi lượt xem thì kiểm tra lại thứ tự này. */
+/* ---------- Khung thẻ mẫu: Hệ thống thẻ hiện đại, chuẩn Photo-Centric theo web mẫu ----------
+   6 kiểu layout: Phong bì nhung & dấu sáp, Polaroid băng keo & hoa khô, Cổng vòm hoàng gia / Song Hỷ,
+   Song ảnh hoa lá màu nước, Dải phim triptych, Toàn cảnh điện ảnh chữ nghệ thuật. */
 const FRAME_OF = {
-  'hong-pastel':'arch', 'oai-huong':'arch', 'nang-vang':'arch', 'thanh-lich':'arch',
-  'hoang-kim':'baroque', 'co-dien':'baroque', 'be-kem':'baroque',
-  'song-hy':'orient', 'mau-don':'orient', 'anh-bac':'orient',
-  'tiec-vuon':'botanic', 'rung-thong':'botanic', 'la-non':'botanic',
-  'vuon-xanh':'polaroid', 'giay-kraft':'polaroid', 'toi-gian-trang':'polaroid', 'ngay-nang':'polaroid',
-  'bien-xanh':'stamp', 'dem-sao':'stamp', 'hoang-hon':'stamp'
+  // 1. Phong bì nhung & Con dấu sáp 3D + Nhánh hoa
+  'mau-don':        { kind: 'envelope', envColor: '#721921', bg: '#F6ECE1' }, // Velvet Burgundy (Mẫu 9)
+  'hoang-kim':      { kind: 'envelope', envColor: '#344D38', bg: '#F2EFEB' }, // Olive Green (Mẫu 3)
+  'oai-huong':      { kind: 'envelope', envColor: '#553A70', bg: '#ECE4F4' }, // Plum Lavender (Mẫu 6)
+  'thanh-lich':     { kind: 'envelope', envColor: '#9C4635', bg: '#F4ECE6' }, // Terracotta (Mẫu 16)
+  'be-kem':         { kind: 'envelope', envColor: '#8E4652', bg: '#F6ECEB' }, // Dusty Rose (Mẫu 19)
+
+  // 2. Polaroid dán băng dính kraft & Hoa khô & Dấu sáp
+  'vuon-xanh':      { kind: 'polaroid', bg: '#EFE6D8' }, // Warm Sand (Mẫu 2)
+  'toi-gian-trang': { kind: 'polaroid', bg: '#E8DFD3' }, // Warm Oatmeal (Mẫu 10)
+  'la-non':         { kind: 'polaroid', bg: '#E3EDE4' }, // Celadon Eucalyptus (Mẫu 17)
+  'anh-bac':        { kind: 'polaroid', bg: '#E5DFD7' }, // Warm Stone (Mẫu 20)
+  'co-dien':        { kind: 'polaroid', bg: '#ECE3D2' }, // Antique Parchment (Mẫu 12)
+
+  // 3. Cổng vòm hoàng gia & Song Hỷ đỏ truyền thống
+  'song-hy':        { kind: 'arch', archColor: '#85121A', bg: '#FAF5EE', groomRole: 'Trưởng Nam', brideRole: 'Út Nữ' }, // Imperial Crimson (Mẫu 4)
+  'dem-sao':        { kind: 'arch', archColor: '#153621', bg: '#FAF6EE', groomRole: 'Trưởng Nam', brideRole: 'Út Nữ' }, // Royal Emerald (Mẫu 8)
+  'nang-vang':      { kind: 'arch', archColor: '#9C7228', bg: '#FBF5E9', groomRole: 'Trưởng Nam', brideRole: 'Út Nữ' }, // Golden Amber (Mẫu 13)
+  'bien-xanh':      { kind: 'arch', archColor: '#1A364B', bg: '#EDF3F7', groomRole: 'Trưởng Nam', brideRole: 'Út Nữ' }, // Slate Navy (Mẫu 5)
+  'rung-thong':     { kind: 'arch', archColor: '#1A3322', bg: '#EEF3EE', groomRole: 'Trưởng Nam', brideRole: 'Út Nữ' }, // Pine Moss (Mẫu 15)
+
+  // 4. Song ảnh hoa lá màu nước (Hai khung ảnh riêng cho chú rể & cô dâu)
+  'hong-pastel':    { kind: 'botanic-dual', bg: '#EDF3EB' }, // Sage Green (Mẫu 1)
+  'tiec-vuon':      { kind: 'botanic-dual', bg: '#E6EFE2' }, // Garden Foliage (Mẫu 14)
+
+  // 5. Dải phim Polaroid Triptych (Ảnh chính + 3 ảnh mini)
+  'giay-kraft':     { kind: 'filmstrip', bg: '#94442E' }, // Cinnamon Brick (Mẫu 7)
+  'ngay-nang':      { kind: 'filmstrip', bg: '#7A242B' }, // Wine Crimson (Mẫu 18)
+
+  // 6. Toàn cảnh điện ảnh chữ nghệ thuật
+  'hoang-hon':      { kind: 'cinematic', bg: '#1C1917', script: 'Our Love Begins' } // Sunset Cinematic (Mẫu 11)
 };
-const HY = new Set(['song-hy', 'mau-don']);
+
 const ddmmyyyy = d => `${String(d.getDate()).padStart(2,'0')} · ${String(d.getMonth()+1).padStart(2,'0')} · ${d.getFullYear()}`;
-// Góc hoa văn baroque (vẽ ở góc trên-trái, các góc khác lật bằng CSS)
-const BAROQUE_CORNER = g => `<svg class="fr-corner" viewBox="0 0 60 60" aria-hidden="true"><g fill="none" stroke="url(#${g})" stroke-width="2.2" stroke-linecap="round">
-  <path d="M4 56V22Q4 4 22 4h34"/><path d="M10 50V25q0-15 15-15h25" stroke-width="1.2"/>
-  <path d="M26 10c-1 9 3 15 11 15 6 0 8-6 4-9-3-2-7 1-5 4"/><path d="M10 26c9 1 15-3 15-11 0-6-6-8-9-4-2 3 1 7 4 5"/>
-  <path d="M40 4c4 3 9 3 13 0M4 40c3 4 3 9 0 13" stroke-width="1.4"/></g><circle cx="16" cy="16" r="3.2" fill="url(#${g})"/></svg>`;
-const BAROQUE_CREST = g => `<svg class="fr-crest" viewBox="0 0 120 34" aria-hidden="true"><g fill="none" stroke="url(#${g})" stroke-width="1.8" stroke-linecap="round">
-  <path d="M60 30C48 30 40 22 40 14c0-6 5-9 9-6 3 2 2 7-2 7"/><path d="M60 30c12 0 20-8 20-16 0-6-5-9-9-6-3 2-2 7 2 7"/>
-  <path d="M38 18C26 22 14 18 4 22M82 18c12 4 24 0 34 4"/></g><path d="M60 4l5 9-5 9-5-9z" fill="url(#${g})"/></svg>`;
-const GOLD_DEFS = g => `<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="${g}" x1="0" y1="0" x2="1" y2="1">
-  <stop offset="0" stop-color="#f6e3a5"/><stop offset=".45" stop-color="#c9a24f"/><stop offset=".7" stop-color="#e9cf86"/><stop offset="1" stop-color="#9c7a34"/></linearGradient></defs></svg>`;
-// Cụm lá & hoa màu nước (khung hoa lá)
-const BOTANIC = (c, cls) => `<svg class="fr-leaves ${cls}" viewBox="0 0 120 120" aria-hidden="true"><g style="mix-blend-mode:multiply">
-  <path d="M10 70C20 40 45 22 78 18 62 34 44 54 10 70z" fill="#8db596" opacity=".75"/><path d="M14 64C40 50 58 36 76 20" stroke="#5f8f6c" stroke-width="1.2" fill="none" opacity=".8"/>
-  <path d="M30 96C30 70 44 52 66 44 60 62 52 80 30 96z" fill="#a9c9a4" opacity=".7"/><path d="M4 40C18 26 30 10 52 4 46 22 30 34 4 40z" fill="#6f9f7b" opacity=".6"/>
-  <path d="M50 110c4-22 18-36 40-40-8 18-20 32-40 40z" fill="#c2d8b5" opacity=".65"/>
-  <g opacity=".9"><circle cx="58" cy="58" r="11" fill="${c}" opacity=".55"/><circle cx="66" cy="52" r="9" fill="${c}" opacity=".5"/><circle cx="52" cy="50" r="8" fill="${c}" opacity=".45"/>
-  <circle cx="58" cy="54" r="4" fill="#f6d77c" opacity=".9"/></g>
-  <circle cx="84" cy="36" r="6" fill="${c}" opacity=".45"/><circle cx="24" cy="84" r="5" fill="${c}" opacity=".4"/><circle cx="90" cy="30" r="2.5" fill="#f6d77c"/></g></svg>`;
-const POSTMARK = c => `<svg class="fr-postmark" viewBox="0 0 120 70" aria-hidden="true"><g fill="none" stroke="${c}" stroke-width="2" opacity=".55">
-  <circle cx="35" cy="35" r="28"/><circle cx="35" cy="35" r="21" stroke-width="1"/>
-  <path d="M66 18q9-6 18 0t18 0 18 0M66 30q9-6 18 0t18 0 18 0M66 42q9-6 18 0t18 0 18 0M66 54q9-6 18 0t18 0 18 0"/></g>
-  <text x="35" y="31" text-anchor="middle" font-size="8" font-weight="700" fill="${c}" opacity=".6" letter-spacing="1">LOVE</text>
-  <text x="35" y="44" text-anchor="middle" font-size="8" font-weight="700" fill="${c}" opacity=".6">♥</text></svg>`;
 
 TH.frameTpl = (t, o = {}) => {
-  const kind = FRAME_OF[t.id] || 'arch';
+  const cfg = FRAME_OF[t.id] || { kind: 'polaroid', bg: '#EFE6D8' };
+  const kind = cfg.kind;
   const d = o.date ? new Date(o.date) : new Date(Date.now() + 60*864e5);
   const src = o.photo === undefined ? t.thumb : o.photo;
-  const g = 'gold-' + t.id;
-  const names = `<div class="fr-names">${TH.esc(o.groom || 'Minh Khôi')}<i>&amp;</i>${TH.esc(o.bride || 'Thu Hà')}</div>`;
-  const photo = src ? `<div class="fr-photo" style="background-image:url('${src}')"></div>` : '';
-  const top = `<div class="fr-top">Save the date</div>`, date = `<div class="fr-date">${ddmmyyyy(d)}</div>`;
-  let deco = '', body = `${photo}${top}${names}${date}`;
-  if (kind === 'baroque') deco = GOLD_DEFS(g) + BAROQUE_CREST(g) + ['tl','tr','bl','br'].map(p => BAROQUE_CORNER(g).replace('class="fr-corner"', `class="fr-corner ${p}"`)).join('');
-  if (kind === 'orient') { deco = `<div class="fr-in"></div>`; body = `<div class="fr-sym">${HY.has(t.id) ? '囍' : '◆'}</div>${photo}${names}${date}`; }
-  if (kind === 'botanic') deco = BOTANIC(t.accent, 'tl') + BOTANIC(t.accent, 'br');
-  if (kind === 'polaroid') { deco = `<span class="fr-tape"></span>`; body = `${photo}${names}${date}`; }
-  if (kind === 'stamp') { deco = `<div class="fr-in"></div>${POSTMARK(t.accent)}<span class="fr-val">${d.getFullYear()}</span>`; }
-  return `<div class="fr fr-${kind}" style="--ac:${t.accent};--fg:${t.fg};--bg:${t.bg};--ff:${TH.fontStack(t.font)}">
-    <div class="fr-card"><div class="fr-paper"></div>${deco}<div class="fr-body">${body}</div></div></div>`;
+  const groom = TH.esc(o.groom || 'Minh Khôi');
+  const bride = TH.esc(o.bride || 'Thu Hà');
+
+  if (kind === 'envelope') {
+    const envColor = cfg.envColor || '#721921';
+    return `<div class="fr fr-envelope" style="--bg:${cfg.bg};--env:${envColor};--ff:${TH.fontStack(t.font)}">
+      <div class="fr-env-top"><span class="fr-tag">SAVE THE DATE</span></div>
+      <div class="fr-env-card">
+        <div class="fr-photo-wrap"><div class="fr-photo" style="background-image:url('${src}')"></div></div>
+        <div class="fr-floral-sprig" aria-hidden="true">
+          <svg viewBox="0 0 50 70" fill="none"><path d="M25 65 Q20 30 5 10" stroke="#4A5847" stroke-width="2"/><circle cx="10" cy="18" r="8" fill="#8B1E2B" opacity=".9"/><circle cx="6" cy="14" r="5" fill="#D65866" opacity=".8"/><circle cx="22" cy="30" r="7" fill="#751622" opacity=".9"/><path d="M12 28 Q2 32 8 45" fill="#586B52" opacity=".8"/></svg>
+        </div>
+        <div class="fr-env-pocket"><div class="fr-seal gold" aria-hidden="true"><span>💍</span></div></div>
+      </div>
+      <div class="fr-env-bottom">
+        <div class="fr-name-line">${groom}</div>
+        <div class="fr-name-line">${bride}</div>
+      </div>
+    </div>`;
+  }
+
+  if (kind === 'polaroid') {
+    return `<div class="fr fr-polaroid" style="--bg:${cfg.bg};--ff:${TH.fontStack(t.font)}">
+      <div class="fr-pol-top">
+        <span class="fr-tag">THE WEDDING OF</span>
+        <div class="fr-names-script">${groom} <i>&amp;</i> ${bride}</div>
+      </div>
+      <div class="fr-pol-frame">
+        <span class="fr-tape" aria-hidden="true"></span>
+        <div class="fr-photo" style="background-image:url('${src}')"></div>
+        <div class="fr-pol-sprig" aria-hidden="true">
+          <svg viewBox="0 0 50 50"><path d="M10 40 Q25 25 35 10" stroke="#7A6855" stroke-width="1.6" fill="none"/><circle cx="35" cy="10" r="3.2" fill="#B38F6D"/><circle cx="28" cy="18" r="2.8" fill="#997554"/><circle cx="20" cy="27" r="2.8" fill="#B38F6D"/></svg>
+        </div>
+        <div class="fr-seal gold fr-pol-seal" aria-hidden="true"><span>♥</span></div>
+      </div>
+      <div class="fr-date">${ddmmyyyy(d)}</div>
+    </div>`;
+  }
+
+  if (kind === 'arch') {
+    const archColor = cfg.archColor || '#153621';
+    const groomRole = cfg.groomRole || 'Trưởng Nam';
+    const brideRole = cfg.brideRole || 'Út Nữ';
+    return `<div class="fr fr-arch" style="--bg:${cfg.bg};--arch:${archColor};--ff:${TH.fontStack(t.font)}">
+      <div class="fr-arch-header">
+        <span class="fr-arch-welcome">WELCOME TO OUR WEDDING</span>
+        <div class="fr-arch-family">
+          <div class="fr-arch-col"><small>${groomRole}</small><b>${groom}</b></div>
+          <div class="fr-arch-hy">囍</div>
+          <div class="fr-arch-col"><small>${brideRole}</small><b>${bride}</b></div>
+        </div>
+        <span class="fr-arch-motto">LOVE NEVER FAILS</span>
+      </div>
+      <div class="fr-arch-window">
+        <div class="fr-photo" style="background-image:url('${src}')"></div>
+      </div>
+    </div>`;
+  }
+
+  if (kind === 'botanic-dual') {
+    const groomSrc = (t.photos && t.photos[0]) || src;
+    const brideSrc = (t.photos && t.photos[1]) || src;
+    return `<div class="fr fr-botanic-dual" style="--bg:${cfg.bg};--ff:${TH.fontStack(t.font)}">
+      <div class="fr-bot-top">
+        <span class="fr-bot-leaf">🌿</span>
+        <span class="fr-tag">WEDDING INVITATION</span>
+      </div>
+      <div class="fr-bot-pair">
+        <div class="fr-bot-item groom">
+          <div class="fr-photo" style="background-image:url('${groomSrc}')"></div>
+          <div class="fr-bot-info"><small>Trưởng Nam</small><b>${groom}</b></div>
+        </div>
+        <div class="fr-bot-bar"></div>
+        <div class="fr-bot-item bride">
+          <div class="fr-photo" style="background-image:url('${brideSrc}')"></div>
+          <div class="fr-bot-info"><small>Út Nữ</small><b>${bride}</b></div>
+        </div>
+      </div>
+      <div class="fr-date">${ddmmyyyy(d)}</div>
+    </div>`;
+  }
+
+  if (kind === 'filmstrip') {
+    const s1 = (t.photos && t.photos[1]) || src;
+    const s2 = (t.photos && t.photos[2]) || src;
+    const s3 = (t.photos && t.photos[3]) || src;
+    return `<div class="fr fr-filmstrip" style="--bg:${cfg.bg};--ff:${TH.fontStack(t.font)}">
+      <div class="fr-film-top"><span class="fr-tag-light">WEDDING INVITATION</span></div>
+      <div class="fr-film-main">
+        <div class="fr-photo" style="background-image:url('${src}')"></div>
+      </div>
+      <div class="fr-film-banner">
+        <div class="fr-names-script" style="color:#222">${groom} <i>&amp;</i> ${bride}</div>
+        <div class="fr-date-mini">${ddmmyyyy(d)}</div>
+      </div>
+      <div class="fr-film-strip">
+        <div class="fr-film-thumb" style="background-image:url('${s1}')"></div>
+        <div class="fr-film-thumb" style="background-image:url('${s2}')"></div>
+        <div class="fr-film-thumb" style="background-image:url('${s3}')"></div>
+      </div>
+    </div>`;
+  }
+
+  // Cinematic
+  const scriptText = cfg.script || 'Our Love Begins';
+  return `<div class="fr fr-cinematic" style="--bg:#1C1917;--ff:${TH.fontStack(t.font)}">
+    <div class="fr-photo" style="background-image:url('${src}')"></div>
+    <div class="fr-cine-overlay"></div>
+    <div class="fr-cine-content">
+      <div class="fr-cine-script">${scriptText}</div>
+      <div class="fr-cine-names">${groom} <i>&amp;</i> ${bride}</div>
+      <div class="fr-date-light">${ddmmyyyy(d)}</div>
+    </div>
+  </div>`;
 };
 /* Nhãn Hot (4 mẫu nhiều lượt xem nhất) / Mới (4 mẫu thêm gần nhất) */
 TH.tplBadge = t => {

@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WedStory - Mẫu Thiệp Cưới Đương Đại</title>
+  
+  <!-- Fonts cao cấp: Playfair Display, Cormorant Garamond, Dancing Script, Alex Brush, Montserrat -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Dancing+Script:wght@500;600;700&family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Pinyon+Script&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            serif: ['"Playfair Display"', '"Cormorant Garamond"', 'serif'],
+            cormorant: ['"Cormorant Garamond"', 'serif'],
+            sans: ['"Montserrat"', 'sans-serif'],
+            script: ['"Alex Brush"', '"Dancing Script"', 'cursive'],
+            pinyon: ['"Pinyon Script"', 'cursive'],
+          },
+          aspectRatio: {
+            'card': '1000 / 1470',
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- React 18 & Babel for standalone preview -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background-color: #EFECE6;
+      color: #292524;
+    }
+    .font-script {
+      font-family: 'Alex Brush', cursive;
+    }
+    .font-dancing {
+      font-family: 'Dancing Script', cursive;
+    }
+    .font-pinyon {
+      font-family: 'Pinyon Script', cursive;
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    /* Wax seal 3D realistic styling */
+    .wax-seal-gold {
+      background: radial-gradient(circle at 35% 35%, #FFE29F, #D4AF37 50%, #997819 100%);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25), inset 0 2px 3px rgba(255, 255, 255, 0.6), inset 0 -2px 3px rgba(0, 0, 0, 0.4);
+    }
+    .wax-seal-red {
+      background: radial-gradient(circle at 35% 35%, #D4424B, #9E1B24 50%, #680A12 100%);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3), inset 0 2px 3px rgba(255, 255, 255, 0.4), inset 0 -2px 3px rgba(0, 0, 0, 0.5);
+    }
+    .masking-tape {
+      background: rgba(243, 230, 203, 0.85);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+      clip-path: polygon(0 0, 100% 2%, 98% 100%, 2% 98%);
+    }
+  </style>
+</head>
+<body class="min-h-screen">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useMemo } = React;
+
+    // 20 MẪU THIỆP CHUẨN THỰC TẾ (ĐÚNG THEO ẢNH MẪU: ĐA DẠNG MÀU SẮC, KHÔNG CẮT MẤT ẢNH)
+    const mockTemplates = [
+      // 1. Velvet Burgundy Envelope (Card 1 trong ảnh)
+      {
+        id: 'hong-long',
+        name: 'Hoàng Long & Bảo Ngọc',
+        category: 'Phong bì nhung',
+        styleType: 'envelope-burgundy',
+        badge: 'Hot',
+        couple: {
+          groom: 'Hoàng Long',
+          bride: 'Bảo Ngọc',
+          dateFormatted: '18 . 01 . 2026',
+        },
+        images: {
+          main: 'assets/img/mau/mau-4/01.webp',
+        },
+        bgTone: 'bg-[#F6ECE1]',
+        envelopeColor: '#721921',
+        sealColor: 'gold',
+      },
+
+      // 2. Taped Polaroid with Wax Seal (Card 2 trong ảnh)
+      {
+        id: 'hoang-nam-vy',
+        name: 'Hoàng Nam & Thảo Vy',
+        category: 'Polaroid nghệ thuật',
+        styleType: 'polaroid-tape',
+        badge: 'Hot',
+        couple: {
+          groom: 'Hoàng Nam',
+          bride: 'Thảo Vy',
+          dateFormatted: '21 . 11 . 2026',
+        },
+        images: {
+          main: 'assets/img/mau/mau-20/01.webp',
+        },
+        bgTone: 'bg-[#EFE6D8]',
+      },
+
+      // 3. Royal Green Arched Gate (Card 3 trong ảnh)
+      {
+        id: 'hai-nam-linh',
+        name: 'Hải Nam & Khánh Linh',
+        category: 'Cổng vòm xanh',
+        styleType: 'royal-green-arch',
+        badge: 'Hot',
+        couple: {
+          groomRole: 'Trưởng Nam',
+          groom: 'HẢI NAM',
+          brideRole: 'Út Nữ',
+          bride: 'KHÁNH LINH',
+          dateFormatted: '12 . 12 . 2026',
+        },
+        images: {
+          main: 'assets/img/mau/mau-8/01.webp',
+        },
+        bgTone: 'bg-[#FAF6EE]',
+        archColor: '#153621',
+      },
+
+      // 4. Botanical Dual-Portrait (Card 4 trong ảnh)
+      {
+        id: 'minh-quan-ha',
+        name: 'Minh Quân & Thu Hà',
+        category: 'Song ảnh hoa lá',
+        styleType: 'botanical-dual',
+        badge: 'Hot',
+        couple: {
+          groomRole: 'Trưởng Nam',
+          groom: 'Minh Quân',
+          brideRole: 'Út Nữ',
+          bride: 'Thu Hà',
+          dateFormatted: '08 . 03 . 2026',
+        },
+        images: {
+          groomPhoto: 'assets/img/mau/mau-1/01.webp',
+          bridePhoto: 'assets/img/mau/mau-1/02.webp',
+        },
+        bgTone: 'bg-[#EDF3EB]',
+      },
+
+      // 5. Imperial Red Arched Gate (Card 5 trong ảnh)
+      {
+        id: 'gia-khanh-anh',
+        name: 'Gia Khánh & Quỳnh Anh',
+        category: 'Song Hỷ Đỏ truyền thống',
+        styleType: 'imperial-red-arch',
+        badge: 'Hot',
+        couple: {
+          groomRole: 'ÚT NAM',
+          groom: 'GIA KHÁNH',
+          brideRole: 'ÚT NỮ',
+          bride: 'QUỲNH ANH',
+          dateFormatted: '18 . 01 . 2026',
+        },
+        images: {
+          main: 'assets/img/mau/mau-4/01.webp',
+        },
+        bgTone: 'bg-[#FAF5EE]',
+        archColor: '#85121A',
+      },
+
+      // 6. Deep Wine Filmstrip Triptych (Ảnh mẫu Zenlove Card 1)
+      {
+        id: 'duc-hung-hien',
+        name: 'Đức Hùng & Phương Hiền',
+        category: 'Dải phim Polaroid',
+        styleType: 'filmstrip-triptych',
+        badge: 'Mới',
+        couple: {
+          groom: 'Đức Hùng',
+          bride: 'Phương Hiền',
+          dateFormatted: '04 . 12 . 2026',
+        },
+        images: {
+          main: 'assets/img/mau/mau-7/01.webp',
+          strip1: 'assets/img/mau/mau-7/02.webp',
+          strip2: 'assets/img/mau/mau-7/03.webp',
+          strip3: 'assets/img/mau/mau-7/04.webp',
+        },
+        bgTone: 'bg-[#7A242B]',
+      },
+
+      // 7. Full Bleed & "and happily ever after" (Ảnh mẫu Zenlove Card 2)
+      {
+        id: 'minh-vinh-hanh',
+        name: 'Minh Vinh & Mai Hạnh',
+        category: 'Ảnh tràn viền hoàng hôn',
+        styleType: 'full-bleed-script',
+        badge: 'Biểu mẫu',
+        displayScript: 'and happily ever after',
+        couple: {
+          groom: 'Minh Vinh',
+          bride: 'Mai Hạnh',
+          dateFormatted: '15 . 08 . 2026',
+        },
+        images: {
+          main: 'assets/img/mau/mau-11/01.webp',
+        },
+        bgTone: 'bg-[#1C1917]',
+      },
+
+      // 8. Olive Green Envelope with Wax Seal (Ảnh mẫu Zenlove Card 5)
+      {
+        id: 'tuan-kiet-ngoc',
+        name: 'Tuấn Kiệt & Bảo Ngọc',
+        category: 'Phong bì xanh Olive',
+        styleType: 'envelope-olive',
+        badge: 'Hot',
+        couple: {
+          groom: 'Tuấn Kiệt',
+          bride: 'Bảo Ngọc',
+          dateFormatted: '22 . 02 . 2026',
+        },
+        images: {
+          main: 'assets/img/mau/mau-3/01.webp',
+        },
+        bgTone: 'bg-[#F2EFEB]',
+        envelopeColor: '#344D38',
+      },
+
+      // 9. Modern Minimalist "Save The Date" (Ảnh mẫu Zenlove Card 4)
+      {
+        id: 'tien-dat-chi',
+        name: 'Tiến Đạt & Quỳnh Chi',
+        category: 'Studio tối giản',
+        styleType: 'studio-minimalist',
+        badge: 'Hot',
+        displayScript: 'Save The Date',
+        couple: {
+          groom: 'Tiến Đạt',
+          bride: 'Quỳnh Chi',
+          dateFormatted: '24 . 10 . 2026',
+        },
+        images: {
+          main: 'assets/img/mau/mau-12/01.webp',
+        },
+        bgTone: 'bg-[#E8DFD3]',
+      },
+
+      // 10. Sunset "Our Love Begins" (Ảnh mẫu Zenlove)
+      {
+        id: 'huu-phuoc-ly',
+        name: 'Hữu Phước & Cẩm Ly',
+        category: 'Hoàng hôn điện ảnh',
+        styleType: 'sunset-cinematic',
+        badge: 'Biểu mẫu',
+        displayTitle: 'Our Love Begins',
+        couple: {
+          groom: 'Hữu Phước',
+          bride: 'Cẩm Ly',
+          dateFormatted: '15 . 08 . 2026',
+        },
+        images: {
+          main: 'assets/img/mau/mau-11/01.webp',
+        },
+        bgTone: 'bg-[#1C1917]',
+      },
+
+      // 11. Slate Navy Arched Gate
+      {
+        id: 'quoc-bao-my',
+        name: 'Quốc Bảo & Hà My',
+        category: 'Cổng vòm xanh biển sâu',
+        styleType: 'royal-green-arch',
+        badge: 'Mới',
+        couple: {
+          groomRole: 'Trưởng Nam',
+          groom: 'Quốc Bảo',
+          brideRole: 'Út Nữ',
+          bride: 'Hà My',
+          dateFormatted: '20 . 06 . 2026',
+        },
+        images: {
+          main: 'assets/img/mau/mau-5/01.webp',
+        },
+        bgTone: 'bg-[#EDF3F7]',
+        archColor: '#1A364B',
+      },
+
+      // 12. Golden Amber Arch with Calendar Stamp
+      {
+        id: 'van-hau-mai',
+        name: 'Văn Hậu & Trúc Mai',
+        category: 'Mái vòm hoàng kim',
+        styleType: 'arch-calendar',
+        badge: 'Hot',
+        couple: {
+          groom: 'Văn Hậu',
+          bride: 'Trúc Mai',
+          dateFormatted: '05 . 09 . 2026',
+        },
+        images: {
+          main: 'assets/img/mau/mau-13/01.webp',
+        },
+        bgTone: 'bg-[#FBF5E9]',
+        archColor: '#9C7228',
+      },
+
+      // 13. Garden Foliage Dual-Portrait (Card 4 style)
+      {
+        id: 'gia-an-huong',
+        name: 'Gia An & Thùy Hương',
+        category: 'Bộ đôi ảnh hoa lá',
+        styleType: 'botanical-dual',
+        badge: 'Mới',
+        couple: {
+          groomRole: 'Trưởng Nam',
+          groom: 'Gia An',
+          brideRole: 'Út Nữ',
+          bride: 'Thùy Hương',
+          dateFormatted: '18 . 09 . 2026',
+        },
+        images: {
+          groomPhoto: 'assets/img/mau/mau-14/01.webp',
+          bridePhoto: 'assets/img/mau/mau-14/02.webp',
+        },
+        bgTone: 'bg-[#E6EFE2]',
+      },
+
+      // 14. Terracotta Envelope with Seal
+      {
+        id: 'khac-viet-thao',
+        name: 'Khắc Việt & Thu Thảo',
+        category: 'Phong bì đất nung',
+        styleType: 'envelope-dusty-rose',
+        badge: 'Mới',
+        couple: {
+          groom: 'Khắc Việt',
+          bride: 'Thu Thảo',
+          dateFormatted: '27 . 12 . 2026',
+        },
+        images: {
+          main: 'assets/img/mau/mau-19/01.webp',
+        },
+        bgTone: 'bg-[#F4ECE6]',
+        envelopeColor: '#9C4635',
+      },
+
+      // 15. Forest Pine Emerald Gate
+      {
+        id: 'dinh-trong-nhi',
+        name: 'Đình Trọng & Yến Nhi',
+        category: 'Rừng thông xanh biếc',
+        styleType: 'royal-green-arch',
+        badge: 'Hot',
+        couple: {
+          groomRole: 'Trưởng Nam',
+          groom: 'Đình Trọng',
+          brideRole: 'Út Nữ',
+          bride: 'Yến Nhi',
+          dateFormatted: '07 . 11 . 2026',
+        },
+        images: {
+          main: 'assets/img/mau/mau-15/01.webp',
+        },
+        bgTone: 'bg-[#EEF3EE]',
+        archColor: '#1A3322',
+      },
+
+      // 16. Celadon Eucalyptus Polaroid
+      {
+        id: 'thanh-long-anh',
+        name: 'Thành Long & Ngọc Ánh',
+        category: 'Polaroid lá khuynh diệp',
+        styleType: 'polaroid-tape',
+        badge: 'Hot',
+        couple: {
+          groom: 'Thành Long',
+          bride: 'Ngọc Ánh',
+          dateFormatted: '11 . 07 . 2026',
+        },
+        images: {
+          main: 'assets/img/mau/mau-10/01.webp',
+        },
+        bgTone: 'bg-[#E3EDE4]',
+      },
+
+      // 17. Song Hỷ Crane Imperial Red
+      {
+        id: 'hoang-bach-ngan',
+        name: 'Hoàng Bách & Nguyễn Ngân',
+        category: 'Song Hỷ Chim Hạc',
+        styleType: 'imperial-red-arch',
+        badge: 'Mới',
+        couple: {
+          groomRole: 'Trưởng Nam',
+          groom: 'Hoàng Bách',
+          brideRole: 'Út Nữ',
+          bride: 'Nguyễn Ngân',
+          dateFormatted: '20 . 10 . 2026',
+        },
+        images: {
+          main: 'assets/img/mau/mau-4/01.webp',
+        },
+        bgTone: 'bg-[#FBF5EE]',
+        archColor: '#8E1920',
+      },
+
+      // 18. Cinnamon Brick Filmstrip Triptych
+      {
+        id: 'viet-anh-nhung',
+        name: 'Việt Anh & Hồng Nhung',
+        category: 'Dải phim nắng mai',
+        styleType: 'filmstrip-triptych',
+        badge: 'Hot',
+        couple: {
+          groom: 'Việt Anh',
+          bride: 'Hồng Nhung',
+          dateFormatted: '25 . 07 . 2026',
+        },
+        images: {
+          main: 'assets/img/mau/mau-18/01.webp',
+          strip1: 'assets/img/mau/mau-18/02.webp',
+          strip2: 'assets/img/mau/mau-18/03.webp',
+          strip3: 'assets/img/mau/mau-18/04.webp',
+        },
+        bgTone: 'bg-[#94442E]',
+      },
+
+      // 19. Plum Lavender Velvet Envelope
+      {
+        id: 'trong-hieu-dung',
+        name: 'Trọng Hiếu & Thùy Dung',
+        category: 'Phong bì hoa oải hương',
+        styleType: 'envelope-dusty-rose',
+        badge: 'Hot',
+        couple: {
+          groom: 'Trọng Hiếu',
+          bride: 'Thùy Dung',
+          dateFormatted: '17 . 05 . 2026',
+        },
+        images: {
+          main: 'assets/img/mau/mau-6/01.webp',
+        },
+        bgTone: 'bg-[#ECE4F4]',
+        envelopeColor: '#553A70',
+      },
+
+      // 20. Warm Stone Balcony Polaroid
+      {
+        id: 'gia-huy-mai',
+        name: 'Gia Huy & Tuyết Mai',
+        category: 'Cổ điển ban công Pháp',
+        styleType: 'polaroid-tape',
+        badge: 'Hot',
+        couple: {
+          groom: 'Gia Huy',
+          bride: 'Tuyết Mai',
+          dateFormatted: '29 . 03 . 2026',
+        },
+        images: {
+          main: 'assets/img/mau/mau-16/01.webp',
+        },
+        bgTone: 'bg-[#E5DFD7]',
+      },
+    ];
+
+    // =========================================================
+    // RENDERER THỰC TẾ CHO TỪNG KIỂU THIỆP CHUẨN MẪU
+    // =========================================================
+
+    const WeddingCard = ({ template, onPreview }) => {
+      const { styleType, couple, images, bgTone, badge } = template;
+
+      // 1. PHONG BÌ NHUNG ĐỎ & DẤU SÁP VÀNG (Card 1 trong ảnh)
+      if (styleType === 'envelope-burgundy' || styleType === 'envelope-dusty-rose' || styleType === 'envelope-olive') {
+        const envColor = template.envelopeColor || '#721921';
+        return (
+          <div
+            onClick={() => onPreview(template)}
+            className={`group relative [aspect-ratio:1000/1470] w-full ${bgTone || 'bg-[#F6ECE1]'} overflow-hidden rounded-2xl shadow-[0_4px_16px_rgba(0,0,0,0.08)] hover:shadow-[0_12px_28px_rgba(0,0,0,0.18)] transition-all duration-300 transform hover:-translate-y-2 cursor-pointer p-3.5 flex flex-col justify-between border border-stone-300/60 select-none`}
+          >
+            {/* Top Bar: SAVE THE DATE & Badge */}
+            <div className="flex items-center justify-between z-20">
+              <span className="text-[9.5px] font-serif tracking-[0.25em] text-stone-600 uppercase font-semibold">
+                SAVE THE DATE
+              </span>
+              <span className="rounded-full bg-rose-600 px-2 py-0.5 text-[8.5px] font-bold text-white shadow-xs">
+                {badge}
+              </span>
+            </div>
+
+            {/* Inner Photo Card with Floral Sprig and Wax Seal */}
+            <div className="relative w-full flex-1 my-2 flex items-center justify-center">
+              {/* Photo inside white border: uncropped, clear faces and bodies */}
+              <div className="relative w-[84%] h-[82%] bg-white p-1.5 shadow-md rounded-md transform group-hover:-translate-y-3 transition-transform duration-500">
+                <img
+                  src={images.main}
+                  alt={couple.groom}
+                  className="w-full h-full object-cover object-top rounded-xs"
+                />
+              </div>
+
+              {/* Decorative Floral Sprig at Left Shoulder of Envelope */}
+              <div className="absolute left-1 top-7 z-20 pointer-events-none drop-shadow-md">
+                <svg width="45" height="60" viewBox="0 0 50 70" fill="none">
+                  <path d="M25 65 Q20 30 5 10" stroke="#4A5847" strokeWidth="2" fill="none"/>
+                  <circle cx="10" cy="18" r="8" fill="#8B1E2B" opacity="0.9"/>
+                  <circle cx="6" cy="14" r="5" fill="#D65866" opacity="0.8"/>
+                  <circle cx="22" cy="30" r="7" fill="#751622" opacity="0.9"/>
+                  <path d="M12 28 Q2 32 8 45" fill="#586B52" opacity="0.8"/>
+                </svg>
+              </div>
+
+              {/* Velvet Open Envelope Pocket at Lower Half (V-flap doesn't block heads) */}
+              <div
+                className="absolute inset-x-0 bottom-0 h-[44%] rounded-b-xl shadow-lg flex flex-col items-center justify-end pb-2.5 z-10"
+                style={{
+                  backgroundColor: envColor,
+                  clipPath: 'polygon(0 22%, 50% 0, 100% 22%, 100% 100%, 0 100%)'
+                }}
+              >
+                {/* 3D Wax Seal at the V Tip */}
+                <div className="absolute -top-3.5 flex items-center justify-center">
+                  <div className="h-8.5 w-8.5 rounded-full wax-seal-gold flex items-center justify-center text-amber-900 text-[10px] font-serif font-bold shadow-md">
+                    💍
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom Names in Elegant Serif */}
+            <div className="text-center z-20 mt-1">
+              <h3 className="font-serif text-base sm:text-lg text-stone-900 font-medium leading-snug">
+                {couple.groom}
+              </h3>
+              <h3 className="font-serif text-base sm:text-lg text-stone-900 font-medium leading-snug">
+                {couple.bride}
+              </h3>
+            </div>
+          </div>
+        );
+      }
+
+      // 2. POLAROID DÁN BĂNG DÍNH & DẤU SÁP (Card 2 trong ảnh)
+      if (styleType === 'polaroid-tape') {
+        return (
+          <div
+            onClick={() => onPreview(template)}
+            className={`group relative [aspect-ratio:1000/1470] w-full ${bgTone || 'bg-[#EFE6D8]'} overflow-hidden rounded-2xl shadow-[0_4px_16px_rgba(0,0,0,0.08)] hover:shadow-[0_12px_28px_rgba(0,0,0,0.18)] transition-all duration-300 transform hover:-translate-y-2 cursor-pointer p-3.5 flex flex-col justify-between border border-stone-300/60 select-none`}
+          >
+            {/* Top Bar: THE WEDDING OF & Names & Badge */}
+            <div className="flex items-start justify-between z-20">
+              <div className="text-left">
+                <span className="text-[8px] font-sans tracking-[0.25em] text-stone-600 uppercase block font-semibold">
+                  THE WEDDING OF
+                </span>
+                <h3 className="font-serif text-lg sm:text-xl text-stone-800 leading-tight font-medium">
+                  {couple.groom} &amp; {couple.bride}
+                </h3>
+              </div>
+              <span className="rounded-full bg-rose-600 px-2 py-0.5 text-[8.5px] font-bold text-white shadow-xs">
+                {badge}
+              </span>
+            </div>
+
+            {/* Polaroid Frame with Masking Tape and Wax Seal */}
+            <div className="relative w-full flex-1 my-2 flex items-center justify-center">
+              <div className="relative w-[90%] h-[90%] bg-white p-2 pb-7 shadow-lg rounded-xs -rotate-1.5 transition-transform duration-500 group-hover:rotate-0 flex flex-col">
+                {/* Masking Tape at Top Center */}
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-14 h-5 masking-tape z-30" />
+
+                {/* Photo: Full height without cropping head/feet */}
+                <div className="w-full flex-1 overflow-hidden bg-stone-100 rounded-xs">
+                  <img
+                    src={images.main}
+                    alt={couple.groom}
+                    className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-103"
+                  />
+                </div>
+
+                {/* Dried Flower Branch Bottom-Left */}
+                <div className="absolute -bottom-2 -left-2 z-20 pointer-events-none">
+                  <svg width="40" height="40" viewBox="0 0 50 50">
+                    <path d="M10 40 Q25 25 35 10" stroke="#7A6855" strokeWidth="1.5" fill="none"/>
+                    <circle cx="35" cy="10" r="3" fill="#B38F6D"/>
+                    <circle cx="28" cy="18" r="2.5" fill="#997554"/>
+                    <circle cx="20" cy="27" r="2.5" fill="#B38F6D"/>
+                  </svg>
+                </div>
+
+                {/* Gold Wax Seal Bottom-Right */}
+                <div className="absolute -bottom-2 -right-2 z-20">
+                  <div className="h-8 w-8 rounded-full wax-seal-gold flex items-center justify-center text-amber-900 text-[9px] font-serif font-bold shadow-md">
+                    ♥
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="text-center text-[10px] font-mono text-stone-600 uppercase tracking-widest font-semibold">
+              {couple.dateFormatted}
+            </div>
+          </div>
+        );
+      }
+
+      // 3. ROYAL GREEN / RED ARCHED GATE (Card 3 & Card 5 trong ảnh)
+      if (styleType === 'royal-green-arch' || styleType === 'imperial-red-arch') {
+        const archBg = template.archColor || (styleType === 'royal-green-arch' ? '#153621' : '#85121A');
+        return (
+          <div
+            onClick={() => onPreview(template)}
+            className={`group relative [aspect-ratio:1000/1470] w-full ${bgTone || 'bg-[#FAF6EE]'} overflow-hidden rounded-2xl shadow-[0_4px_16px_rgba(0,0,0,0.08)] hover:shadow-[0_12px_28px_rgba(0,0,0,0.18)] transition-all duration-300 transform hover:-translate-y-2 cursor-pointer flex flex-col justify-between border border-stone-300/60 select-none`}
+          >
+            {/* Top Arched Gate Header */}
+            <div
+              className="relative w-full pt-3 pb-3 px-3 text-center text-amber-100 flex flex-col items-center justify-center rounded-t-xl"
+              style={{
+                backgroundColor: archBg,
+                clipPath: 'polygon(0 0, 100% 0, 100% 86%, 50% 100%, 0 86%)',
+                paddingBottom: '22px'
+              }}
+            >
+              {/* Badge */}
+              <div className="absolute top-2 right-2">
+                <span className="rounded-full bg-rose-600 px-2 py-0.5 text-[8.5px] font-bold text-white shadow-xs">
+                  {badge}
+                </span>
+              </div>
+
+              <span className="text-[7.5px] font-serif tracking-[0.25em] text-amber-200 uppercase block mb-1">
+                WELCOME TO OUR WEDDING
+              </span>
+
+              {/* Family titles + Double Happiness 囍 */}
+              <div className="flex items-center justify-center gap-3 my-0.5">
+                <div className="text-right">
+                  <span className="text-[7px] text-amber-200 block">{couple.groomRole || 'Trưởng Nam'}</span>
+                  <span className="font-serif text-[11px] font-bold tracking-wider">{couple.groom}</span>
+                </div>
+
+                <span className="font-serif text-xl text-amber-300 leading-none drop-shadow-sm px-1">
+                  囍
+                </span>
+
+                <div className="text-left">
+                  <span className="text-[7px] text-amber-200 block">{couple.brideRole || 'Út Nữ'}</span>
+                  <span className="font-serif text-[11px] font-bold tracking-wider">{couple.bride}</span>
+                </div>
+              </div>
+
+              {/* Curved Motto */}
+              <span className="text-[7.5px] font-sans tracking-[0.3em] text-amber-200/90 uppercase mt-0.5">
+                LOVE NEVER FAILS
+              </span>
+            </div>
+
+            {/* Lower Photo Window inside Arch: Full View, Not Chopped! */}
+            <div className="relative flex-1 w-full p-2 pt-0 -mt-2">
+              <div className="w-full h-full rounded-b-xl overflow-hidden shadow-inner bg-stone-100">
+                <img
+                  src={images.main}
+                  alt={couple.groom}
+                  className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-103"
+                />
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      // 4. BOTANICAL DUAL PORTRAIT (Card 4 trong ảnh)
+      if (styleType === 'botanical-dual') {
+        return (
+          <div
+            onClick={() => onPreview(template)}
+            className={`group relative [aspect-ratio:1000/1470] w-full ${bgTone || 'bg-[#EDF3EB]'} overflow-hidden rounded-2xl shadow-[0_4px_16px_rgba(0,0,0,0.08)] hover:shadow-[0_12px_28px_rgba(0,0,0,0.18)] transition-all duration-300 transform hover:-translate-y-2 cursor-pointer p-3 flex flex-col justify-between border border-stone-200/60 select-none`}
+          >
+            {/* Top Foliage Illustration Header */}
+            <div className="flex items-start justify-between z-20">
+              <div className="flex items-center gap-1.5">
+                <span className="text-sm">🌿</span>
+                <span className="text-[9px] font-serif italic text-emerald-900 font-semibold tracking-wide">Wedding Invitation</span>
+              </div>
+              <span className="rounded-full bg-rose-600 px-2 py-0.5 text-[8.5px] font-bold text-white shadow-xs">
+                {badge}
+              </span>
+            </div>
+
+            {/* Two Separate Framed Portraits (Groom & Bride) */}
+            <div className="relative flex-1 flex flex-col justify-around py-1">
+              {/* Top Photo: Groom */}
+              <div className="flex items-center gap-2.5">
+                <div className="w-[46%] aspect-[4/4.8] bg-white p-1 rounded-sm shadow-md border border-amber-600/30 overflow-hidden">
+                  <img
+                    src={images.groomPhoto}
+                    alt={couple.groom}
+                    className="w-full h-full object-cover object-top"
+                  />
+                </div>
+                <div className="text-left">
+                  <span className="text-[8px] font-sans text-stone-600 uppercase block font-semibold">{couple.groomRole}</span>
+                  <h4 className="font-serif text-base text-stone-900 font-semibold">{couple.groom}</h4>
+                </div>
+              </div>
+
+              {/* Divider bar */}
+              <div className="w-full h-px bg-emerald-900/15 my-0.5" />
+
+              {/* Bottom Photo: Bride (Staggered to right) */}
+              <div className="flex items-center justify-end gap-2.5 flex-row-reverse">
+                <div className="w-[46%] aspect-[4/4.8] bg-white p-1 rounded-sm shadow-md border border-amber-600/30 overflow-hidden">
+                  <img
+                    src={images.bridePhoto}
+                    alt={couple.bride}
+                    className="w-full h-full object-cover object-top"
+                  />
+                </div>
+                <div className="text-right">
+                  <span className="text-[8px] font-sans text-stone-600 uppercase block font-semibold">{couple.brideRole}</span>
+                  <h4 className="font-serif text-base text-stone-900 font-semibold">{couple.bride}</h4>
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom Foliage Accent */}
+            <div className="text-center pt-1 border-t border-emerald-900/10 text-[9px] font-mono tracking-widest text-emerald-950 uppercase font-semibold">
+              {couple.dateFormatted}
+            </div>
+          </div>
+        );
+      }
+
+      // 5. FILMSTRIP TRIPTYCH (Main photo + 3 Polaroid mini thumbnails ở chân thẻ)
+      if (styleType === 'filmstrip-triptych') {
+        const strip1 = images.strip1 || images.main;
+        const strip2 = images.strip2 || images.main;
+        const strip3 = images.strip3 || images.main;
+        return (
+          <div
+            onClick={() => onPreview(template)}
+            className={`group relative [aspect-ratio:1000/1470] w-full ${bgTone || 'bg-[#7A242B]'} overflow-hidden rounded-2xl shadow-[0_4px_16px_rgba(0,0,0,0.08)] hover:shadow-[0_12px_28px_rgba(0,0,0,0.18)] transition-all duration-300 transform hover:-translate-y-2 cursor-pointer p-3 flex flex-col justify-between border border-white/20 select-none`}
+          >
+            {/* Top Bar */}
+            <div className="flex items-center justify-between">
+              <span className="text-[8.5px] font-sans tracking-[0.25em] text-white/80 uppercase font-semibold">
+                WEDDING INVITATION
+              </span>
+              <span className="rounded-full bg-rose-600 px-2 py-0.5 text-[8.5px] font-bold text-white shadow-xs">
+                {badge}
+              </span>
+            </div>
+
+            {/* Main Top Photograph - Clean & High Clarity */}
+            <div className="relative w-full h-[50%] rounded-xl overflow-hidden shadow-sm ring-1 ring-white/10 bg-stone-100 my-1">
+              <img
+                src={images.main}
+                alt={couple.groom}
+                className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-103"
+              />
+            </div>
+
+            {/* Middle Typography Banner */}
+            <div className="text-center py-1 bg-white/95 backdrop-blur-sm rounded-md shadow-xs border border-white/40">
+              <h3 className="font-serif text-lg text-stone-900 font-medium">
+                {couple.groom} &amp; {couple.bride}
+              </h3>
+              <p className="text-[8.5px] font-mono tracking-widest uppercase text-stone-600 font-semibold">
+                {couple.dateFormatted}
+              </p>
+            </div>
+
+            {/* Dải 3 Ảnh Polaroid Mini Ở Chân Thẻ */}
+            <div className="grid grid-cols-3 gap-1.5 w-full mt-1">
+              <div className="aspect-square rounded-md overflow-hidden border border-white shadow-xs">
+                <img src={strip1} alt="Film 1" className="h-full w-full object-cover object-top" />
+              </div>
+              <div className="aspect-square rounded-md overflow-hidden border border-white shadow-xs">
+                <img src={strip2} alt="Film 2" className="h-full w-full object-cover object-top" />
+              </div>
+              <div className="aspect-square rounded-md overflow-hidden border border-white shadow-xs">
+                <img src={strip3} alt="Film 3" className="h-full w-full object-cover object-top" />
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+
+      // 6. CINEMATIC FULL BLEED SCRIPT
+      if (styleType === 'full-bleed-script' || styleType === 'sunset-cinematic' || styleType === 'forest-emerald') {
+        const titleText = template.displayTitle || template.displayScript || 'Our Love Begins';
+        return (
+          <div
+            onClick={() => onPreview(template)}
+            className="group relative [aspect-ratio:1000/1470] w-full bg-stone-900 overflow-hidden rounded-2xl shadow-[0_4px_16px_rgba(0,0,0,0.1)] hover:shadow-[0_12px_28px_rgba(0,0,0,0.22)] transition-all duration-300 transform hover:-translate-y-2 cursor-pointer border border-stone-800 select-none"
+          >
+            {/* Full-bleed Photo: completely uncropped from top */}
+            <img
+              src={images.main}
+              alt={couple.groom}
+              className="absolute inset-0 w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
+            />
+            {/* Vignette Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/85 pointer-events-none" />
+
+            {/* Badge */}
+            <div className="absolute top-3 right-3 z-20">
+              <span className="rounded-full bg-rose-600 px-2 py-0.5 text-[8.5px] font-bold text-white shadow-xs">
+                {badge}
+              </span>
+            </div>
+
+            {/* Content Overlay */}
+            <div className="relative z-10 h-full p-4 flex flex-col justify-between text-center text-white">
+              <span className="text-[8.5px] font-sans tracking-[0.25em] text-white/80 uppercase font-semibold">
+                WEDDING INVITATION
+              </span>
+
+              <div className="my-auto">
+                <h2 className="font-script text-3xl sm:text-4xl text-white drop-shadow-md">
+                  {titleText}
+                </h2>
+              </div>
+
+              <div className="pb-1">
+                <h3 className="font-serif text-lg text-white font-medium tracking-wide">
+                  {couple.groom} &amp; {couple.bride}
+                </h3>
+                <p className="text-[9px] font-mono tracking-widest text-white/80 uppercase mt-0.5 font-semibold">
+                  {couple.dateFormatted}
+                </p>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      // 7. DEFAULT STUDIO MINIMALIST
+      return (
+        <div
+          onClick={() => onPreview(template)}
+          className={`group relative [aspect-ratio:1000/1470] w-full ${bgTone || 'bg-[#FAF8F5]'} overflow-hidden rounded-2xl shadow-[0_4px_16px_rgba(0,0,0,0.08)] hover:shadow-[0_12px_28px_rgba(0,0,0,0.18)] transition-all duration-300 transform hover:-translate-y-2 cursor-pointer p-3.5 flex flex-col justify-between border border-stone-300/60 select-none`}
+        >
+          {/* Top Bar */}
+          <div className="flex items-center justify-between">
+            <span className="text-[9px] font-serif tracking-[0.25em] text-stone-600 uppercase font-semibold">
+              SAVE THE DATE
+            </span>
+            <span className="rounded-full bg-rose-600 px-2 py-0.5 text-[8.5px] font-bold text-white shadow-xs">
+              {badge}
+            </span>
+          </div>
+
+          {/* Central Portrait without cutting: object-top */}
+          <div className="relative my-2 flex-1 w-full rounded-xl overflow-hidden shadow-xs ring-1 ring-black/5 bg-stone-100">
+            <img
+              src={images.main}
+              alt={couple.groom}
+              className="h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-103"
+            />
+          </div>
+
+          <div className="text-center pt-1">
+            <h2 className="font-script text-2xl text-stone-900 leading-tight">
+              {template.displayScript || 'Save The Date'}
+            </h2>
+            <h3 className="font-serif text-base text-stone-800 tracking-wider font-normal mt-0.5">
+              {couple.groom} &amp; {couple.bride}
+            </h3>
+            <p className="text-[9px] font-mono tracking-widest text-stone-600 uppercase mt-0.5 font-semibold">
+              {couple.dateFormatted}
+            </p>
+          </div>
+        </div>
+      );
+    };
+
+    // ==========================================
+    // MAIN APP
+    // ==========================================
+    const App = () => {
+      const [filterCategory, setFilterCategory] = useState('all');
+      const [searchQuery, setSearchQuery] = useState('');
+      const [previewTemplate, setPreviewTemplate] = useState(null);
+
+      const filtered = useMemo(() => {
+        return mockTemplates.filter(t => {
+          if (filterCategory !== 'all' && t.category !== filterCategory) return false;
+          if (searchQuery.trim()) {
+            const q = searchQuery.toLowerCase().trim();
+            if (!t.name.toLowerCase().includes(q) && !t.category.toLowerCase().includes(q)) return false;
+          }
+          return true;
+        });
+      }, [filterCategory, searchQuery]);
+
+      const categories = [
+        { id: 'all', label: 'Tất cả 20 mẫu' },
+        { id: 'Phong bì nhung', label: '💌 Phong bì nhung' },
+        { id: 'Polaroid nghệ thuật', label: '📸 Polaroid & Tape' },
+        { id: 'Cổng vòm xanh', label: '🌿 Cổng vòm xanh' },
+        { id: 'Song ảnh hoa lá', label: '🌸 Song ảnh hoa lá' },
+        { id: 'Song Hỷ Đỏ truyền thống', label: '囍 Song Hỷ truyền thống' },
+        { id: 'Dải phim Polaroid', label: '🎞️ Dải phim Polaroid' },
+      ];
+
+      return (
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+          {/* Header giống web mẫu Chung Đôi / WedStory */}
+          <header className="text-center max-w-2xl mx-auto mb-8">
+            <h1 className="text-3xl sm:text-4xl font-sans font-bold text-stone-900 tracking-tight">
+              Mẫu thiệp mời đám cưới
+            </h1>
+            <p className="mt-2 text-sm text-stone-500 font-light">
+              Tạo miễn phí · Thử 3 ngày · Đẹp mới thanh toán<br/>
+              Bạn có thể đổi mẫu bất cứ lúc nào khi chỉnh sửa
+            </p>
+          </header>
+
+          {/* Filter Pills */}
+          <div className="flex items-center justify-start sm:justify-center overflow-x-auto no-scrollbar gap-2 pb-3 mb-6">
+            {categories.map(cat => (
+              <button
+                key={cat.id}
+                onClick={() => setFilterCategory(cat.id)}
+                className={`whitespace-nowrap rounded-full px-4 py-1.5 text-xs font-medium transition-all ${
+                  filterCategory === cat.id
+                    ? 'bg-rose-600 text-white shadow-sm'
+                    : 'bg-white text-stone-600 hover:bg-stone-100 border border-stone-200'
+                }`}
+              >
+                {cat.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Cards Grid: Bố cục 5 cột chuẩn web mẫu */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-5">
+            {filtered.map(template => (
+              <WeddingCard
+                key={template.id}
+                template={template}
+                onPreview={(tpl) => setPreviewTemplate(tpl)}
+              />
+            ))}
+          </div>
+
+          {/* Modal Preview */}
+          {previewTemplate && (
+            <div
+              className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+              onClick={() => setPreviewTemplate(null)}
+            >
+              <div
+                className="relative w-full max-w-lg bg-white rounded-2xl overflow-hidden shadow-2xl p-6 flex flex-col items-center"
+                onClick={e => e.stopPropagation()}
+              >
+                <button
+                  onClick={() => setPreviewTemplate(null)}
+                  className="absolute top-3 right-3 text-stone-400 hover:text-stone-800 text-lg font-bold"
+                >
+                  ✕
+                </button>
+                <div className="w-[240px] shadow-xl rounded-xl overflow-hidden my-3">
+                  <WeddingCard template={previewTemplate} onPreview={() => {}} />
+                </div>
+                <h3 className="font-serif text-xl font-bold text-stone-900 mt-2">
+                  {previewTemplate.name}
+                </h3>
+                <p className="text-xs text-stone-500 font-light mt-0.5">
+                  Phong cách: {previewTemplate.category}
+                </p>
+                <button
+                  onClick={() => { alert(`Đã chọn mẫu: ${previewTemplate.name}`); setPreviewTemplate(null); }}
+                  className="mt-5 w-full rounded-full bg-stone-900 py-3 text-xs font-bold text-white uppercase tracking-wider hover:bg-stone-800 shadow-md"
+                >
+                  Dùng mẫu này để tạo thiệp
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    };
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
