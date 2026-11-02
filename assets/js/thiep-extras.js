@@ -89,8 +89,126 @@ TH.speech = {
 };
 if (TH.speech.supported) speechSynthesis.getVoices(); // nạp sẵn danh sách giọng
 
-/* ---------- Trợ lý Google Gemini AI: Sáng tác lời chúc cá nhân hoá ---------- */
+/* ---------- Trợ lý Google Gemini AI: Sáng tác lời chúc & Cá nhân hoá thiệp cưới ---------- */
 TH.geminiApiKey = atob('QVEuQWI4Uk42TGNKYlpZUXBkNmVCeldTUHBGUUFEUWdTRU8zeHhWM1VCanVtY3JPSVFaalE=');
+
+/**
+ * Cá nhân hoá Lời mời chính (message) và Thông điệp mở đầu (quote) theo từng Nhóm khách mời bằng Gemini AI
+ */
+TH.generateAiInvitation = async ({
+  guestGroup = 'Bạn thân',
+  groom = 'chú rể',
+  bride = 'cô dâu',
+  tone = 'Tự nhiên & Chuẩn mực theo nhóm',
+  notes = ''
+} = {}) => {
+  const grp = (guestGroup || '').trim() || 'Bạn thân';
+  const prompt = `Bạn là trợ lý AI cao cấp của nền tảng thiệp cưới thông minh WedStory.
+Hãy sáng tác nội dung thiệp cưới cá nhân hoá dành riêng cho nhóm khách mời: "${grp}".
+Cô dâu & Chú rể: ${groom} & ${bride}.
+Phong cách / Giọng điệu: "${tone}".
+${notes ? `Ghi chú thêm: "${notes}".` : ''}
+
+YÊU CẦU VĂN PHONG CHUẨN XÁC THEO NHÓM:
+- Bạn thân: Xưng hô thân mật, gần gũi, hóm hỉnh ("tụi mình", "hai đứa", rủ quẩy hết mình, không câu nệ).
+- Đồng nghiệp / Cấp trên (Sếp): Lịch thiệp, trang trọng, trân trọng sự đồng hành trong công việc ("chúng tôi", "quý anh chị / quý đồng nghiệp").
+- Họ hàng lớn tuổi (Bác, Cô, Chú): Lễ phép, kính cẩn, báo tin và kính mời các bậc tiền bối đến chung vui và ban phước lành cho con cháu.
+- Bạn cấp 3 / Đại học: Đong đầy kỷ niệm thanh xuân ngồi chung giảng đường, hân hoan tái ngộ trong ngày hạnh phúc.
+- Đối tác & Khách quý: Chuẩn mực, trang trọng, trang nhã, nhấn mạnh niềm vinh hạnh to lớn khi được đón tiếp Quý khách.
+- Anh / Chị / Em: Gần gũi, ấm áp, tình thân gia đình ngọt ngào.
+
+Trả về DUY NHẤT một chuỗi JSON hợp lệ (không kèm markdown ngoài JSON):
+{
+  "quote": "Câu thông điệp mở đầu ngắn gọn (1-2 câu)",
+  "message": "Nội dung lời mời chính trên thiệp (khoảng 2-4 câu)"
+}`;
+
+  const models = ['gemini-3.5-flash', 'gemini-3-flash-preview', 'gemini-3.8-flash'];
+  for (const m of models) {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${TH.geminiApiKey}`;
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+      });
+      const data = await res.json();
+      const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (text) {
+        let clean = text.trim();
+        if (clean.includes('```json')) clean = clean.split('```json')[1].split('```')[0].trim();
+        else if (clean.includes('```')) clean = clean.split('```')[1].split('```')[0].trim();
+        try {
+          const parsed = JSON.parse(clean);
+          if (parsed.message) {
+            return {
+              message: parsed.message.replace(/^["“]|["”]$/g, '').trim(),
+              quote: (parsed.quote || '').replace(/^["“]|["”]$/g, '').trim(),
+              group: grp
+            };
+          }
+        } catch (_) {}
+      }
+    } catch (_) {}
+  }
+
+  // Fallback offline
+  return TH.getFallbackInvitation(grp, groom, bride);
+};
+
+/**
+ * Mẫu lời mời và trích dẫn chuẩn mực cho từng nhóm khi offline
+ */
+TH.getFallbackInvitation = (guestGroup = '', groom = 'chú rể', bride = 'cô dâu') => {
+  const g = guestGroup.toLowerCase();
+  if (g.includes('thân') || g.includes('nối khố') || g.includes('ruột')) {
+    return {
+      group: guestGroup,
+      quote: `Tình bạn diệu kỳ nhất là cùng chứng kiến nhau bước vào ngày hạnh phúc nhất.`,
+      message: `Tụi mình sắp về chung một nhà rồi! Ngày trọng đại nhất của hai đứa sẽ không thể trọn vẹn nếu thiếu đi sự có mặt của bạn. Hãy đến chung vui, nâng ly chúc mừng và quẩy hết mình cùng tụi mình nhé! 🥂💕`
+    };
+  }
+  if (g.includes('đồng nghiệp') || g.includes('sếp') || g.includes('công ty') || g.includes('cơ quan')) {
+    return {
+      group: guestGroup,
+      quote: `Trân quý sự gắn kết và hiện diện của Quý đồng nghiệp trong ngày trọng đại của chúng tôi.`,
+      message: `Sự đồng hành và ủng hộ của Quý anh/chị và đồng nghiệp trong công việc lẫn cuộc sống là niềm vinh hạnh lớn của chúng tôi. Trân trọng kính mời anh/chị đến tham dự buổi tiệc cưới để cùng chia sẻ niềm vui và nâng ly chúc phúc cho tổ ấm mới của ${groom} & ${bride}.`
+    };
+  }
+  if (g.includes('họ hàng') || g.includes('lớn tuổi') || g.includes('bác') || g.includes('cô') || g.includes('chú') || g.includes('ông') || g.includes('bà')) {
+    return {
+      group: guestGroup,
+      quote: `Ơn sâu dưỡng dục sinh thành, phước lành con cháu sum vầy trăm năm.`,
+      message: `Chúng cháu xin kính cẩn báo tin lễ thành hôn và trân trọng kính mời Bác, Cô, Chú cùng toàn thể gia đình đến dự bữa cơm thân mật chung vui cùng hai họ. Sự hiện diện và lời chúc phúc của các bậc tiền bối là niềm phúc lành và hạnh phúc lớn lao cho chặng đường tương lai của chúng cháu.`
+    };
+  }
+  if (g.includes('cấp 3') || g.includes('đại học') || g.includes('học sinh') || g.includes('sinh viên') || g.includes('bạn học')) {
+    return {
+      group: guestGroup,
+      quote: `Thanh xuân có nhau chung lối, ngày chung đôi có nhau chúc mừng.`,
+      message: `Từ những năm tháng thanh xuân cùng ngồi trên ghế nhà trường, nay hai đứa mình đã cùng nhau bước sang một trang mới của cuộc đời. Rất mong được gặp lại những gương mặt thân thương ngày ấy, cùng ôn lại kỷ niệm và chứng kiến khoảnh khắc chung đôi của tụi mình!`
+    };
+  }
+  if (g.includes('đối tác') || g.includes('khách quý') || g.includes('vip')) {
+    return {
+      group: guestGroup,
+      quote: `Trân trọng sự đồng hành và vinh hạnh được đón tiếp Quý khách quý.`,
+      message: `Sự hiện diện của Quý khách là niềm vinh dự to lớn đối với gia đình và hai chúng tôi. Kính mời Quý khách bớt chút thời gian quý báu đến tham dự buổi tiệc thành hôn, cùng sẻ chia khoảnh khắc hạnh phúc và đón nhận sự đón tiếp chu đáo nhất từ gia đình chúng tôi.`
+    };
+  }
+  if (g.includes('anh') || g.includes('chị') || g.includes('em') || g.includes('gia đình')) {
+    return {
+      group: guestGroup,
+      quote: `Tình thân gia đình là điểm tựa ấm áp nhất cho ngày chung đôi.`,
+      message: `Tụi em chuẩn bị bước sang một chặng đường mới! Ngày vui của tụi em sẽ ấm áp và ý nghĩa hơn rất nhiều khi có sự hiện diện của anh chị em thân yêu trong gia đình. Cùng về chung vui và nâng ly chúc mừng cho hai đứa nhé!`
+    };
+  }
+  return {
+    group: guestGroup,
+    quote: `Yêu nhau không phải là nhìn nhau, mà là cùng nhau nhìn về một hướng.`,
+    message: `Trân trọng kính mời quý khách đến dự buổi tiệc chung vui cùng gia đình chúng tôi. Sự hiện diện và lời chúc phúc của quý vị là niềm vinh hạnh to lớn cho đôi uyên ương ${groom} & ${bride} trên hành trình xây đắp tổ ấm mới.`
+  };
+};
 
 TH.generateAiWish = async ({
   guestName = '',

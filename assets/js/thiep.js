@@ -1043,6 +1043,14 @@ if (!D) {
 }
 /* ?grp=…: chỉ hiện lịch trình của nhóm khách được mời */
 const group = TH.applyGroup(D, P.get("grp"));
+const grpQuery = P.get("group") || P.get("grp");
+if (D.groupMessages && (group || grpQuery)) {
+  const gm = (group && (D.groupMessages[group.id] || D.groupMessages[group.name])) || D.groupMessages[grpQuery];
+  if (gm) {
+    if (gm.message) D.message = gm.message;
+    if (gm.quote) D.quote = gm.quote;
+  }
+}
 render();
 if (!isPreview && P.get('id') && !P.has('owner')) TH.guestbook.view(id);   // ?owner=1: chủ thiệp xem trước, không tính lượt xem
 

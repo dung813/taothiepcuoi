@@ -688,44 +688,52 @@
       onClose = null,
       onApply = null,
     }) => {
+      const [activeTab, setActiveTab] = useState('invitation'); // 'invitation' | 'wish'
+
+      // Mode 1: Cá nhân hoá lời mời
+      const [guestGroup, setGuestGroup] = useState('Bạn thân');
+      const [invitationTone, setInvitationTone] = useState('Tự nhiên & Chuẩn mực theo nhóm');
+      const [customGroup, setCustomGroup] = useState('');
+      const [generatedInvitation, setGeneratedInvitation] = useState(null);
+
+      // Mode 2: Lời chúc
       const [guestName, setGuestName] = useState(initialName);
       const [relationship, setRelationship] = useState('Bạn thân');
-      const [tone, setTone] = useState('Chân thành & Ấm áp');
-      const [isLoading, setIsLoading] = useState(false);
+      const [wishTone, setWishTone] = useState('Chân thành & Ấm áp');
       const [generatedWish, setGeneratedWish] = useState('');
+
+      const [isLoading, setIsLoading] = useState(false);
       const [copied, setCopied] = useState(false);
 
-      const relationships = [
-        { value: 'Bạn thân', label: '👭 Bạn thân thiết' },
-        { value: 'Đồng nghiệp', label: '💼 Đồng nghiệp / Công ty' },
-        { value: 'Họ hàng', label: '🏡 Họ hàng / Người thân' },
-        { value: 'Bạn học cũ', label: '🎓 Bạn thời học sinh / Sinh viên' },
-        { value: 'Anh / Chị / Em', label: '🌸 Anh / Chị / Em' },
-        { value: 'Người lớn / Bác / Cô / Chú', label: '👴 Bác / Cô / Chú / Người lớn tuổi' },
+      const guestGroups = [
+        { value: 'Bạn thân', label: '👭 Bạn thân / Bạn nối khố', desc: 'Thân mật, hóm hỉnh' },
+        { value: 'Đồng nghiệp & Sếp', label: '💼 Đồng nghiệp / Sếp', desc: 'Lịch thiệp, trang trọng' },
+        { value: 'Họ hàng lớn tuổi (Bác, Cô, Chú)', label: '🏡 Họ hàng lớn tuổi', desc: 'Lễ phép, kính cẩn' },
+        { value: 'Bạn cấp 3 / Đại học', label: '🎓 Bạn cấp 3 / Đại học', desc: 'Thanh xuân, hoài niệm' },
+        { value: 'Đối tác & Khách quý', label: '🤝 Đối tác & Khách quý', desc: 'Trang nhã, đẳng cấp' },
+        { value: 'Anh / Chị / Em', label: '🌸 Anh / Chị / Em', desc: 'Gần gũi, ngọt ngào' },
       ];
 
-      const tones = [
-        { value: 'Chân thành & Ấm áp', label: '💖 Chân thành & Ấm áp' },
-        { value: 'Hài hước & Dí dỏm', label: '😄 Hài hước & Vui vẻ' },
-        { value: 'Trang trọng & Lịch sự', label: '🎩 Trang trọng & Lịch thiệp' },
-        { value: 'Ngắn gọn & Súc tích', label: '⚡ Ngắn gọn & Ý nghĩa' },
-      ];
+      const apiKey = atob('QVEuQWI4Uk42TGNKYlpZUXBkNmVCeldTUHBGUUFEUWdTRU8zeHhWM1VCanVtY3JPSVFaalE=');
+      const models = ['gemini-3.5-flash', 'gemini-3-flash-preview', 'gemini-3.8-flash'];
 
-      const handleGenerate = async () => {
+      // Sinh lời mời cá nhân hoá
+      const handleGenerateInvitation = async () => {
         setIsLoading(true);
         setCopied(false);
+        const grp = customGroup.trim() || guestGroup;
 
-        const name = guestName.trim() || 'Người bạn';
-        const rel = relationship.trim() || 'bạn bè';
-        const prompt = `Bạn là trợ lý AI thông minh của nền tảng thiệp cưới WedStory. Hãy sáng tác duy nhất 1 lời chúc mừng đám cưới tinh tế, chân thành, tự nhiên (khoảng 2-3 câu) từ khách mời "${name}" gửi đến đôi uyên ương ${brideGroomNames}.
-Mối quan hệ: "${rel}".
-Phong cách: "${tone}".
-Xưng hô đúng mực theo vai vế "${rel}", đính kèm 1-2 emoji ngọt ngào (như 🥂, 💕, ✨). Chỉ trả về nội dung lời chúc, không ngoặc kép hay tiêu đề.`;
+        const prompt = `Bạn là trợ lý AI cao cấp của WedStory. Hãy soạn thông điệp mở đầu và lời mời thiệp cưới cá nhân hoá dành riêng cho nhóm khách mời: "${grp}".
+Cô dâu & Chú rể: ${brideGroomNames}.
+Phong cách: "${invitationTone}".
+Yêu cầu văn phong chuẩn xác theo đối tượng (ví dụ Bạn thân thì thân mật hóm hỉnh xưng tụi mình, Họ hàng lớn tuổi thì kính cẩn lễ phép, Đồng nghiệp thì trang trọng lịch thiệp).
+Trả về duy nhất JSON:
+{
+  "quote": "Câu thông điệp mở đầu ngắn gọn (1-2 câu)",
+  "message": "Nội dung lời mời chính trên thiệp (2-3 câu)"
+}`;
 
-        const apiKey = atob('QVEuQWI4Uk42TGNKYlpZUXBkNmVCeldTUHBGUUFEUWdTRU8zeHhWM1VCanVtY3JPSVFaalE=');
-        const models = ['gemini-3.5-flash', 'gemini-3-flash-preview', 'gemini-3.8-flash'];
         let success = false;
-
         for (const m of models) {
           try {
             const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${apiKey}`, {
@@ -737,24 +745,63 @@ Xưng hô đúng mực theo vai vế "${rel}", đính kèm 1-2 emoji ngọt ngà
             const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
             if (text) {
               let clean = text.trim();
-              if (clean.startsWith('"') && clean.endsWith('"')) clean = clean.slice(1, -1).trim();
-              if (clean.startsWith('“') && clean.endsWith('”')) clean = clean.slice(1, -1).trim();
+              if (clean.includes('```json')) clean = clean.split('```json')[1].split('```')[0].trim();
+              else if (clean.includes('```')) clean = clean.split('```')[1].split('```')[0].trim();
+              const parsed = JSON.parse(clean);
+              if (parsed.message) {
+                setGeneratedInvitation({ ...parsed, group: grp });
+                success = true;
+                break;
+              }
+            }
+          } catch (_) {}
+        }
+
+        if (!success) {
+          setGeneratedInvitation({
+            group: grp,
+            quote: 'Yêu nhau không phải là nhìn nhau, mà là cùng nhau nhìn về một hướng.',
+            message: `Trân trọng kính mời quý khách đến dự buổi tiệc chung vui cùng gia đình chúng tôi. Sự hiện diện của bạn là niềm hạnh phúc lớn của ${brideGroomNames}! 💕`
+          });
+        }
+        setIsLoading(false);
+      };
+
+      // Sinh lời chúc
+      const handleGenerateWish = async () => {
+        setIsLoading(true);
+        setCopied(false);
+        const name = guestName.trim() || 'Người bạn';
+        const rel = relationship.trim() || 'bạn bè';
+        const prompt = `Bạn là trợ lý AI thông minh của nền tảng thiệp cưới WedStory. Hãy sáng tác duy nhất 1 lời chúc mừng đám cưới tinh tế, chân thành, tự nhiên (khoảng 2-3 câu) từ khách mời "${name}" gửi đến đôi uyên ương ${brideGroomNames}. Mối quan hệ: "${rel}". Phong cách: "${wishTone}". Đính kèm 1-2 emoji ngọt ngào. Chỉ trả về lời chúc.`;
+
+        let success = false;
+        for (const m of models) {
+          try {
+            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${apiKey}`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
+            });
+            const data = await res.json();
+            const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (text) {
+              let clean = text.trim().replace(/^["“]|["”]$/g, '');
               setGeneratedWish(clean);
               success = true;
               break;
             }
           } catch (_) {}
         }
-
         if (!success) {
           setGeneratedWish(`Chúc hai bạn trăm năm hạnh phúc, một đời an yên, cùng nhau nắm tay đi qua mọi chặng đường ngọt ngào và xây dựng một mái ấm ngập tràn tiếng cười! 💕🥂`);
         }
         setIsLoading(false);
       };
 
-      const handleCopy = () => {
-        if (!generatedWish) return;
-        navigator.clipboard?.writeText(generatedWish);
+      const handleCopyText = (text) => {
+        if (!text) return;
+        navigator.clipboard?.writeText(text);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
       };
@@ -767,109 +814,202 @@ Xưng hô đúng mực theo vai vế "${rel}", đính kèm 1-2 emoji ngọt ngà
             </button>
           )}
 
-          <div className="flex items-center gap-3 mb-4">
+          <div className="flex items-center gap-3 mb-3">
             <span className="text-2xl">✨</span>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="font-serif text-lg font-bold text-stone-900">Trợ lý AI Soạn Lời Chúc</h3>
+                <h3 className="font-serif text-lg font-bold text-stone-900">Trợ Lý AI Gemini WedStory</h3>
                 <span className="bg-rose-100 text-rose-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
                   Gemini 3.5 Flash
                 </span>
               </div>
-              <p className="text-xs text-stone-500 font-light">Cá nhân hoá theo tên và mối quan hệ của bạn</p>
+              <p className="text-xs text-stone-500 font-light">Tự động cá nhân hoá lời mời thiệp cưới theo nhóm đối tượng</p>
             </div>
           </div>
 
-          <div className="space-y-3">
-            <div>
-              <label className="block text-xs font-semibold text-stone-700 mb-1">Tên của bạn</label>
-              <input
-                type="text"
-                value={guestName}
-                onChange={e => setGuestName(e.target.value)}
-                placeholder="Ví dụ: Hoàng Long, Chị Thuỳ Dung..."
-                className="w-full px-3 py-2 text-sm border border-stone-300 rounded-lg outline-none focus:border-rose-600 focus:ring-1 focus:ring-rose-600"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-stone-700 mb-1">Mối quan hệ</label>
-              <select
-                value={relationship}
-                onChange={e => setRelationship(e.target.value)}
-                className="w-full px-3 py-2 text-sm border border-stone-300 rounded-lg outline-none focus:border-rose-600 focus:ring-1 focus:ring-rose-600 bg-white"
-              >
-                {relationships.map(r => (
-                  <option key={r.value} value={r.value}>{r.label}</option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-stone-700 mb-1">Phong cách mong muốn</label>
-              <div className="grid grid-cols-2 gap-2">
-                {tones.map(t => (
-                  <button
-                    type="button"
-                    key={t.value}
-                    onClick={() => setTone(t.value)}
-                    className={`px-3 py-1.5 text-xs rounded-lg border text-left transition-all ${
-                      tone === t.value
-                        ? 'border-rose-600 bg-rose-50 text-rose-700 font-medium'
-                        : 'border-stone-200 bg-white text-stone-600 hover:bg-stone-50'
-                    }`}
-                  >
-                    {t.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
+          {/* Tab Switcher */}
+          <div className="flex bg-stone-100 p-1 rounded-xl mb-4 gap-1">
             <button
-              type="button"
-              onClick={handleGenerate}
-              disabled={isLoading}
-              className="w-full mt-2 py-2.5 px-4 rounded-xl bg-gradient-to-r from-rose-700 to-amber-700 text-white font-medium text-sm flex items-center justify-center gap-2 shadow-md hover:brightness-105 transition-all disabled:opacity-60"
+              onClick={() => setActiveTab('invitation')}
+              className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition-all ${
+                activeTab === 'invitation' ? 'bg-white text-rose-700 shadow-sm' : 'text-stone-600 hover:text-stone-900'
+              }`}
             >
-              {isLoading ? (
-                <>
-                  <span className="animate-spin">⏳</span>
-                  <span>Gemini AI đang sáng tác...</span>
-                </>
-              ) : (
-                <>
-                  <span>✨</span>
-                  <span>Tạo Lời Chúc Bằng AI</span>
-                </>
-              )}
+              💌 Cá nhân hoá lời mời thiệp
             </button>
+            <button
+              onClick={() => setActiveTab('wish')}
+              className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition-all ${
+                activeTab === 'wish' ? 'bg-white text-rose-700 shadow-sm' : 'text-stone-600 hover:text-stone-900'
+              }`}
+            >
+              💬 Soạn lời chúc cưới
+            </button>
+          </div>
 
-            {generatedWish && (
-              <div className="mt-4 p-4 rounded-xl bg-rose-50/60 border border-rose-200/80">
-                <div className="text-[11px] font-bold uppercase tracking-wider text-rose-700 mb-1.5">
-                  💌 Lời chúc dành cho bạn:
+          {activeTab === 'invitation' ? (
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs font-semibold text-stone-700 mb-1.5">1. Chọn Nhóm khách mời</label>
+                <div className="grid grid-cols-2 gap-1.5 mb-2">
+                  {guestGroups.map(grp => (
+                    <button
+                      type="button"
+                      key={grp.value}
+                      onClick={() => { setGuestGroup(grp.value); setCustomGroup(''); }}
+                      className={`p-2 rounded-lg border text-left transition-all ${
+                        guestGroup === grp.value && !customGroup
+                          ? 'border-rose-600 bg-rose-50 text-rose-800 font-bold'
+                          : 'border-stone-200 bg-white text-stone-700 hover:bg-stone-50 text-xs'
+                      }`}
+                    >
+                      <div className="text-xs">{grp.label}</div>
+                      <div className="text-[10px] text-stone-400 font-normal">{grp.desc}</div>
+                    </button>
+                  ))}
                 </div>
-                <p className="text-sm text-stone-800 leading-relaxed italic mb-3">
-                  "{generatedWish}"
-                </p>
-                <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Hoặc tự nhập tên nhóm (VD: CLB Cầu lông, Team Marketing...)"
+                  value={customGroup}
+                  onChange={e => setCustomGroup(e.target.value)}
+                  className="w-full px-3 py-2 text-xs border border-stone-300 rounded-lg outline-none focus:border-rose-600 focus:ring-1 focus:ring-rose-600"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-stone-700 mb-1">2. Phong cách mong muốn</label>
+                <select
+                  value={invitationTone}
+                  onChange={e => setInvitationTone(e.target.value)}
+                  className="w-full px-3 py-2 text-xs border border-stone-300 rounded-lg outline-none focus:border-rose-600 focus:ring-1 focus:ring-rose-600 bg-white"
+                >
+                  <option value="Tự nhiên & Chuẩn mực theo nhóm">✨ Tự động theo chuẩn văn phong nhóm (Khuyên dùng)</option>
+                  <option value="Thân mật, vui vẻ & Hóm hỉnh">😄 Thân mật, vui tươi &amp; Hóm hỉnh</option>
+                  <option value="Lễ phép, kính cẩn & Đầm ấm gia phong">👵 Lễ phép, kính cẩn &amp; Chuẩn truyền thống</option>
+                  <option value="Trang trọng, lịch thiệp & Tôn quý">🎩 Trang trọng, lịch thiệp &amp; Đẳng cấp</option>
+                  <option value="Lãng mạn, tinh tế & Cảm xúc">🌹 Lãng mạn, sâu lắng &amp; Tinh tế</option>
+                </select>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleGenerateInvitation}
+                disabled={isLoading}
+                className="w-full mt-2 py-2.5 px-4 rounded-xl bg-gradient-to-r from-rose-700 to-amber-700 text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-md hover:brightness-105 transition-all disabled:opacity-60"
+              >
+                {isLoading ? '⏳ Gemini AI đang soạn lời mời…' : '✨ Gemini AI Tạo Lời Mời Cá Nhân Hoá'}
+              </button>
+
+              {generatedInvitation && (
+                <div className="mt-3 p-4 rounded-xl bg-rose-50/70 border border-rose-200">
+                  <div className="flex justify-between items-center mb-1.5">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-rose-700">
+                      📜 Lời mời nhóm: {generatedInvitation.group}
+                    </span>
+                  </div>
+                  {generatedInvitation.quote && (
+                    <div className="mb-2">
+                      <div className="text-[10px] text-stone-500 font-semibold uppercase">Thông điệp mở đầu:</div>
+                      <p className="text-xs text-stone-700 italic bg-white p-2 rounded border border-rose-100">
+                        “{generatedInvitation.quote}”
+                      </p>
+                    </div>
+                  )}
+                  <div>
+                    <div className="text-[10px] text-stone-500 font-semibold uppercase">Lời mời chính:</div>
+                    <p className="text-xs text-stone-900 leading-relaxed bg-white p-2.5 rounded border border-rose-100 mb-3">
+                      {generatedInvitation.message}
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleCopyText(`“${generatedInvitation.quote}”\n\n${generatedInvitation.message}`)}
+                      className="px-3 py-1.5 bg-white border border-stone-200 rounded-lg text-xs font-medium text-stone-700 hover:bg-stone-50 flex items-center gap-1.5 shadow-sm"
+                    >
+                      <span>{copied ? '✅' : '📋'}</span>
+                      <span>{copied ? 'Đã sao chép!' : 'Sao chép'}</span>
+                    </button>
+                    {onClose && (
+                      <button
+                        onClick={onClose}
+                        className="px-3 py-1.5 bg-rose-700 text-white rounded-lg text-xs font-semibold ml-auto shadow-sm hover:bg-rose-800"
+                      >
+                        Xong
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs font-semibold text-stone-700 mb-1">Tên của bạn</label>
+                <input
+                  type="text"
+                  value={guestName}
+                  onChange={e => setGuestName(e.target.value)}
+                  placeholder="Ví dụ: Hoàng Long, Chị Thuỳ Dung..."
+                  className="w-full px-3 py-2 text-xs border border-stone-300 rounded-lg outline-none focus:border-rose-600 focus:ring-1 focus:ring-rose-600"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-stone-700 mb-1">Mối quan hệ</label>
+                <select
+                  value={relationship}
+                  onChange={e => setRelationship(e.target.value)}
+                  className="w-full px-3 py-2 text-xs border border-stone-300 rounded-lg outline-none focus:border-rose-600 focus:ring-1 focus:ring-rose-600 bg-white"
+                >
+                  <option value="Bạn thân">👭 Bạn thân thiết</option>
+                  <option value="Đồng nghiệp">💼 Đồng nghiệp / Công ty</option>
+                  <option value="Họ hàng">🏡 Họ hàng / Người thân</option>
+                  <option value="Bạn học cũ">🎓 Bạn thời học sinh / Sinh viên</option>
+                  <option value="Anh / Chị / Em">🌸 Anh / Chị / Em</option>
+                  <option value="Người lớn / Bác / Cô / Chú">👴 Bác / Cô / Chú / Người lớn tuổi</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-stone-700 mb-1">Phong cách mong muốn</label>
+                <select
+                  value={wishTone}
+                  onChange={e => setWishTone(e.target.value)}
+                  className="w-full px-3 py-2 text-xs border border-stone-300 rounded-lg outline-none focus:border-rose-600 focus:ring-1 focus:ring-rose-600 bg-white"
+                >
+                  <option value="Chân thành & Ấm áp">💖 Chân thành &amp; Ấm áp</option>
+                  <option value="Hài hước & Dí dỏm">😄 Hài hước &amp; Vui vẻ</option>
+                  <option value="Trang trọng & Lịch sự">🎩 Trang trọng &amp; Lịch thiệp</option>
+                  <option value="Ngắn gọn & Súc tích">⚡ Ngắn gọn &amp; Ý nghĩa</option>
+                </select>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleGenerateWish}
+                disabled={isLoading}
+                className="w-full mt-2 py-2.5 px-4 rounded-xl bg-gradient-to-r from-rose-700 to-amber-700 text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-md hover:brightness-105 transition-all disabled:opacity-60"
+              >
+                {isLoading ? '⏳ Gemini AI đang sáng tác…' : '✨ Tạo Lời Chúc Bằng AI'}
+              </button>
+
+              {generatedWish && (
+                <div className="mt-3 p-4 rounded-xl bg-rose-50/70 border border-rose-200">
+                  <p className="text-xs text-stone-800 leading-relaxed italic mb-3">
+                    "{generatedWish}"
+                  </p>
                   <button
-                    onClick={handleCopy}
+                    onClick={() => handleCopyText(generatedWish)}
                     className="px-3 py-1.5 bg-white border border-stone-200 rounded-lg text-xs font-medium text-stone-700 hover:bg-stone-50 flex items-center gap-1.5 shadow-sm"
                   >
                     <span>{copied ? '✅' : '📋'}</span>
                     <span>{copied ? 'Đã sao chép!' : 'Sao chép'}</span>
                   </button>
-                  <button
-                    onClick={handleGenerate}
-                    className="px-3 py-1.5 bg-white border border-stone-200 rounded-lg text-xs font-medium text-stone-700 hover:bg-stone-50 flex items-center gap-1.5 shadow-sm ml-auto"
-                  >
-                    <span>🔄</span> Đổi câu khác
-                  </button>
                 </div>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
         </div>
       );
     };
@@ -980,13 +1120,13 @@ Xưng hô đúng mực theo vai vế "${rel}", đính kèm 1-2 emoji ngọt ngà
             </div>
           )}
 
-          {/* Floating Button: Mở Trợ lý AI Chúc Cưới */}
+          {/* Floating Button: Mở Trợ lý AI Cá Nhân Hoá */}
           <button
             onClick={() => setShowAiWishModal(true)}
             className="fixed bottom-6 right-6 z-40 flex items-center gap-2 px-5 py-3 rounded-full bg-gradient-to-r from-rose-700 to-amber-700 text-white shadow-xl hover:shadow-2xl hover:scale-105 transition-all text-xs sm:text-sm font-semibold tracking-wide cursor-pointer"
           >
             <span className="text-base">✨</span>
-            <span>Trợ lý AI Lời Chúc (Gemini)</span>
+            <span>Trợ lý Cá Nhân Hoá AI (Gemini)</span>
           </button>
 
           {/* Modal Trợ lý AI Chúc Cưới */}

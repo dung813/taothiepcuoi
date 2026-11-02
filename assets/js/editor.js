@@ -115,89 +115,185 @@ const ANIMS = [['','Không'],['fade','Hiện dần'],['up','Trượt lên'],['do
   ['spin','Xoay vào'],['blur','Mờ → rõ'],['flip','Lật'],['float','Bồng bềnh ∞'],['pulse','Nhịp tim ∞'],['swing','Đung đưa ∞'],['shine','Lấp lánh ∞']];
 
 const DRAWERS = {
-  ai: () => `
-    <div style="background:linear-gradient(135deg,#fff8f6,#fdf1ed);border:1px solid #f3d4cc;border-radius:14px;padding:14px;margin-bottom:12px">
+  ai: () => {
+    const curGroup = D._lastAiGroup || 'Bạn thân';
+    const hasCustom = !['Bạn thân', 'Đồng nghiệp & Sếp', 'Họ hàng lớn tuổi (Bác, Cô, Chú)', 'Bạn cấp 3 / Đại học', 'Đối tác & Khách quý', 'Anh / Chị / Em'].includes(curGroup);
+    return `
+    <div style="background:linear-gradient(135deg,#fff8f6,#fdf1ed);border:1px solid #f3d4cc;border-radius:14px;padding:14px;margin-bottom:14px">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-        <span style="font-size:1.3rem">✨</span>
-        <b style="color:#9b382d;font-size:1.02rem">Trợ Lý AI WedStory</b>
-        <span style="font-size:10px;background:#b85042;color:#fff;padding:2px 7px;border-radius:10px;font-weight:600;margin-left:auto">Gemini 3.5 Flash</span>
+        <span style="font-size:1.35rem">✨</span>
+        <div>
+          <b style="color:#9b382d;font-size:1.02rem;display:block">Cá Nhân Hoá Lời Mời AI</b>
+          <small style="color:#8a5e55">Gemini 3.5 Flash · Cá nhân hoá theo nhóm khách</small>
+        </div>
+        <span style="font-size:10px;background:#b85042;color:#fff;padding:2px 7px;border-radius:10px;font-weight:600;margin-left:auto">Gemini 3.5</span>
       </div>
-      <p class="hint" style="margin:0;color:#6b524c">Tự động soạn Lời chúc mừng, Lời ngỏ hoặc Câu trích dẫn ý nghĩa cho thiệp cưới của bạn.</p>
+      <p class="hint" style="margin:4px 0 0;color:#6b524c;font-size:0.83rem;line-height:1.45">
+        Tự động tạo <b>Lời mời chính</b> và <b>Thông điệp mở đầu</b> trên thiệp với văn phong chuẩn mực (thân mật, lịch thiệp hoặc kính cẩn) phù hợp từng nhóm khách mời.
+      </p>
     </div>
 
-    <div class="field">
-      <label>Mục đích sử dụng</label>
-      <select id="edAiType" style="width:100%;padding:8px 10px;border-radius:9px;border:1px solid var(--ed-line);background:#fff">
-        <option value="wish">💌 Sáng tác Lời chúc mừng đám cưới</option>
-        <option value="quote">💍 Sáng tác Câu trích dẫn tình yêu (Quote)</option>
-        <option value="message">📜 Sáng tác Lời mời / Lời ngỏ của cô dâu chú rể</option>
-      </select>
+    <!-- Chọn chế độ -->
+    <div style="display:flex;background:#f3e9e6;border-radius:10px;padding:3px;margin-bottom:14px;gap:4px">
+      <button type="button" class="btn btn-sm" id="edAiTabInvite" style="flex:1;background:#fff;border:0;color:#9b382d;font-weight:700;box-shadow:0 1px 4px rgba(0,0,0,0.06);border-radius:8px;padding:7px">
+        💌 Cá nhân hoá lời mời
+      </button>
+      <button type="button" class="btn btn-sm" id="edAiTabWish" style="flex:1;background:transparent;border:0;color:#7a625d;font-weight:600;border-radius:8px;padding:7px">
+        💬 Lời chúc đám cưới
+      </button>
     </div>
 
-    <div class="field" id="edAiNameField">
-      <label>Tên người gửi / Khách mời</label>
-      <input type="text" id="edAiGuest" placeholder="Ví dụ: Bạn thân Minh Quân, Chị Thuỳ Dung..." value="Bạn thân">
-    </div>
+    <!-- KHỐI 1: CÁ NHÂN HOÁ LỜI MỜI THEO NHÓM (CHÍNH) -->
+    <div id="edAiInviteSection">
+      <div class="field">
+        <label style="display:flex;align-items:center;justify-content:space-between">
+          <span><b>1. Chọn Nhóm khách mời</b></span>
+          <small style="color:#9b382d;font-weight:600">Được tối ưu văn phong</small>
+        </label>
+        
+        <!-- Các nhóm khách mời mẫu nhanh -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px">
+          ${[
+            ['Bạn thân', '👭 Bạn thân / Bạn nối khố', 'Thân mật, hóm hỉnh'],
+            ['Đồng nghiệp & Sếp', '💼 Đồng nghiệp / Sếp', 'Lịch thiệp, trang trọng'],
+            ['Họ hàng lớn tuổi (Bác, Cô, Chú)', '🏡 Họ hàng lớn tuổi', 'Lễ phép, kính cẩn'],
+            ['Bạn cấp 3 / Đại học', '🎓 Bạn cấp 3 / Đại học', 'Thanh xuân, hoài niệm'],
+            ['Đối tác & Khách quý', '🤝 Đối tác & Khách quý', 'Trang nhã, đẳng cấp'],
+            ['Anh / Chị / Em', '🌸 Anh / Chị / Em', 'Gần gũi, ấm áp']
+          ].map(([val, label, sub]) => `
+            <button type="button" class="btn btn-outline btn-sm ed-grp-pill ${curGroup === val ? 'is-active' : ''}" data-grp="${esc(val)}" style="padding:7px 9px;text-align:left;height:auto;display:flex;flex-direction:column;gap:2px;border-radius:10px;${curGroup === val ? 'border-color:#b85042;background:#fff4f2;color:#9b382d;font-weight:700' : 'background:#fff'}">
+              <span style="font-size:0.83rem">${label}</span>
+              <small style="font-size:10px;opacity:0.75;font-weight:normal">${sub}</small>
+            </button>
+          `).join('')}
+        </div>
 
-    <div class="field" id="edAiRelField">
-      <label>Mối quan hệ với cô dâu chú rể</label>
-      <select id="edAiRel" style="width:100%;padding:8px 10px;border-radius:9px;border:1px solid var(--ed-line);background:#fff">
-        <option value="Bạn thân">👭 Bạn thân thiết</option>
-        <option value="Đồng nghiệp">💼 Đồng nghiệp / Công ty</option>
-        <option value="Họ hàng">🏡 Họ hàng / Người thân</option>
-        <option value="Bạn học cũ">🎓 Bạn thời học sinh / Sinh viên</option>
-        <option value="Anh / Chị / Em">🌸 Anh / Chị / Em</option>
-        <option value="Người lớn / Bác / Cô / Chú">👴 Bác / Cô / Chú / Người lớn tuổi</option>
-      </select>
-    </div>
+        <div style="display:flex;gap:6px;align-items:center;margin-top:4px">
+          <input type="text" id="edAiCustomGroup" placeholder="Hoặc tự nhập tên nhóm (VD: CLB Cầu lông, Team Marketing...)" value="${hasCustom ? esc(curGroup) : ''}" style="width:100%;font-size:0.85rem">
+        </div>
+      </div>
 
-    <div class="field">
-      <label>Phong cách giọng điệu</label>
-      <select id="edAiTone" style="width:100%;padding:8px 10px;border-radius:9px;border:1px solid var(--ed-line);background:#fff">
-        <option value="Chân thành & Ấm áp">💖 Chân thành &amp; Ấm áp</option>
-        <option value="Hài hước & Dí dỏm">😄 Hài hước &amp; Dí dỏm</option>
-        <option value="Lãng mạn & Ngọt ngào">🌹 Lãng mạn &amp; Ngọt ngào</option>
-        <option value="Trang trọng & Lịch sự">🎩 Trang trọng &amp; Lịch thiệp</option>
-        <option value="Ngắn gọn & Súc tích">⚡ Ngắn gọn &amp; Ý nghĩa</option>
-      </select>
-    </div>
+      <div class="field">
+        <label><b>2. Phong cách &amp; Văn phong</b></label>
+        <select id="edAiGroupTone" style="width:100%;padding:8px 10px;border-radius:9px;border:1px solid var(--ed-line);background:#fff;font-size:0.88rem">
+          <option value="Tự nhiên & Chuẩn mực theo nhóm">✨ Tự động theo chuẩn văn phong của nhóm (Khuyên dùng)</option>
+          <option value="Thân mật, vui vẻ & Hóm hỉnh">😄 Thân mật, vui tươi &amp; Hài hước (Tụi mình, hai đứa...)</option>
+          <option value="Lễ phép, kính cẩn & Đầm ấm gia phong">👵 Lễ phép, kính cẩn &amp; Chuẩn truyền thống (Con cháu kính cẩn...)</option>
+          <option value="Trang trọng, lịch thiệp & Tôn quý">🎩 Trang trọng, lịch thiệp &amp; Đẳng cấp (Chúng tôi, kính mời Quý khách...)</option>
+          <option value="Lãng mạn, tinh tế & Cảm xúc">🌹 Lãng mạn, sâu lắng &amp; Tinh tế</option>
+          <option value="Ngắn gọn, súc tích & Tinh gọn">⚡ Ngắn gọn, súc tích &amp; Hiện đại</option>
+        </select>
+      </div>
 
-    <button type="button" class="btn btn-primary" id="edAiBtn" style="width:100%;background:linear-gradient(135deg,#b85042,#9b382d);border:0;box-shadow:0 6px 16px rgba(184,80,66,.25);padding:11px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px">
-      <span>✨</span><span>Tạo Bằng Google Gemini AI</span>
-    </button>
+      <div class="field">
+        <label>Ghi chú thêm cho AI (tuỳ chọn)</label>
+        <input type="text" id="edAiNotes" placeholder="VD: Nhắc lại thời sinh viên, xưng hô hai cháu với Bác..." style="font-size:0.85rem">
+      </div>
 
-    <div id="edAiResult" style="display:none;background:#fff;border:1.5px dashed #d8a69d;border-radius:12px;padding:12px;margin-top:6px">
-      <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:#9b382d;margin-bottom:6px">Kết quả từ Gemini AI:</div>
-      <p id="edAiText" style="font-size:0.92rem;line-height:1.55;color:#332724;font-style:italic;margin:0 0 10px;background:#fdf8f6;padding:10px;border-radius:8px"></p>
-      <div style="display:flex;flex-direction:column;gap:6px">
-        <button type="button" class="btn btn-primary btn-sm" id="edAiInsertCard" style="background:#b85042;border:0;width:100%;justify-content:center">
-          ➕ Đưa thành chữ mới lên thiệp cưới
+      <button type="button" class="btn btn-primary" id="edAiGenGroupBtn" style="width:100%;background:linear-gradient(135deg,#b85042,#9b382d);border:0;box-shadow:0 6px 16px rgba(184,80,66,.25);padding:11px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:12px;border-radius:10px">
+        <span>✨</span><span>Gemini AI Tạo Lời Mời Cho Nhóm Này</span>
+      </button>
+
+      <!-- KHUNG HIỂN THỊ KẾT QUẢ VÀ ÁP DỤNG TRỰC TIẾP LÊN THIỆP -->
+      <div id="edAiGroupResult" style="background:#fff;border:1.5px solid #eecbc4;border-radius:12px;padding:12px;margin-bottom:14px;box-shadow:0 4px 14px rgba(184,80,66,0.06)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <span style="font-size:11px;font-weight:700;text-transform:uppercase;color:#9b382d;letter-spacing:0.05em">
+            Nội dung lời mời cá nhân hoá:
+          </span>
+          <span id="edAiBadgeGroup" style="font-size:11px;background:#fde8e4;color:#9b382d;padding:2px 8px;border-radius:12px;font-weight:600">
+            ${esc(curGroup)}
+          </span>
+        </div>
+
+        <div style="margin-bottom:10px">
+          <label style="font-size:0.75rem;font-weight:700;color:#6b524c;display:block;margin-bottom:4px">
+            📜 Lời mời chính (hiển thị trên thiệp):
+          </label>
+          <textarea id="edAiMsgText" rows="3" style="width:100%;font-size:0.88rem;line-height:1.5;padding:8px;border:1px solid #e8d0cb;border-radius:8px;color:#332724;background:#fffaf8">${esc(D.message || 'Trân trọng kính mời quý khách đến dự buổi tiệc chung vui cùng gia đình chúng tôi.')}</textarea>
+        </div>
+
+        <div style="margin-bottom:12px">
+          <label style="font-size:0.75rem;font-weight:700;color:#6b524c;display:block;margin-bottom:4px">
+            💍 Thông điệp / Câu mở đầu (quote):
+          </label>
+          <input type="text" id="edAiQuoteText" value="${esc(D.quote || 'Yêu nhau không phải là nhìn nhau, mà là cùng nhau nhìn về một hướng.')}" style="width:100%;font-size:0.85rem;padding:7px 8px;border:1px solid #e8d0cb;border-radius:8px;color:#332724;background:#fffaf8">
+        </div>
+
+        <!-- NÚT ÁP DỤNG TRỰC TIẾP LÊN THIỆP XEM TRƯỚC -->
+        <button type="button" class="btn btn-primary" id="edAiApplyDirectBtn" style="width:100%;background:#b85042;border:0;padding:10px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;border-radius:8px;box-shadow:0 3px 10px rgba(184,80,66,0.2)">
+          <span>👁️</span><span>Áp Dụng Lên Thiệp Xem Trước Ngay</span>
         </button>
-        <div style="display:flex;gap:6px">
-          <button type="button" class="btn btn-outline btn-sm" id="edAiSetQuote" style="flex:1;justify-content:center;font-size:0.75rem">
-            💬 Đặt làm Câu trích dẫn
-          </button>
-          <button type="button" class="btn btn-outline btn-sm" id="edAiCopy" style="flex:1;justify-content:center;font-size:0.75rem">
+
+        <div style="display:flex;gap:6px;margin-top:8px">
+          <button type="button" class="btn btn-outline btn-sm" id="edAiCopyAll" style="flex:1;justify-content:center;font-size:0.78rem">
             📋 Sao chép
+          </button>
+          <button type="button" class="btn btn-outline btn-sm" id="edAiResetCard" style="flex:1;justify-content:center;font-size:0.78rem" title="Đưa thành chữ tự do lên thiệp">
+            ➕ Thêm chữ tự do
           </button>
         </div>
       </div>
+
+      <!-- THANH CHUYỂN ĐỔI XEM TRƯỚC THEO NHÓM -->
+      <div style="border-top:1px solid var(--ed-line);padding-top:12px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <b style="font-size:0.82rem;color:#332724">👁️ Chuyển đổi xem thử theo nhóm:</b>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:5px" id="edAiQuickSwitchers">
+          ${['Bạn thân', 'Đồng nghiệp & Sếp', 'Họ hàng lớn tuổi (Bác, Cô, Chú)', 'Bạn cấp 3 / Đại học', 'Đối tác & Khách quý', 'Anh / Chị / Em'].map(g => `
+            <button type="button" class="btn btn-outline btn-sm ed-switch-grp" data-switchgrp="${esc(g)}" style="font-size:0.74rem;padding:4px 8px;border-radius:999px">
+              ${g === 'Bạn thân' ? '👭' : g.includes('Đồng nghiệp') ? '💼' : g.includes('Họ hàng') ? '🏡' : g.includes('cấp 3') ? '🎓' : g.includes('Đối tác') ? '🤝' : '🌸'} ${esc(g.split(' ')[0])}
+            </button>
+          `).join('')}
+        </div>
+        <p class="hint" style="margin:6px 0 0;font-size:11px">Bấm vào nhóm để đổi nội dung và xem giao diện thiệp biến đổi trực tiếp.</p>
+      </div>
     </div>
 
-    <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--ed-line)">
-      <h4 class="dr-h">💡 Lời chúc mẫu nhanh</h4>
-      <div style="display:flex;flex-direction:column;gap:6px">
-        ${[
-          'Chúc hai bạn trăm năm hạnh phúc, mãi giữ được nụ cười rạng rỡ và ngọt ngào như ngày đầu! 💕🥂',
-          'Mừng ngày chung đôi! Chúc hai bạn luôn là bến bình yên của nhau trên mọi chặng đường. ✨💍',
-          'Hạnh phúc không phải là tìm được người hoàn hảo, mà là cùng nhau vun đắp mỗi ngày. 💖'
-        ].map(sample => `
-          <button type="button" class="btn btn-outline btn-sm" style="text-align:left;font-size:0.78rem;padding:8px 10px;line-height:1.4;white-space:normal;height:auto" data-sampleset="${esc(sample)}">
-            "${esc(sample)}"
-          </button>
-        `).join('')}
+    <!-- KHỐI 2: LỜI CHÚC CƯỚI (PHỤ DÀNH CHO KHÁCH MỜI) -->
+    <div id="edAiWishSection" style="display:none">
+      <div class="field">
+        <label>Tên khách mời gửi lời chúc</label>
+        <input type="text" id="edAiGuest" placeholder="Ví dụ: Bạn thân Minh Quân, Chị Thuỳ Dung..." value="Bạn thân">
       </div>
-    </div>`,
+
+      <div class="field">
+        <label>Mối quan hệ với cô dâu chú rể</label>
+        <select id="edAiRel" style="width:100%;padding:8px 10px;border-radius:9px;border:1px solid var(--ed-line);background:#fff">
+          <option value="Bạn thân">👭 Bạn thân thiết</option>
+          <option value="Đồng nghiệp">💼 Đồng nghiệp / Công ty</option>
+          <option value="Họ hàng">🏡 Họ hàng / Người thân</option>
+          <option value="Bạn học cũ">🎓 Bạn thời học sinh / Sinh viên</option>
+          <option value="Anh / Chị / Em">🌸 Anh / Chị / Em</option>
+          <option value="Người lớn / Bác / Cô / Chú">👴 Bác / Cô / Chú / Người lớn tuổi</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Phong cách giọng điệu</label>
+        <select id="edAiTone" style="width:100%;padding:8px 10px;border-radius:9px;border:1px solid var(--ed-line);background:#fff">
+          <option value="Chân thành & Ấm áp">💖 Chân thành &amp; Ấm áp</option>
+          <option value="Hài hước & Dí dỏm">😄 Hài hước &amp; Dí dỏm</option>
+          <option value="Lãng mạn & Ngọt ngào">🌹 Lãng mạn &amp; Ngọt ngào</option>
+          <option value="Trang trọng & Lịch sự">🎩 Trang trọng &amp; Lịch thiệp</option>
+          <option value="Ngắn gọn & Súc tích">⚡ Ngắn gọn &amp; Ý nghĩa</option>
+        </select>
+      </div>
+
+      <button type="button" class="btn btn-primary" id="edAiWishBtn" style="width:100%;background:linear-gradient(135deg,#b85042,#9b382d);border:0;box-shadow:0 6px 16px rgba(184,80,66,.25);padding:11px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px;border-radius:10px">
+        <span>✨</span><span>Sáng Tác Lời Chúc (Gemini AI)</span>
+      </button>
+
+      <div id="edAiWishResult" style="display:none;background:#fff;border:1.5px dashed #d8a69d;border-radius:12px;padding:12px;margin-top:10px">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:#9b382d;margin-bottom:6px">Lời chúc mừng:</div>
+        <p id="edAiWishText" style="font-size:0.92rem;line-height:1.55;color:#332724;font-style:italic;margin:0 0 10px;background:#fdf8f6;padding:10px;border-radius:8px"></p>
+        <button type="button" class="btn btn-primary btn-sm" id="edAiInsertCard" style="background:#b85042;border:0;width:100%;justify-content:center">
+          ➕ Đưa thành chữ tự do lên thiệp cưới
+        </button>
+      </div>
+    </div>`;
+  },
+
 
   info: () => `
     <details class="acc" data-pv=".sec-couple" open><summary>💑 Cặp đôi &amp; gia đình</summary><div class="body">${INFO.couple()}</div></details>
@@ -330,122 +426,256 @@ function buildDrawer(){
   $$('input', body).forEach(dateWarn);   // báo ngay cả giá trị sai đã lưu từ trước
 
   if (drawer === 'ai') {
-    const aiBtn = $('#edAiBtn', dr);
-    const aiType = $('#edAiType', dr);
-    const aiGuest = $('#edAiGuest', dr);
-    const aiRel = $('#edAiRel', dr);
-    const aiTone = $('#edAiTone', dr);
-    const aiResult = $('#edAiResult', dr);
-    const aiText = $('#edAiText', dr);
-    const insertBtn = $('#edAiInsertCard', dr);
-    const setQuoteBtn = $('#edAiSetQuote', dr);
-    const copyBtn = $('#edAiCopy', dr);
-    const nameField = $('#edAiNameField', dr);
-    const relField = $('#edAiRelField', dr);
+    // Chuyển đổi giữa 2 tab: Cá nhân hoá lời mời (chính) vs Lời chúc đám cưới
+    const tabInvite = $('#edAiTabInvite', dr);
+    const tabWish = $('#edAiTabWish', dr);
+    const secInvite = $('#edAiInviteSection', dr);
+    const secWish = $('#edAiWishSection', dr);
 
-    if (aiType) {
-      aiType.onchange = () => {
-        const isWish = aiType.value === 'wish';
-        if (nameField) nameField.style.display = isWish ? 'block' : 'none';
-        if (relField) relField.style.display = isWish ? 'block' : 'none';
+    if (tabInvite && tabWish) {
+      tabInvite.onclick = () => {
+        tabInvite.style.background = '#fff'; tabInvite.style.color = '#9b382d'; tabInvite.style.fontWeight = '700';
+        tabWish.style.background = 'transparent'; tabWish.style.color = '#7a625d'; tabWish.style.fontWeight = '600';
+        if (secInvite) secInvite.style.display = 'block';
+        if (secWish) secWish.style.display = 'none';
+      };
+      tabWish.onclick = () => {
+        tabWish.style.background = '#fff'; tabWish.style.color = '#9b382d'; tabWish.style.fontWeight = '700';
+        tabInvite.style.background = 'transparent'; tabInvite.style.color = '#7a625d'; tabInvite.style.fontWeight = '600';
+        if (secInvite) secInvite.style.display = 'none';
+        if (secWish) secWish.style.display = 'block';
       };
     }
 
-    if (aiBtn) {
-      aiBtn.onclick = async () => {
-        aiBtn.disabled = true;
-        aiBtn.innerHTML = '<span>⏳</span><span>Gemini AI đang sáng tác…</span>';
+    // Nhóm khách mời đang chọn
+    let selectedGroup = D._lastAiGroup || 'Bạn thân';
+    const customInput = $('#edAiCustomGroup', dr);
+    const badgeGroup = $('#edAiBadgeGroup', dr);
+    const msgText = $('#edAiMsgText', dr);
+    const quoteText = $('#edAiQuoteText', dr);
+    const toneSelect = $('#edAiGroupTone', dr);
+    const notesInput = $('#edAiNotes', dr);
+    const genGroupBtn = $('#edAiGenGroupBtn', dr);
+    const applyDirectBtn = $('#edAiApplyDirectBtn', dr);
+    const copyAllBtn = $('#edAiCopyAll', dr);
+    const addFreeBtn = $('#edAiResetCard', dr);
+
+    // Khởi tạo lưu trữ nội dung theo nhóm
+    D.groupMessages = D.groupMessages || {};
+
+    const selectGroup = (grpName) => {
+      selectedGroup = grpName.trim() || 'Bạn thân';
+      D._lastAiGroup = selectedGroup;
+      if (badgeGroup) badgeGroup.textContent = selectedGroup;
+
+      $$('.ed-grp-pill', dr).forEach(p => {
+        const isMatch = p.dataset.grp === selectedGroup;
+        p.style.borderColor = isMatch ? '#b85042' : 'var(--ed-line)';
+        p.style.background = isMatch ? '#fff4f2' : '#fff';
+        p.style.color = isMatch ? '#9b382d' : 'inherit';
+        p.style.fontWeight = isMatch ? '700' : 'normal';
+      });
+
+      // Nếu đã có nội dung lưu trước đó cho nhóm này, nạp vào ngay
+      if (D.groupMessages[selectedGroup]) {
+        if (msgText) msgText.value = D.groupMessages[selectedGroup].message || '';
+        if (quoteText) quoteText.value = D.groupMessages[selectedGroup].quote || '';
+      } else {
+        // Nạp mẫu sẵn phù hợp theo nhóm để người dùng xem ngay
+        const groom = D.groom?.nick || D.groom?.name || 'Chú rể';
+        const bride = D.bride?.nick || D.bride?.name || 'Cô dâu';
+        const fallback = TH.getFallbackInvitation?.(selectedGroup, groom, bride);
+        if (fallback) {
+          if (msgText && !D.message) msgText.value = fallback.message;
+          if (quoteText && !D.quote) quoteText.value = fallback.quote;
+        }
+      }
+    };
+
+    // Bấm chọn nhóm từ các pill
+    $$('.ed-grp-pill', dr).forEach(p => {
+      p.onclick = () => {
+        if (customInput) customInput.value = '';
+        selectGroup(p.dataset.grp);
+      };
+    });
+
+    // Khi người dùng gõ tên nhóm tuỳ chỉnh
+    if (customInput) {
+      customInput.oninput = () => {
+        const val = customInput.value.trim();
+        if (val) selectGroup(val);
+      };
+    }
+
+    // Nút Sinh lời mời bằng Gemini AI
+    if (genGroupBtn) {
+      genGroupBtn.onclick = async () => {
+        genGroupBtn.disabled = true;
+        genGroupBtn.innerHTML = '<span>⏳</span><span>Gemini AI đang soạn lời mời cá nhân hoá…</span>';
         try {
-          const type = aiType?.value || 'wish';
-          const guest = aiGuest?.value || 'Bạn thân';
-          const rel = aiRel?.value || 'Bạn thân';
-          const tone = aiTone?.value || 'Chân thành & Ấm áp';
+          const groom = D.groom?.nick || D.groom?.name || 'Chú rể';
+          const bride = D.bride?.nick || D.bride?.name || 'Cô dâu';
+          const grp = selectedGroup || 'Bạn thân';
+          const tone = toneSelect?.value || 'Tự nhiên & Chuẩn mực theo nhóm';
+          const notes = notesInput?.value || '';
+
+          const result = await TH.generateAiInvitation({
+            guestGroup: grp,
+            groom,
+            bride,
+            tone,
+            notes
+          });
+
+          if (result && result.message) {
+            if (msgText) msgText.value = result.message;
+            if (quoteText) quoteText.value = result.quote || '';
+
+            // Tự động lưu và cập nhật trực tiếp vào thiệp cưới xem trước!
+            D.message = result.message;
+            if (result.quote) D.quote = result.quote;
+            D.groupMessages[grp] = {
+              name: grp,
+              message: result.message,
+              quote: result.quote || ''
+            };
+
+            // Đồng bộ ngay lập tức sang iframe xem trước
+            touch(true);
+            // Cuộn khung xem trước đến phần Lời mời & Lời ngỏ để người dùng thấy ngay
+            pvPost({type:'th-scroll', sel:'.sec-couple'});
+
+            TH.toast(`✨ Đã cá nhân hoá lời mời cho "${grp}" và cập nhật lên thiệp xem trước! 💌`);
+          }
+        } catch (err) {
+          console.error('Lỗi khi gọi AI cá nhân hoá lời mời:', err);
+          TH.toast('Không thể kết nối AI, vui lòng thử lại.');
+        } finally {
+          genGroupBtn.disabled = false;
+          genGroupBtn.innerHTML = '<span>✨</span><span>Gemini AI Tạo Lời Mời Cho Nhóm Này</span>';
+        }
+      };
+    }
+
+    // Nút ÁP DỤNG TRỰC TIẾP LÊN THIỆP XEM TRƯỚC
+    if (applyDirectBtn) {
+      applyDirectBtn.onclick = () => {
+        const newMsg = msgText?.value?.trim();
+        const newQuote = quoteText?.value?.trim();
+        if (newMsg) D.message = newMsg;
+        if (newQuote !== undefined) D.quote = newQuote;
+
+        D.groupMessages[selectedGroup] = {
+          name: selectedGroup,
+          message: newMsg || D.message,
+          quote: newQuote || D.quote
+        };
+
+        // Gửi sang iframe xem trước và cuộn đến khu vực hiển thị
+        touch(true);
+        pvPost({type:'th-scroll', sel:'.sec-couple'});
+        TH.toast(`👁️ Đã hiển thị lời mời nhóm "${selectedGroup}" lên thiệp cưới xem trước! 💕`);
+      };
+    }
+
+    // Chuyển đổi nhanh xem trước giữa các nhóm
+    $$('.ed-switch-grp', dr).forEach(btn => {
+      btn.onclick = () => {
+        const grp = btn.dataset.switchgrp;
+        selectGroup(grp);
+        const groom = D.groom?.nick || D.groom?.name || 'Chú rể';
+        const bride = D.bride?.nick || D.bride?.name || 'Cô dâu';
+
+        // Lấy nội dung đã lưu hoặc nội dung mẫu chuẩn của nhóm
+        let targetMsg = D.groupMessages[grp]?.message;
+        let targetQuote = D.groupMessages[grp]?.quote;
+        if (!targetMsg) {
+          const sample = TH.getFallbackInvitation(grp, groom, bride);
+          targetMsg = sample.message;
+          targetQuote = sample.quote;
+          D.groupMessages[grp] = { name: grp, message: targetMsg, quote: targetQuote };
+        }
+
+        if (msgText) msgText.value = targetMsg;
+        if (quoteText) quoteText.value = targetQuote;
+        D.message = targetMsg;
+        D.quote = targetQuote;
+
+        touch(true);
+        pvPost({type:'th-scroll', sel:'.sec-couple'});
+        TH.toast(`Đang xem thiệp cưới gửi nhóm: ${grp} ✨`);
+      };
+    });
+
+    // Sao chép nội dung
+    if (copyAllBtn) {
+      copyAllBtn.onclick = () => {
+        const txt = `[${selectedGroup}]\n` + (quoteText?.value ? `“${quoteText.value}”\n\n` : '') + (msgText?.value || '');
+        navigator.clipboard?.writeText(txt);
+        TH.toast('Đã sao chép lời mời vào bộ nhớ tạm!');
+      };
+    }
+
+    // Thêm chữ tự do
+    if (addFreeBtn) {
+      addFreeBtn.onclick = () => {
+        const txt = msgText?.value;
+        if (txt) {
+          addLayer({kind:'text', text:txt, o:{ff:'Playfair Display', fs:16, i:1, color:'#332724'}});
+          TH.toast('Đã thêm chữ tự do lên thiệp cưới!');
+        }
+      };
+    }
+
+    // Xử lý tab Lời chúc đám cưới (dành cho khách mời)
+    const wishBtn = $('#edAiWishBtn', dr);
+    const wishGuest = $('#edAiGuest', dr);
+    const wishRel = $('#edAiRel', dr);
+    const wishTone = $('#edAiTone', dr);
+    const wishResult = $('#edAiWishResult', dr);
+    const wishText = $('#edAiWishText', dr);
+    const wishInsertCard = $('#edAiInsertCard', dr);
+
+    if (wishBtn) {
+      wishBtn.onclick = async () => {
+        wishBtn.disabled = true;
+        wishBtn.innerHTML = '<span>⏳</span><span>Gemini AI đang sáng tác…</span>';
+        try {
+          const guest = wishGuest?.value || 'Bạn thân';
+          const rel = wishRel?.value || 'Bạn thân';
+          const tone = wishTone?.value || 'Chân thành & Ấm áp';
           const groom = D.groom?.nick || D.groom?.name || 'Chú rể';
           const bride = D.bride?.nick || D.bride?.name || 'Cô dâu';
 
-          let prompt = '';
-          if (type === 'wish') {
-            prompt = `Bạn là trợ lý AI thông minh của WedStory. Hãy sáng tác 1 lời chúc đám cưới ngắn (khoảng 2-3 câu) từ "${guest}" (mối quan hệ: "${rel}") gửi cô dâu chú rể ${groom} & ${bride}. Phong cách: "${tone}". Đính kèm 1-2 emoji ngọt ngào (🥂, 💕, ✨). Chỉ trả về nội dung lời chúc, không ngoặc kép hay tiêu đề.`;
-          } else if (type === 'quote') {
-            prompt = `Bạn là trợ lý AI thông minh của WedStory. Hãy sáng tác 1 câu trích dẫn ngắn lãng mạn, sâu lắng về tình yêu và hôn nhân để in lên thiệp cưới cho cặp đôi ${groom} & ${bride}. Phong cách: "${tone}". Chỉ trả về nội dung câu nói, không ngoặc kép.`;
-          } else {
-            prompt = `Bạn là trợ lý AI thông minh của WedStory. Hãy sáng tác lời ngỏ / lời mời đám cưới ấm áp, trang trọng ngắn gọn (2-3 câu) từ cô dâu chú rể ${groom} & ${bride} gửi đến quan khách. Phong cách: "${tone}". Chỉ trả về nội dung lời mời, không ngoặc kép.`;
-          }
+          const wish = await TH.generateAiWish({
+            guestName: guest,
+            relationship: rel,
+            tone,
+            groom,
+            bride
+          });
 
-          const apiKey = TH.geminiApiKey || atob('QVEuQWI4Uk42TGNKYlpZUXBkNmVCeldTUHBGUUFEUWdTRU8zeHhWM1VCanVtY3JPSVFaalE=');
-          const models = ['gemini-3.5-flash', 'gemini-3-flash-preview', 'gemini-3.8-flash'];
-          let generated = '';
-
-          for (const m of models) {
-            try {
-              const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${apiKey}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-              });
-              const data = await res.json();
-              const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-              if (text) {
-                generated = text.trim().replace(/^["“]|["”]$/g, '').trim();
-                break;
-              }
-            } catch (_) {}
-          }
-
-          if (!generated) {
-            generated = type === 'quote' 
-              ? `Tình yêu không phải là nhìn nhau, mà là cùng nhau nhìn về một hướng. Trân trọng ngày chung đôi! 💕`
-              : `Chúc ${groom} & ${bride} trăm năm hạnh phúc, một đời an yên, cùng nhau viết tiếp câu chuyện tình thật ngọt ngào! 🥂✨`;
-          }
-
-          if (aiText) aiText.textContent = generated;
-          if (aiResult) aiResult.style.display = 'block';
-        } catch (err) {
+          if (wishText) wishText.textContent = wish;
+          if (wishResult) wishResult.style.display = 'block';
+        } catch (_) {
           TH.toast('Lỗi khi gọi AI, vui lòng thử lại.');
         } finally {
-          aiBtn.disabled = false;
-          aiBtn.innerHTML = '<span>✨</span><span>Tạo Bằng Google Gemini AI</span>';
+          wishBtn.disabled = false;
+          wishBtn.innerHTML = '<span>✨</span><span>Sáng Tác Lời Chúc (Gemini AI)</span>';
         }
       };
     }
 
-    if (insertBtn) {
-      insertBtn.onclick = () => {
-        const txt = aiText?.textContent;
+    if (wishInsertCard) {
+      wishInsertCard.onclick = () => {
+        const txt = wishText?.textContent;
         if (txt) {
-          addLayer({kind:'text', text:txt, o:{ff:'Playfair Display', fs:18, i:1, color:'#332724'}});
-          TH.toast('Đã thêm chữ lên thiệp cưới! Bạn có thể kéo thả di chuyển.');
+          addLayer({kind:'text', text:txt, o:{ff:'Playfair Display', fs:17, i:1, color:'#332724'}});
+          TH.toast('Đã thêm lời chúc lên thiệp cưới!');
         }
       };
     }
-
-    if (setQuoteBtn) {
-      setQuoteBtn.onclick = () => {
-        const txt = aiText?.textContent;
-        if (txt) {
-          D.quote = txt;
-          touch(true);
-          TH.toast('Đã cập nhật câu trích dẫn của thiệp cưới! 💖');
-        }
-      };
-    }
-
-    if (copyBtn) {
-      copyBtn.onclick = () => {
-        const txt = aiText?.textContent;
-        if (txt) {
-          navigator.clipboard?.writeText(txt);
-          TH.toast('Đã sao chép vào bộ nhớ tạm!');
-        }
-      };
-    }
-
-    $$('[data-sampleset]', dr).forEach(b => {
-      b.onclick = () => {
-        if (aiText) aiText.textContent = b.dataset.sampleset;
-        if (aiResult) aiResult.style.display = 'block';
-      };
-    });
   }
 }
 function openDrawer(k){
