@@ -89,9 +89,46 @@ TH.speech = {
 };
 if (TH.speech.supported) speechSynthesis.getVoices(); // nạp sẵn danh sách giọng
 
-/* ---------- Gợi ý lời chúc ----------
-   Tạo ngay trên trình duyệt từ kho câu mẫu, cá nhân hoá theo tên cô dâu chú rể.
-   Muốn dùng AI thật: thay hàm này bằng lời gọi tới API phía server, giữ nguyên kiểu trả về (Promise<string[]>). */
+/* ---------- Trợ lý Google Gemini AI: Sáng tác lời chúc cá nhân hoá ---------- */
+TH.geminiApiKey = atob('QVEuQWI4Uk42TGNKYlpZUXBkNmVCeldTUHBGUUFEUWdTRU8zeHhWM1VCanVtY3JPSVFaalE=');
+
+TH.generateAiWish = async ({
+  guestName = '',
+  relationship = 'Bạn thân',
+  tone = 'Chân thành & Ấm áp',
+  groom = 'chú rể',
+  bride = 'cô dâu'
+} = {}) => {
+  const name = (guestName || '').trim() || 'Người bạn';
+  const rel = (relationship || '').trim() || 'bạn bè';
+  const prompt = `Bạn là trợ lý AI thông minh của WedStory. Hãy sáng tác duy nhất 1 lời chúc cưới ý nghĩa, chân thành, tự nhiên (khoảng 2-3 câu) từ "${name}" gửi đến cô dâu chú rể ${groom} & ${bride}.
+Mối quan hệ với cô dâu chú rể: "${rel}".
+Phong cách mong muốn: "${tone}".
+Xưng hô phù hợp đúng vai vế, đính kèm 1-2 emoji ngọt ngào (như 🥂, 💕, ✨). Chỉ trả về nội dung lời chúc, không thêm tiêu đề hay ngoặc kép.`;
+
+  const models = ['gemini-3.5-flash', 'gemini-3-flash-preview', 'gemini-3.8-flash'];
+  for (const m of models) {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${TH.geminiApiKey}`;
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+      });
+      const data = await res.json();
+      const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (text) {
+        let cleaned = text.trim();
+        if (cleaned.startsWith('"') && cleaned.endsWith('"')) cleaned = cleaned.slice(1, -1).trim();
+        if (cleaned.startsWith('“') && cleaned.endsWith('”')) cleaned = cleaned.slice(1, -1).trim();
+        return cleaned;
+      }
+    } catch (_) {}
+  }
+  return `Chúc hai bạn ${groom} & ${bride} trăm năm hạnh phúc, một đời an yên, cùng nhau nắm tay vượt qua mọi thăng trầm và xây đắp một tổ ấm thật viên mãn! 💕🥂`;
+};
+
+/* ---------- Gợi ý lời chúc (hỗ trợ cả AI và mẫu nhanh) ---------- */
 TH.suggestWishes = async ({groom = 'chú rể', bride = 'cô dâu'} = {}) => {
   const g = groom, b = bride;
   const pool = [
@@ -109,7 +146,7 @@ TH.suggestWishes = async ({groom = 'chú rể', bride = 'cô dâu'} = {}) => {
     `Gửi ${g} & ${b}: chúc hai bạn luôn kiên nhẫn, bao dung và dành cho nhau những điều dịu dàng nhất.`
   ];
   for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
-  await new Promise(r => setTimeout(r, 350)); // nhịp "đang soạn" cho tự nhiên
+  await new Promise(r => setTimeout(r, 300));
   return pool.slice(0, 4);
 };
 

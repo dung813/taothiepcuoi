@@ -166,6 +166,7 @@ function render(){
       </fieldset>
       <fieldset class="rsvp-branch" data-when="no" hidden disabled>
         <textarea name="msg" placeholder="Gửi lời chúc mừng từ xa đến cô dâu chú rể 💌" maxlength="500"></textarea>
+        <div style="display:flex;margin:4px 0 10px"><button type="button" class="t-btn ghost sm" id="rsvpAiWishBtn" style="border-color:#b85042;color:#b85042;background:rgba(184,80,66,0.06);font-size:0.8rem;font-weight:600">🤖 AI Soạn Lời Chúc (Gemini)</button></div>
         ${o.gift !== false && (D.gift?.groom?.acc || D.gift?.bride?.acc) ? `<p class="rsvp-label">Mừng cưới từ xa</p><div class="gift-grid rsvp-gift" id="rsvpGift"></div>` : ''}
       </fieldset>
       <p class="rsvp-err" id="rsvpErr" role="alert" hidden></p>
@@ -175,6 +176,7 @@ function render(){
     <form class="t-form card reveal" id="wishForm"><input name="name" placeholder="Tên của bạn *" required value="${esc(myName())}"><textarea name="msg" placeholder="Lời chúc của bạn *" required></textarea>
     <div class="wish-tools">
       <button type="button" class="t-btn ghost sm" id="suggestBtn">✨ Gợi ý lời chúc</button>
+      <button type="button" class="t-btn ghost sm" id="aiAssistantBtn" style="border-color:#b85042;color:#b85042;background:rgba(184,80,66,0.06);font-weight:600">🤖 AI Soạn Lời Chúc (Gemini)</button>
       <label class="t-btn ghost sm" for="wishPhoto">📷 Đính kèm ảnh</label><input type="file" id="wishPhoto" accept="image/*" hidden>
     </div>
     <div class="photo-prev" id="photoPrev" hidden><img alt="Ảnh đính kèm"><button type="button" aria-label="Bỏ ảnh">×</button></div>
@@ -205,7 +207,49 @@ function render(){
   <button class="fab fab-music" id="musicBtn" aria-label="Nhạc nền">🎵</button>
   ${o.wishes !== false && stage === 'before' ? '<button class="fab fab-wish" id="wishBtn" aria-label="Gửi lời chúc">💬</button>' : ''}
   ${o.gift !== false ? '<button class="fab fab-gift" id="giftBtn" aria-label="Mừng cưới">🎁</button>' : ''}
-  <div class="lightbox" id="lb"><div class="lb-stage"><img alt="" draggable="false"></div><button class="lb-prev" aria-label="Ảnh trước">‹</button><button class="lb-next" aria-label="Ảnh sau">›</button><div class="lb-tools"><button class="lb-zout" aria-label="Thu nhỏ" title="Thu nhỏ (−)">−</button><span class="lb-zv">100%</span><button class="lb-zin" aria-label="Phóng to" title="Phóng to (+)">+</button><button class="lb-fs" aria-label="Toàn màn hình" title="Toàn màn hình"><svg class="ic-in" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><svg class="ic-out" viewBox="0 0 24 24"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg></button><button class="lb-x" aria-label="Đóng">×</button></div><span class="lb-n"></span></div>`;
+  <div class="lightbox" id="lb"><div class="lb-stage"><img alt="" draggable="false"></div><button class="lb-prev" aria-label="Ảnh trước">‹</button><button class="lb-next" aria-label="Ảnh sau">›</button><div class="lb-tools"><button class="lb-zout" aria-label="Thu nhỏ" title="Thu nhỏ (−)">−</button><span class="lb-zv">100%</span><button class="lb-zin" aria-label="Phóng to" title="Phóng to (+)">+</button><button class="lb-fs" aria-label="Toàn màn hình" title="Toàn màn hình"><svg class="ic-in" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><svg class="ic-out" viewBox="0 0 24 24"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg></button><button class="lb-x" aria-label="Đóng">×</button></div><span class="lb-n"></span></div>
+  <div class="ai-modal-backdrop" id="aiModal" hidden>
+    <div class="ai-modal-card">
+      <button class="ai-modal-close" id="aiModalClose" aria-label="Đóng">✕</button>
+      <div class="ai-modal-head">
+        <span class="ai-modal-badge">Google Gemini 3.5 Flash</span>
+        <h3>✨ Trợ Lý AI Chúc Cưới</h3>
+        <p>Sáng tác lời chúc riêng biệt theo tên & mối quan hệ của bạn</p>
+      </div>
+      <div class="ai-modal-form">
+        <label>Tên của bạn:
+          <input id="aiGuestName" placeholder="Ví dụ: Minh Quân, Chị Lan..." maxlength="40">
+        </label>
+        <label>Mối quan hệ với cô dâu chú rể:
+          <select id="aiRelationship">
+            <option value="Bạn thân">👭 Bạn thân thiết</option>
+            <option value="Đồng nghiệp">💼 Đồng nghiệp / Công ty</option>
+            <option value="Họ hàng">🏡 Họ hàng / Người thân</option>
+            <option value="Bạn học cũ">🎓 Bạn thời học sinh / Sinh viên</option>
+            <option value="Anh / Chị / Em">🌸 Anh / Chị / Em</option>
+            <option value="Người lớn / Bác / Cô / Chú">👴 Bác / Cô / Chú / Người lớn tuổi</option>
+          </select>
+        </label>
+        <label>Phong cách mong muốn:
+          <select id="aiTone">
+            <option value="Chân thành & Ấm áp">💖 Chân thành & Ấm áp</option>
+            <option value="Hài hước & Dí dỏm">😄 Hài hước & Vui vẻ</option>
+            <option value="Trang trọng & Lịch sự">🎩 Trang trọng & Lịch thiệp</option>
+            <option value="Ngắn gọn & Súc tích">⚡ Ngắn gọn & Ý nghĩa</option>
+          </select>
+        </label>
+        <button type="button" class="t-btn ai-gen-btn" id="aiSubmitBtn">✨ Tạo Lời Chúc Bằng AI</button>
+        <div class="ai-result-box" id="aiResultBox" hidden>
+          <div class="ai-result-title">💌 Lời chúc được tạo riêng cho bạn:</div>
+          <p class="ai-result-text" id="aiResultText"></p>
+          <div class="ai-result-actions">
+            <button type="button" class="t-btn ai-apply-btn" id="aiApplyBtn">✍️ Dùng lời chúc này</button>
+            <button type="button" class="t-btn ghost sm" id="aiCopyBtn">📋 Sao chép</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>`;
 
   TH.ek?.apply(D);   // chỉnh sửa tự do (vị trí, phông, màu, ảnh thay thế, chữ/ảnh thêm) — xem thiep-edit.js
   bind(photos);
@@ -833,6 +877,85 @@ function bind(photos){
       if (!ok) return TH.toast('Ảnh quá lớn so với bộ nhớ, bạn thử gửi lại không kèm ảnh nhé');
       wf.msg.value = ''; setPhoto(''); if ($('#cheerName') && !$('#cheerName').value) $('#cheerName').value = name;
       renderWishes(); renderSocial(); hearts(12); TH.toast('Đã gửi lời chúc 💕'); }; }
+
+  // Trợ lý AI Chúc Cưới (Google Gemini 2.5 Flash)
+  let activeWishTarget = null;
+  const aiModal = $('#aiModal'),
+        aiGuestInput = $('#aiGuestName'),
+        aiRelSelect = $('#aiRelationship'),
+        aiToneSelect = $('#aiTone'),
+        aiSubmitBtn = $('#aiSubmitBtn'),
+        aiResultBox = $('#aiResultBox'),
+        aiResultText = $('#aiResultText'),
+        aiApplyBtn = $('#aiApplyBtn'),
+        aiCopyBtn = $('#aiCopyBtn'),
+        aiCloseBtn = $('#aiModalClose');
+
+  const openAiModal = (targetTextarea, defaultName) => {
+    activeWishTarget = targetTextarea;
+    if (aiGuestInput) aiGuestInput.value = defaultName || (wf && wf.name?.value) || myName() || '';
+    if (aiResultBox) aiResultBox.hidden = true;
+    if (aiResultText) aiResultText.textContent = '';
+    if (aiModal) aiModal.hidden = false;
+  };
+
+  const closeAiModal = () => { if (aiModal) aiModal.hidden = true; };
+  if (aiCloseBtn) aiCloseBtn.onclick = closeAiModal;
+  if (aiModal) aiModal.onclick = e => { if (e.target === aiModal) closeAiModal(); };
+
+  if ($('#aiAssistantBtn')) {
+    $('#aiAssistantBtn').onclick = () => openAiModal(wf?.msg, wf?.name?.value);
+  }
+  if ($('#rsvpAiWishBtn')) {
+    $('#rsvpAiWishBtn').onclick = () => openAiModal($('#rsvp textarea[name=msg]'), $('#rsvp input[name=name]')?.value);
+  }
+
+  if (aiSubmitBtn) {
+    aiSubmitBtn.onclick = async () => {
+      aiSubmitBtn.disabled = true;
+      aiSubmitBtn.textContent = '⏳ Gemini AI đang sáng tác…';
+      try {
+        const wish = await TH.generateAiWish({
+          guestName: aiGuestInput?.value || '',
+          relationship: aiRelSelect?.value || 'Bạn thân',
+          tone: aiToneSelect?.value || 'Chân thành & Ấm áp',
+          groom: D.groom.nick,
+          bride: D.bride.nick
+        });
+        if (aiResultText) aiResultText.textContent = wish;
+        if (aiResultBox) aiResultBox.hidden = false;
+      } catch (err) {
+        TH.toast('Không thể kết nối AI, vui lòng thử lại.');
+      } finally {
+        aiSubmitBtn.disabled = false;
+        aiSubmitBtn.textContent = '✨ Tạo Lời Chúc Bằng AI';
+      }
+    };
+  }
+
+  if (aiApplyBtn) {
+    aiApplyBtn.onclick = () => {
+      const text = aiResultText?.textContent;
+      if (text && activeWishTarget) {
+        activeWishTarget.value = text;
+        activeWishTarget.focus();
+        closeAiModal();
+        TH.toast('Đã điền lời chúc AI vào thiệp! 💌');
+        activeWishTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    };
+  }
+
+  if (aiCopyBtn) {
+    aiCopyBtn.onclick = () => {
+      const text = aiResultText?.textContent;
+      if (text) {
+        navigator.clipboard?.writeText(text);
+        aiCopyBtn.textContent = '✅ Đã chép!';
+        setTimeout(() => { if (aiCopyBtn) aiCopyBtn.textContent = '📋 Sao chép'; }, 2000);
+      }
+    };
+  }
   const ch = $('#cheerHeart'), cf = $('#cheerFire');
   if (ch) { ch.onclick = () => cheer('heart'); cf.onclick = () => cheer('fire'); }
 

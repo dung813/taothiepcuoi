@@ -517,75 +517,194 @@ body.tm-open{overflow:hidden}
 .tpl-badge.hot{background:linear-gradient(135deg,#ff3b56,#ff7347)}
 .tpl-badge.new{background:linear-gradient(135deg,#34c3a0,#1e9bd7)}
 
-/* Dấu sáp 3D & Băng dính Washi Tape */
+/* Dấu sáp 3D & Băng dính Washi Tape đa dạng */
 .fr-seal{position:absolute;border-radius:50%;display:grid;place-items:center;font-size:3.5cqw;font-weight:700}
 .fr-seal.gold{background:radial-gradient(circle at 35% 35%,#FFE29F,#D4AF37 50%,#997819 100%);box-shadow:0 3px 8px rgba(0,0,0,.35),inset 0 2px 3px rgba(255,255,255,.6),inset 0 -2px 3px rgba(0,0,0,.4);color:#5a3f05}
+.fr-seal.red{background:radial-gradient(circle at 35% 35%,#F87171,#DC2626 50%,#7F1D1D 100%);box-shadow:0 3px 8px rgba(0,0,0,.35),inset 0 2px 3px rgba(255,255,255,.5),inset 0 -2px 3px rgba(0,0,0,.4);color:#FFF}
+.fr-seal.white{background:radial-gradient(circle at 35% 35%,#FFFFFF,#E5E7EB 60%,#9CA3AF 100%);box-shadow:0 3px 8px rgba(0,0,0,.25),inset 0 2px 3px rgba(255,255,255,.8),inset 0 -2px 3px rgba(0,0,0,.25);color:#4B5563}
+.fr-seal.purple{background:radial-gradient(circle at 35% 35%,#DDD6FE,#8B5CF6 50%,#4C1D95 100%);box-shadow:0 3px 8px rgba(0,0,0,.35),inset 0 2px 3px rgba(255,255,255,.5),inset 0 -2px 3px rgba(0,0,0,.4);color:#FFF}
+.fr-seal.jade{background:radial-gradient(circle at 35% 35%,#A7F3D0,#10B981 50%,#064E3B 100%);box-shadow:0 3px 8px rgba(0,0,0,.35),inset 0 2px 3px rgba(255,255,255,.6),inset 0 -2px 3px rgba(0,0,0,.4);color:#064E3B}
+
 .fr-tape{position:absolute;top:-2.8cqw;left:50%;transform:translateX(-50%) rotate(1deg);width:20cqw;height:5.5cqw;background:rgba(235,220,190,.88);box-shadow:0 1px 3px rgba(0,0,0,.12);clip-path:polygon(0 0,100% 2%,98% 100%,2% 98%);z-index:5}
-
-/* 1. PHONG BÌ NHUNG & DẤU SÁP VÀNG (.fr-envelope) */
-.fr-envelope .fr-env-top{display:flex;justify-content:space-between;align-items:center;z-index:5}
 .fr-tag{font:600 2.2cqw var(--f-body);letter-spacing:.25em;text-transform:uppercase;color:#6e6055}
-.fr-envelope .fr-env-card{position:relative;flex:1;margin:3% 0;display:flex;align-items:center;justify-content:center;width:100%}
-.fr-envelope .fr-photo-wrap{width:82%;height:82%;background:#fff;padding:1.8cqw;border-radius:6px;box-shadow:0 4px 14px rgba(0,0,0,.12);z-index:1;display:flex;flex-direction:column}
-.fr-envelope .fr-photo{width:100%;height:100%;background-position:top center;background-size:cover;border-radius:4px}
-.fr-floral-sprig{position:absolute;left:1cqw;top:7cqw;z-index:4;width:12cqw;height:16cqw;pointer-events:none;filter:drop-shadow(0 2px 4px rgba(0,0,0,.2))}
-.fr-envelope .fr-env-pocket{position:absolute;inset-x:0;bottom:0;height:46%;background:var(--env,#721921);border-radius:0 0 12px 12px;z-index:3;box-shadow:0 -2px 12px rgba(0,0,0,.2);clip-path:polygon(0 22%,50% 0,100% 22%,100% 100%,0 100%);display:flex;justify-content:center}
-.fr-envelope .fr-seal{top:-4cqw;width:8.5cqw;height:8.5cqw}
-.fr-envelope .fr-env-bottom{text-align:center;z-index:5;margin-top:1.5cqw}
-.fr-name-line{font-family:var(--ff);font-size:5.6cqw;color:#2B1F1D;line-height:1.15;font-weight:500}
-
-/* 2. POLAROID DÁN BĂNG DÍNH & DẤU SÁP (.fr-polaroid) */
-.fr-polaroid .fr-pol-top{text-align:left;z-index:5;width:100%}
-.fr-names-script{font-family:var(--ff);font-size:5.6cqw;color:#2D2322;line-height:1.1;margin-top:.5cqw}
-.fr-names-script i{font-style:normal;color:var(--ac);margin:0 .2em;font-size:.85em}
-.fr-polaroid .fr-pol-frame{position:relative;width:90%;height:86%;margin:2% auto;background:#fff;padding:2.2cqw 2.2cqw 6.5cqw 2.2cqw;border-radius:3px;box-shadow:0 6px 18px rgba(0,0,0,.12);transform:rotate(-1.5deg);transition:transform .4s ease;display:flex;flex-direction:column}
-.tpl-card:hover .fr-polaroid .fr-pol-frame{transform:rotate(0deg)}
-.fr-polaroid .fr-photo{width:100%;flex:1;background-position:top center;background-size:cover;border-radius:2px}
-.fr-pol-sprig{position:absolute;bottom:-1cqw;left:-1.5cqw;width:11cqw;height:11cqw;z-index:4;pointer-events:none}
-.fr-pol-seal{bottom:-2cqw;right:-2cqw;width:7.8cqw;height:7.8cqw;z-index:4}
+.fr-tag-light{font:600 2.2cqw var(--f-body);letter-spacing:.25em;text-transform:uppercase;color:rgba(255,255,255,.85)}
 .fr-date{font:600 2.4cqw var(--f-body);letter-spacing:.18em;opacity:.8;text-align:center}
+.fr-date-mini{font:600 2cqw var(--f-body);letter-spacing:.12em;color:#777}
+.fr-names-script{font-family:var(--ff);font-size:5.6cqw;color:#2D2322;line-height:1.1;margin-top:.5cqw}
+.fr-names-script i{font-style:normal;color:var(--ac,#c9485b);margin:0 .2em;font-size:.85em}
+.fr-photo{width:100%;height:100%;background-position:top center;background-size:cover}
 
-/* 3. CỔNG VÒM HOÀNG GIA & TRUYỀN THỐNG SONG HỶ (.fr-arch) */
-.fr-arch{padding:0;border-radius:inherit}
-.fr-arch-header{position:relative;width:100%;background:var(--arch,#153621);padding:5% 4% 8%;text-align:center;color:#fff;clip-path:polygon(0 0,100% 0,100% 86%,50% 100%,0 86%);display:flex;flex-direction:column;align-items:center;z-index:3}
-.fr-arch-welcome{font:600 2.2cqw var(--f-body);letter-spacing:.24em;color:#f6e3a5;text-transform:uppercase;margin-bottom:1.5cqw}
-.fr-arch-family{display:flex;align-items:center;justify-content:center;gap:3cqw;width:100%}
-.fr-arch-col small{display:block;font-size:1.8cqw;color:#e8d7ad}
-.fr-arch-col b{font-family:var(--ff);font-size:3.2cqw;letter-spacing:.06em;color:#fff}
-.fr-arch-hy{font-size:6.5cqw;color:#f6e3a5;line-height:1;padding:0 1cqw;font-family:serif}
-.fr-arch-motto{font:600 2.1cqw var(--f-body);letter-spacing:.28em;color:#e9cf86;text-transform:uppercase;margin-top:1.5cqw}
-.fr-arch-window{position:relative;flex:1;width:100%;padding:0 3% 3%;margin-top:-3%;box-sizing:border-box}
-.fr-arch-window .fr-photo{width:100%;height:100%;background-position:top center;background-size:cover;border-radius:0 0 14px 14px;box-shadow:inset 0 2px 6px rgba(0,0,0,.15)}
+/* ========================================================
+   20 MẪU THIỆP ĐỘC BẢN - MỖI MẪU 1 KIỂU BẮT MẮT & MÀU SẮC RIÊNG
+   ======================================================== */
 
-/* 4. SONG ẢNH HOA LÁ MÀU NƯỚC (.fr-botanic-dual) */
-.fr-bot-top{display:flex;align-items:center;gap:1.5cqw;z-index:3}
+/* 1. MẪU 1 (hong-pastel): SONG ẢNH HOA LÁ THẢO MỘC (.fr-botanical-dual) */
+.fr-botanical-dual{background:#EDF3EB;padding:4% 3.5%}
+.fr-bot-top{display:flex;align-items:center;justify-content:center;gap:1.5cqw;z-index:3}
 .fr-bot-leaf{font-size:3.8cqw}
 .fr-bot-pair{position:relative;flex:1;display:flex;flex-direction:column;justify-content:space-around;padding:2% 0}
 .fr-bot-item{display:flex;align-items:center;gap:3cqw}
 .fr-bot-item.bride{flex-direction:row-reverse;text-align:right}
-.fr-bot-item .fr-photo{width:44%;aspect-ratio:4/4.8;background-position:top center;background-size:cover;border-radius:4px;border:1.5px solid #d4af37;box-shadow:0 3px 8px rgba(0,0,0,.12)}
-.fr-bot-info small{display:block;font-size:2cqw;color:#6a645f;text-transform:uppercase;letter-spacing:.05em}
-.fr-bot-info b{font-family:var(--ff);font-size:4.2cqw;color:#222}
+.fr-bot-item .fr-photo{width:45%;aspect-ratio:4/4.8;border-radius:4px;border:1.5px solid #d4af37;box-shadow:0 3px 8px rgba(0,0,0,.12)}
+.fr-bot-info small{display:block;font-size:2cqw;color:#4A6B53;text-transform:uppercase;letter-spacing:.05em}
+.fr-bot-info b{font-family:var(--ff);font-size:4.2cqw;color:#223628}
 .fr-bot-bar{width:100%;height:1px;background:rgba(45,74,52,.18);margin:1cqw 0}
 
-/* 5. DẢI PHIM POLAROID TRIPTYCH (.fr-filmstrip) */
-.fr-tag-light{font:600 2.2cqw var(--f-body);letter-spacing:.25em;text-transform:uppercase;color:rgba(255,255,255,.8)}
+/* 2. MẪU 2 (vuon-xanh): POLAROID BĂNG KEO KRAFT & HOA KHÔ (.fr-polaroid-tape) */
+.fr-polaroid-tape{background:#EFE6D8}
+.fr-pol-top{text-align:left;z-index:5;width:100%}
+.fr-pol-frame{position:relative;width:90%;height:86%;margin:2% auto;background:#fff;padding:2.2cqw 2.2cqw 6.5cqw 2.2cqw;border-radius:3px;box-shadow:0 6px 18px rgba(0,0,0,.12);transform:rotate(-1.5deg);transition:transform .4s ease;display:flex;flex-direction:column}
+.tpl-card:hover .fr-pol-frame{transform:rotate(0deg)}
+.fr-pol-sprig{position:absolute;bottom:-1cqw;left:-1.5cqw;width:11cqw;height:11cqw;z-index:4;pointer-events:none}
+.fr-pol-seal{bottom:-2cqw;right:-2cqw;width:7.8cqw;height:7.8cqw;z-index:4}
+
+/* 3. MẪU 3 (hoang-kim): PHONG BÌ RÊU Ô-LIU CỎ XANH (.fr-envelope-olive) */
+.fr-envelope-olive{background:#E4ECE1}
+.fr-env-card{position:relative;flex:1;margin:3% 0;display:flex;align-items:center;justify-content:center;width:100%}
+.fr-env-card .fr-photo-wrap{width:82%;height:82%;background:#fff;padding:1.8cqw;border-radius:6px;box-shadow:0 4px 14px rgba(0,0,0,.12);z-index:1;display:flex;flex-direction:column}
+.fr-env-card .fr-photo{border-radius:4px}
+.fr-envelope-olive .fr-env-pocket{position:absolute;inset-x:0;bottom:0;height:46%;background:#344D38;border-radius:0 0 12px 12px;z-index:3;box-shadow:0 -2px 12px rgba(0,0,0,.2);clip-path:polygon(0 22%,50% 0,100% 22%,100% 100%,0 100%);display:flex;justify-content:center}
+.fr-envelope-olive .fr-seal{top:-4cqw;width:8.5cqw;height:8.5cqw}
+.fr-name-line{font-family:var(--ff);font-size:5.6cqw;color:#1E3321;line-height:1.15;font-weight:500;text-align:center}
+
+/* 4. MẪU 4 (song-hy): CỔNG VÒM ĐỎ CUNG ĐÌNH SONG HỶ (.fr-imperial-red-arch) */
+.fr-imperial-red-arch{padding:0;background:#FAF5EE;border-radius:inherit}
+.fr-arch-header-red{position:relative;width:100%;background:#851219;padding:5% 4% 8%;text-align:center;color:#fff;clip-path:polygon(0 0,100% 0,100% 86%,50% 100%,0 86%);display:flex;flex-direction:column;align-items:center;z-index:3}
+.fr-arch-header-red .fr-arch-welcome{font:600 2.2cqw var(--f-body);letter-spacing:.24em;color:#f6e3a5;text-transform:uppercase;margin-bottom:1.5cqw}
+.fr-arch-family{display:flex;align-items:center;justify-content:center;gap:3cqw;width:100%}
+.fr-arch-col small{display:block;font-size:1.8cqw;color:#e8d7ad}
+.fr-arch-col b{font-family:var(--ff);font-size:3.2cqw;letter-spacing:.06em;color:#fff}
+.fr-arch-hy{font-size:6.5cqw;color:#f6e3a5;line-height:1;padding:0 1cqw;font-family:serif}
+.fr-arch-window{position:relative;flex:1;width:100%;padding:0 3% 3%;margin-top:-3%;box-sizing:border-box}
+.fr-arch-window .fr-photo{border-radius:0 0 14px 14px;box-shadow:inset 0 2px 6px rgba(0,0,0,.15)}
+
+/* 5. MẪU 5 (bien-xanh): CỔNG VÒM XANH BIỂN SÂU & NGUYỆT QUẾ (.fr-slate-navy-arch) */
+.fr-slate-navy-arch{padding:0;background:#EDF3F7;border-radius:inherit}
+.fr-arch-header-navy{position:relative;width:100%;background:#1A364B;padding:5% 4% 8%;text-align:center;color:#fff;clip-path:polygon(0 0,100% 0,100% 86%,50% 100%,0 86%);display:flex;flex-direction:column;align-items:center;z-index:3}
+.fr-navy-crest{font-size:4.5cqw;color:#79B2D9;margin-bottom:1cqw}
+.fr-navy-title{font:600 2.2cqw var(--f-body);letter-spacing:.24em;color:#B8D7ED;text-transform:uppercase}
+
+/* 6. MẪU 6 (oai-huong): PHONG BÌ TÍM MẬN & OẢI HƯƠNG (.fr-envelope-lavender) */
+.fr-envelope-lavender{background:#ECE4F4}
+.fr-envelope-lavender .fr-env-pocket{position:absolute;inset-x:0;bottom:0;height:46%;background:#553A70;border-radius:0 0 12px 12px;z-index:3;box-shadow:0 -2px 12px rgba(0,0,0,.2);clip-path:polygon(0 22%,50% 0,100% 22%,100% 100%,0 100%);display:flex;justify-content:center}
+.fr-envelope-lavender .fr-seal{top:-4cqw;width:8.5cqw;height:8.5cqw}
+.fr-envelope-lavender .fr-name-line{color:#3E2659}
+
+/* 7. MẪU 7 (giay-kraft): DẢI PHIM POLAROID TRIPTYCH NÂU ĐẤT (.fr-filmstrip-triptych) */
+.fr-filmstrip-triptych{background:#8A3828;padding:4%}
 .fr-film-main{width:100%;height:50%;border-radius:6px;overflow:hidden;box-shadow:0 3px 10px rgba(0,0,0,.25)}
-.fr-film-main .fr-photo{width:100%;height:100%;background-position:top center;background-size:cover}
 .fr-film-banner{background:rgba(255,255,255,.94);border-radius:4px;padding:1.5cqw 2cqw;text-align:center;margin:2% 0;box-shadow:0 2px 6px rgba(0,0,0,.15)}
-.fr-date-mini{font:600 2cqw var(--f-body);letter-spacing:.12em;color:#777}
 .fr-film-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:2cqw;width:100%}
 .fr-film-thumb{aspect-ratio:1;border-radius:3px;background-position:top center;background-size:cover;border:1.5px solid #fff;box-shadow:0 2px 4px rgba(0,0,0,.15)}
 
-/* 6. TOÀN CẢNH ĐIỆN ẢNH CHỮ VIẾT TAY (.fr-cinematic) */
-.fr-cinematic{padding:0}
-.fr-cinematic .fr-photo{position:absolute;inset:0;background-position:top center;background-size:cover}
+/* 8. MẪU 8 (dem-sao): CỔNG VÒM LỤC BẢO HOÀNG GIA (.fr-royal-green-arch) */
+.fr-royal-green-arch{padding:0;background:#FAF6EE;border-radius:inherit}
+.fr-arch-header-green{position:relative;width:100%;background:#153621;padding:5% 4% 8%;text-align:center;color:#fff;clip-path:polygon(0 0,100% 0,100% 86%,50% 100%,0 86%);display:flex;flex-direction:column;align-items:center;z-index:3}
+.fr-arch-header-green .fr-arch-welcome{font:600 2.2cqw var(--f-body);letter-spacing:.24em;color:#f6e3a5;text-transform:uppercase;margin-bottom:1.5cqw}
+.fr-arch-motto{font:600 2.1cqw var(--f-body);letter-spacing:.28em;color:#e9cf86;text-transform:uppercase;margin-top:1.5cqw}
+
+/* 9. MẪU 9 (mau-don): PHONG BÌ NHUNG ĐỎ RƯỢU & HOA MẪU ĐƠN (.fr-envelope-burgundy) */
+.fr-envelope-burgundy{background:#F6ECE1}
+.fr-floral-sprig{position:absolute;left:1cqw;top:7cqw;z-index:4;width:12cqw;height:16cqw;pointer-events:none;filter:drop-shadow(0 2px 4px rgba(0,0,0,.2))}
+.fr-envelope-burgundy .fr-env-pocket{position:absolute;inset-x:0;bottom:0;height:46%;background:#70161E;border-radius:0 0 12px 12px;z-index:3;box-shadow:0 -2px 12px rgba(0,0,0,.2);clip-path:polygon(0 22%,50% 0,100% 22%,100% 100%,0 100%);display:flex;justify-content:center}
+.fr-envelope-burgundy .fr-seal{top:-4cqw;width:8.5cqw;height:8.5cqw}
+.fr-envelope-burgundy .fr-name-line{color:#2B1F1D}
+
+/* 10. MẪU 10 (toi-gian-trang): TẠP CHÍ THỜI TRANG EDITORIAL INVITÉ (.fr-fashion-editorial) */
+.fr-fashion-editorial{background:#E8DFD3;padding:4% 3.5%;color:#1A1817}
+.fr-mag-head{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1.5px solid #1A1817;padding-bottom:1cqw}
+.fr-mag-title{font-family:'Playfair Display',serif;font-size:7.5cqw;font-weight:900;letter-spacing:.08em;line-height:1}
+.fr-mag-issue{font:600 2cqw var(--f-body);letter-spacing:.15em;text-transform:uppercase}
+.fr-mag-photo-box{position:relative;flex:1;margin:3% 0;border:1px solid #1A1817;padding:1.5cqw;background:#fff}
+.fr-mag-photo-box .fr-photo{border:1px solid #1A1817}
+.fr-mag-badge{position:absolute;bottom:3cqw;right:3cqw;background:#1A1817;color:#fff;padding:1.2cqw 2.5cqw;font:600 1.8cqw var(--f-body);letter-spacing:.15em;text-transform:uppercase;box-shadow:0 3px 8px rgba(0,0,0,.2)}
+.fr-mag-bottom{display:flex;justify-content:space-between;align-items:center;border-top:1.5px solid #1A1817;padding-top:1.2cqw}
+.fr-mag-names{font-family:'Playfair Display',serif;font-size:4.5cqw;font-weight:700}
+
+/* 11. MẪU 11 (hoang-hon): TOÀN CẢNH HOÀNG HÔN ĐIỆN ẢNH (.fr-cinematic-script) */
+.fr-cinematic-script{padding:0}
+.fr-cinematic-script .fr-photo{position:absolute;inset:0}
 .fr-cine-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.55) 0%,transparent 35%,transparent 60%,rgba(0,0,0,.85) 100%)}
 .fr-cine-content{position:relative;z-index:2;height:100%;display:flex;flex-direction:column;justify-content:space-between;text-align:center;padding:6% 4%;color:#fff}
 .fr-cine-script{font-family:'Great Vibes',cursive;font-size:8.5cqw;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.7);margin-top:6cqw}
 .fr-cine-names{font-family:var(--ff);font-size:5.6cqw;letter-spacing:.04em;text-shadow:0 2px 6px rgba(0,0,0,.7)}
 .fr-cine-names i{font-style:normal;color:#f5dfa5}
 .fr-date-light{font:600 2.4cqw var(--f-body);letter-spacing:.2em;color:rgba(255,255,255,.85);text-shadow:0 1px 4px rgba(0,0,0,.6)}
+
+/* 12. MẪU 12 (co-dien): SALON CỔ ĐIỂN KHUNG VÀNG & ĐÈN CHÙM (.fr-baroque-chandelier) */
+.fr-baroque-chandelier{background:#F4EBD9;padding:5%;color:#3E2D18}
+.fr-baroque-border{position:relative;flex:1;border:2px solid #96783C;outline:1px solid rgba(150,120,60,.4);outline-offset:-6px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:4% 3%}
+.fr-chandelier-ico{width:9cqw;height:9cqw;color:#96783C;margin-bottom:1cqw}
+.fr-baroque-names{font-family:'Pinyon Script','Playfair Display',serif;font-size:6.5cqw;color:#3E2D18;text-align:center;line-height:1.1}
+.fr-baroque-photo-wrap{width:86%;flex:1;margin:3% 0;border:2px solid #96783C;border-radius:4px;overflow:hidden;box-shadow:0 4px 10px rgba(62,45,24,.15)}
+.fr-baroque-corner{position:absolute;width:6cqw;height:6cqw;color:#96783C}
+.fr-corner-tl{top:1cqw;left:1cqw}.fr-corner-tr{top:1cqw;right:1cqw;transform:scaleX(-1)}
+.fr-corner-bl{bottom:1cqw;left:1cqw;transform:scaleY(-1)}.fr-corner-br{bottom:1cqw;right:1cqw;transform:scale(-1)}
+
+/* 13. MẪU 13 (nang-vang): MÁI VÒM LỊCH CƯỚI HOÀNG KIM (.fr-arch-calendar) */
+.fr-arch-calendar{padding:0;background:#FAF1DE;border-radius:inherit}
+.fr-cal-arch{position:relative;width:100%;height:58%;background:#A07428;border-radius:0 0 50% 50%/0 0 25% 25%;overflow:hidden;box-shadow:0 4px 12px rgba(160,116,40,.25)}
+.fr-cal-arch .fr-photo{width:100%;height:100%}
+.fr-cal-bottom{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:space-around;padding:3% 4%}
+.fr-cal-names{font-family:var(--ff);font-size:5.4cqw;color:#57390F;font-weight:600}
+.fr-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1cqw;text-align:center;font-size:1.8cqw;font-family:var(--f-body);color:#735324;width:85%}
+.fr-cal-day-head{font-weight:700;color:#A07428;font-size:1.6cqw}
+.fr-cal-day.special{background:#A07428;color:#fff;border-radius:50%;font-weight:700;box-shadow:0 2px 4px rgba(0,0,0,.2)}
+
+/* 14. MẪU 14 (tiec-vuon): BỘ BA ẢNH DỌC DÂY LEO HOA HỒNG (.fr-triptych-floral) */
+.fr-triptych-floral{background:#F8EBE3;padding:4% 3.5%;color:#592B35}
+.fr-floral-garland{font-size:4cqw;text-align:center;margin-bottom:1cqw}
+.fr-trip-title{font-family:'Great Vibes',cursive;font-size:6cqw;text-align:center;color:#8B4553;line-height:1}
+.fr-trip-names{font-family:var(--ff);font-size:4.8cqw;text-align:center;color:#3D1921;margin:1cqw 0 2cqw}
+.fr-trip-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2cqw;flex:1;width:100%;margin-bottom:2cqw}
+.fr-trip-col{position:relative;border-radius:6px;overflow:hidden;border:1.5px solid #D69EA7;box-shadow:0 3px 8px rgba(89,43,53,.15)}
+
+/* 15. MẪU 15 (rung-thong): RỪNG THÔNG HUYỀN BÍ XANH RÊU ĐẬM (.fr-pine-forest) */
+.fr-pine-forest{background:#152B1E;color:#FAF4E6;padding:4.5% 4%}
+.fr-pine-top{text-align:center}
+.fr-pine-needle{font-size:4.2cqw;color:#D4AF37}
+.fr-pine-tag{font:600 2.2cqw var(--f-body);letter-spacing:.25em;color:#D4AF37;text-transform:uppercase}
+.fr-pine-names{font-family:'Pinyon Script','Playfair Display',serif;font-size:6.8cqw;color:#FAF4E6;text-align:center;margin:1cqw 0}
+.fr-pine-photo-frame{flex:1;position:relative;margin:2% 0;border:2px solid #D4AF37;border-radius:8px;padding:2cqw;display:flex;align-items:center;justify-content:center}
+.fr-pine-photo-frame .fr-photo{border-radius:4px;box-shadow:0 4px 14px rgba(0,0,0,.35)}
+
+/* 16. MẪU 16 (thanh-lich): PHONG BÌ SAN HÔ ĐẤT NUNG (.fr-envelope-terracotta) */
+.fr-envelope-terracotta{background:#F7EAE3}
+.fr-envelope-terracotta .fr-env-pocket{position:absolute;inset-x:0;bottom:0;height:46%;background:#9C4635;border-radius:0 0 12px 12px;z-index:3;box-shadow:0 -2px 12px rgba(0,0,0,.2);clip-path:polygon(0 22%,50% 0,100% 22%,100% 100%,0 100%);display:flex;justify-content:center}
+.fr-envelope-terracotta .fr-seal{top:-4cqw;width:8.5cqw;height:8.5cqw}
+.fr-envelope-terracotta .fr-name-line{color:#4A1F17}
+
+/* 17. MẪU 17 (la-non): GIẤY XÉ THỦ CÔNG & BĂNG KEO CHÉO (.fr-torn-paper-craft) */
+.fr-torn-paper-craft{background:#DDE9DC;padding:5% 4%}
+.fr-torn-sheet{position:relative;width:92%;height:92%;margin:auto;background:#F9FBF8;padding:4% 3%;border-radius:2px;box-shadow:0 4px 16px rgba(0,0,0,.1);display:flex;flex-direction:column;justify-content:space-between}
+.fr-tape-diag-tl{position:absolute;top:-2cqw;left:-3cqw;width:16cqw;height:4.5cqw;background:rgba(215,200,175,.9);transform:rotate(-38deg);box-shadow:0 1px 3px rgba(0,0,0,.12);z-index:4}
+.fr-tape-diag-br{position:absolute;bottom:-2cqw;right:-3cqw;width:16cqw;height:4.5cqw;background:rgba(215,200,175,.9);transform:rotate(-38deg);box-shadow:0 1px 3px rgba(0,0,0,.12);z-index:4}
+.fr-torn-photo{flex:1;border-radius:2px;margin:2% 0;box-shadow:inset 0 1px 3px rgba(0,0,0,.1)}
+
+/* 18. MẪU 18 (ngay-nang): DẢI PHIM PHOTOBOOTH HÀN QUỐC 4 Ô (.fr-photobooth-strip) */
+.fr-photobooth-strip{background:#FBE6DB;padding:3% 4%}
+.fr-booth-card{position:relative;width:82%;height:100%;margin:auto;background:#fff;padding:3% 2.5%;box-shadow:0 6px 18px rgba(138,61,36,.12);border-radius:4px;display:flex;flex-direction:column;align-items:center}
+.fr-booth-header{font-family:'Dancing Script',cursive;font-size:4.8cqw;color:#8A3D24;font-weight:700}
+.fr-booth-grid{flex:1;width:100%;display:grid;grid-template-rows:repeat(4,1fr);gap:1.5cqw;margin:2% 0}
+.fr-booth-item{width:100%;border-radius:2px;overflow:hidden;background-position:top center;background-size:cover}
+.fr-booth-footer{display:flex;justify-content:space-between;align-items:center;width:100%;font:600 1.8cqw var(--f-body);color:#9E5E49}
+
+/* 19. MẪU 19 (be-kem): TRANH CUỘN THỦY MẶC HẠC VÀNG SONG HỶ (.fr-crane-traditional) */
+.fr-crane-traditional{background:#FBF5EE;padding:4% 3.5%;color:#8E1920}
+.fr-crane-header{display:flex;justify-content:space-between;align-items:center}
+.fr-crane-icon{width:9cqw;height:7cqw}
+.fr-crane-hy{font-size:6.5cqw;color:#8E1920;font-family:serif;font-weight:700}
+.fr-crane-frame{position:relative;flex:1;margin:2% 0;border:2px solid #8E1920;border-radius:4px;padding:1.5cqw}
+.fr-crane-frame .fr-photo{border-radius:2px;box-shadow:0 3px 8px rgba(142,25,32,.15)}
+.fr-crane-names{font-family:var(--ff);font-size:5.4cqw;text-align:center;color:#540B10;font-weight:700}
+
+/* 20. MẪU 20 (anh-bac): BAN CÔNG CỔ ĐIỂN PHÁP & STUDIO NOIR (.fr-french-balcony-noir) */
+.fr-french-balcony-noir{background:#EAE5DD;padding:4.5% 4%;color:#252220}
+.fr-balcony-arch{border:1.5px solid #252220;border-radius:120px 120px 4px 4px;padding:3% 3% 2%;display:flex;flex-direction:column;align-items:center;flex:1;position:relative}
+.fr-balcony-iron{width:12cqw;height:5cqw;color:#252220;margin-bottom:1cqw}
+.fr-balcony-title{font:600 2.2cqw var(--f-body);letter-spacing:.25em;text-transform:uppercase}
+.fr-balcony-names{font-family:'Playfair Display',serif;font-size:5.2cqw;font-weight:700;margin:1cqw 0 2cqw;text-align:center}
+.fr-balcony-photo{width:100%;flex:1;border-radius:100px 100px 2px 2px;overflow:hidden;border:1px solid #252220}
 
 @media (prefers-reduced-motion:reduce){.fr-card,.fr,.fr-pol-frame{transition:none}}
 

@@ -700,3 +700,29 @@ body.ek-edit #app .ek-locked{cursor:not-allowed}
 .nf-card h1{font-family:var(--f-head);font-size:1.6rem;margin-bottom:10px;color:var(--t-fg)}
 .nf-card p{opacity:.75;line-height:1.6;margin-bottom:22px}
 .nf-acts{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+
+/* ===== Trợ lý AI Chúc Cưới (Google Gemini 2.5 Flash) ===== */
+.ai-modal-backdrop{position:fixed;inset:0;background:rgba(20,15,18,.6);backdrop-filter:blur(8px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;animation:aiFadeIn .25s ease}
+.ai-modal-backdrop[hidden]{display:none}
+@keyframes aiFadeIn{from{opacity:0}to{opacity:1}}
+.ai-modal-card{position:relative;background:#fff;border-radius:24px;width:100%;max-width:480px;padding:26px 22px;box-shadow:0 24px 60px rgba(0,0,0,.25);border:1px solid #ebd5cf;color:#332724;text-align:left;animation:aiSlideUp .3s cubic-bezier(.16,1,.3,1)}
+@keyframes aiSlideUp{from{transform:translateY(24px) scale(.96);opacity:0}to{transform:none;opacity:1}}
+.ai-modal-close{position:absolute;top:16px;right:16px;width:34px;height:34px;border-radius:50%;background:#f6ece9;border:none;font-size:16px;color:#785a53;display:grid;place-items:center;cursor:pointer;transition:.2s}
+.ai-modal-close:hover{background:#ebd5cf;color:#332724}
+.ai-modal-head{margin-bottom:18px}
+.ai-modal-badge{display:inline-block;font-size:.72rem;font-weight:600;padding:3px 9px;border-radius:999px;background:linear-gradient(135deg,#b85042,#e07a5f);color:#fff;margin-bottom:8px;letter-spacing:.3px}
+.ai-modal-head h3{font-family:var(--f-head);font-size:1.35rem;font-weight:700;color:#9b382d;margin:0 0 4px}
+.ai-modal-head p{font-size:.85rem;color:#7a6864;margin:0;line-height:1.4}
+.ai-modal-form{display:flex;flex-direction:column;gap:14px}
+.ai-modal-form label{display:flex;flex-direction:column;gap:5px;font-size:.85rem;font-weight:600;color:#574844}
+.ai-modal-form input,.ai-modal-form select{width:100%;padding:10px 14px;border-radius:10px;border:1px solid #d8c2bd;font-size:.92rem;background:#fff;color:#332724;outline:none;box-sizing:border-box;font-family:inherit}
+.ai-modal-form input:focus,.ai-modal-form select:focus{border-color:#b85042;box-shadow:0 0 0 3px rgba(184,80,66,.15)}
+.ai-gen-btn{background:linear-gradient(135deg,#b85042,#9b382d)!important;color:#fff!important;justify-content:center;padding:12px;font-size:.95rem;font-weight:600;border-radius:12px!important;box-shadow:0 6px 18px rgba(184,80,66,.25);cursor:pointer;border:none}
+.ai-gen-btn:disabled{opacity:.65;cursor:not-allowed}
+.ai-result-box{background:#fdf8f6;border:1.5px dashed #d8a69d;border-radius:14px;padding:16px;margin-top:6px}
+.ai-result-box[hidden]{display:none}
+.ai-result-title{font-size:.82rem;font-weight:600;color:#9b382d;margin-bottom:8px}
+.ai-result-text{font-size:.95rem;line-height:1.6;color:#332724;font-style:italic;margin:0 0 14px;background:#fff;padding:12px;border-radius:10px;border:1px solid #f0d5ce}
+.ai-result-actions{display:flex;gap:10px;flex-wrap:wrap}
+.ai-apply-btn{background:#9b382d!important;color:#fff!important;padding:8px 14px!important;font-size:.85rem!important;border-radius:8px!important}
+

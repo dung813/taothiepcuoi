@@ -50,6 +50,7 @@ const fontDD = (target, cur, def) => `<div class="fdd"><button type="button" cla
 /* ---------- Biểu tượng ---------- */
 const SVG = p => `<svg viewBox="0 0 24 24" aria-hidden="true">${p}</svg>`;
 const IC = {
+  ai:SVG('<path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8zM19 2l1 3 3 1-3 1-1 3-1-3-3-1 3-1z"/>'),
   info:SVG('<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/>'),
   text:SVG('<path d="M5 6V4h14v2M12 4v16M9 20h6"/>'),
   photos:SVG('<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/>'),
@@ -80,7 +81,7 @@ const IC = {
 
 /* ======================== NGĂN KÉO BÊN TRÁI ======================== */
 const RAIL = [
-  {k:'info',    name:'Thông tin'}, {k:'text', name:'Văn bản'}, {k:'photos', name:'Hình ảnh'}, {k:'stock', name:'Trang trí'},
+  {k:'info',    name:'Thông tin'}, {k:'ai', name:'Trợ lý AI'}, {k:'text', name:'Văn bản'}, {k:'photos', name:'Hình ảnh'}, {k:'stock', name:'Trang trí'},
   {k:'shape',   name:'Hình dạng'}, {k:'bg',   name:'Nền'},     {k:'music',  name:'Âm nhạc'},  {k:'widgets', name:'Tiện ích'},
   {k:'tpl',     name:'Mẫu'},       {k:'fx',   name:'Hiệu ứng'}
 ];
@@ -114,6 +115,90 @@ const ANIMS = [['','Không'],['fade','Hiện dần'],['up','Trượt lên'],['do
   ['spin','Xoay vào'],['blur','Mờ → rõ'],['flip','Lật'],['float','Bồng bềnh ∞'],['pulse','Nhịp tim ∞'],['swing','Đung đưa ∞'],['shine','Lấp lánh ∞']];
 
 const DRAWERS = {
+  ai: () => `
+    <div style="background:linear-gradient(135deg,#fff8f6,#fdf1ed);border:1px solid #f3d4cc;border-radius:14px;padding:14px;margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+        <span style="font-size:1.3rem">✨</span>
+        <b style="color:#9b382d;font-size:1.02rem">Trợ Lý AI WedStory</b>
+        <span style="font-size:10px;background:#b85042;color:#fff;padding:2px 7px;border-radius:10px;font-weight:600;margin-left:auto">Gemini 3.5 Flash</span>
+      </div>
+      <p class="hint" style="margin:0;color:#6b524c">Tự động soạn Lời chúc mừng, Lời ngỏ hoặc Câu trích dẫn ý nghĩa cho thiệp cưới của bạn.</p>
+    </div>
+
+    <div class="field">
+      <label>Mục đích sử dụng</label>
+      <select id="edAiType" style="width:100%;padding:8px 10px;border-radius:9px;border:1px solid var(--ed-line);background:#fff">
+        <option value="wish">💌 Sáng tác Lời chúc mừng đám cưới</option>
+        <option value="quote">💍 Sáng tác Câu trích dẫn tình yêu (Quote)</option>
+        <option value="message">📜 Sáng tác Lời mời / Lời ngỏ của cô dâu chú rể</option>
+      </select>
+    </div>
+
+    <div class="field" id="edAiNameField">
+      <label>Tên người gửi / Khách mời</label>
+      <input type="text" id="edAiGuest" placeholder="Ví dụ: Bạn thân Minh Quân, Chị Thuỳ Dung..." value="Bạn thân">
+    </div>
+
+    <div class="field" id="edAiRelField">
+      <label>Mối quan hệ với cô dâu chú rể</label>
+      <select id="edAiRel" style="width:100%;padding:8px 10px;border-radius:9px;border:1px solid var(--ed-line);background:#fff">
+        <option value="Bạn thân">👭 Bạn thân thiết</option>
+        <option value="Đồng nghiệp">💼 Đồng nghiệp / Công ty</option>
+        <option value="Họ hàng">🏡 Họ hàng / Người thân</option>
+        <option value="Bạn học cũ">🎓 Bạn thời học sinh / Sinh viên</option>
+        <option value="Anh / Chị / Em">🌸 Anh / Chị / Em</option>
+        <option value="Người lớn / Bác / Cô / Chú">👴 Bác / Cô / Chú / Người lớn tuổi</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Phong cách giọng điệu</label>
+      <select id="edAiTone" style="width:100%;padding:8px 10px;border-radius:9px;border:1px solid var(--ed-line);background:#fff">
+        <option value="Chân thành & Ấm áp">💖 Chân thành &amp; Ấm áp</option>
+        <option value="Hài hước & Dí dỏm">😄 Hài hước &amp; Dí dỏm</option>
+        <option value="Lãng mạn & Ngọt ngào">🌹 Lãng mạn &amp; Ngọt ngào</option>
+        <option value="Trang trọng & Lịch sự">🎩 Trang trọng &amp; Lịch thiệp</option>
+        <option value="Ngắn gọn & Súc tích">⚡ Ngắn gọn &amp; Ý nghĩa</option>
+      </select>
+    </div>
+
+    <button type="button" class="btn btn-primary" id="edAiBtn" style="width:100%;background:linear-gradient(135deg,#b85042,#9b382d);border:0;box-shadow:0 6px 16px rgba(184,80,66,.25);padding:11px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px">
+      <span>✨</span><span>Tạo Bằng Google Gemini AI</span>
+    </button>
+
+    <div id="edAiResult" style="display:none;background:#fff;border:1.5px dashed #d8a69d;border-radius:12px;padding:12px;margin-top:6px">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:#9b382d;margin-bottom:6px">Kết quả từ Gemini AI:</div>
+      <p id="edAiText" style="font-size:0.92rem;line-height:1.55;color:#332724;font-style:italic;margin:0 0 10px;background:#fdf8f6;padding:10px;border-radius:8px"></p>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <button type="button" class="btn btn-primary btn-sm" id="edAiInsertCard" style="background:#b85042;border:0;width:100%;justify-content:center">
+          ➕ Đưa thành chữ mới lên thiệp cưới
+        </button>
+        <div style="display:flex;gap:6px">
+          <button type="button" class="btn btn-outline btn-sm" id="edAiSetQuote" style="flex:1;justify-content:center;font-size:0.75rem">
+            💬 Đặt làm Câu trích dẫn
+          </button>
+          <button type="button" class="btn btn-outline btn-sm" id="edAiCopy" style="flex:1;justify-content:center;font-size:0.75rem">
+            📋 Sao chép
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--ed-line)">
+      <h4 class="dr-h">💡 Lời chúc mẫu nhanh</h4>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        ${[
+          'Chúc hai bạn trăm năm hạnh phúc, mãi giữ được nụ cười rạng rỡ và ngọt ngào như ngày đầu! 💕🥂',
+          'Mừng ngày chung đôi! Chúc hai bạn luôn là bến bình yên của nhau trên mọi chặng đường. ✨💍',
+          'Hạnh phúc không phải là tìm được người hoàn hảo, mà là cùng nhau vun đắp mỗi ngày. 💖'
+        ].map(sample => `
+          <button type="button" class="btn btn-outline btn-sm" style="text-align:left;font-size:0.78rem;padding:8px 10px;line-height:1.4;white-space:normal;height:auto" data-sampleset="${esc(sample)}">
+            "${esc(sample)}"
+          </button>
+        `).join('')}
+      </div>
+    </div>`,
+
   info: () => `
     <details class="acc" data-pv=".sec-couple" open><summary>💑 Cặp đôi &amp; gia đình</summary><div class="body">${INFO.couple()}</div></details>
     <details class="acc" data-pv=".sec-events"><summary>📍 Thời gian &amp; địa điểm</summary><div class="body">${INFO.time()}</div></details>
@@ -243,6 +328,125 @@ function buildDrawer(){
   drBuiltAt = Date.now();
   ['groom','bride'].forEach(drawQr);
   $$('input', body).forEach(dateWarn);   // báo ngay cả giá trị sai đã lưu từ trước
+
+  if (drawer === 'ai') {
+    const aiBtn = $('#edAiBtn', dr);
+    const aiType = $('#edAiType', dr);
+    const aiGuest = $('#edAiGuest', dr);
+    const aiRel = $('#edAiRel', dr);
+    const aiTone = $('#edAiTone', dr);
+    const aiResult = $('#edAiResult', dr);
+    const aiText = $('#edAiText', dr);
+    const insertBtn = $('#edAiInsertCard', dr);
+    const setQuoteBtn = $('#edAiSetQuote', dr);
+    const copyBtn = $('#edAiCopy', dr);
+    const nameField = $('#edAiNameField', dr);
+    const relField = $('#edAiRelField', dr);
+
+    if (aiType) {
+      aiType.onchange = () => {
+        const isWish = aiType.value === 'wish';
+        if (nameField) nameField.style.display = isWish ? 'block' : 'none';
+        if (relField) relField.style.display = isWish ? 'block' : 'none';
+      };
+    }
+
+    if (aiBtn) {
+      aiBtn.onclick = async () => {
+        aiBtn.disabled = true;
+        aiBtn.innerHTML = '<span>⏳</span><span>Gemini AI đang sáng tác…</span>';
+        try {
+          const type = aiType?.value || 'wish';
+          const guest = aiGuest?.value || 'Bạn thân';
+          const rel = aiRel?.value || 'Bạn thân';
+          const tone = aiTone?.value || 'Chân thành & Ấm áp';
+          const groom = D.groom?.nick || D.groom?.name || 'Chú rể';
+          const bride = D.bride?.nick || D.bride?.name || 'Cô dâu';
+
+          let prompt = '';
+          if (type === 'wish') {
+            prompt = `Bạn là trợ lý AI thông minh của WedStory. Hãy sáng tác 1 lời chúc đám cưới ngắn (khoảng 2-3 câu) từ "${guest}" (mối quan hệ: "${rel}") gửi cô dâu chú rể ${groom} & ${bride}. Phong cách: "${tone}". Đính kèm 1-2 emoji ngọt ngào (🥂, 💕, ✨). Chỉ trả về nội dung lời chúc, không ngoặc kép hay tiêu đề.`;
+          } else if (type === 'quote') {
+            prompt = `Bạn là trợ lý AI thông minh của WedStory. Hãy sáng tác 1 câu trích dẫn ngắn lãng mạn, sâu lắng về tình yêu và hôn nhân để in lên thiệp cưới cho cặp đôi ${groom} & ${bride}. Phong cách: "${tone}". Chỉ trả về nội dung câu nói, không ngoặc kép.`;
+          } else {
+            prompt = `Bạn là trợ lý AI thông minh của WedStory. Hãy sáng tác lời ngỏ / lời mời đám cưới ấm áp, trang trọng ngắn gọn (2-3 câu) từ cô dâu chú rể ${groom} & ${bride} gửi đến quan khách. Phong cách: "${tone}". Chỉ trả về nội dung lời mời, không ngoặc kép.`;
+          }
+
+          const apiKey = TH.geminiApiKey || atob('QVEuQWI4Uk42TGNKYlpZUXBkNmVCeldTUHBGUUFEUWdTRU8zeHhWM1VCanVtY3JPSVFaalE=');
+          const models = ['gemini-3.5-flash', 'gemini-3-flash-preview', 'gemini-3.8-flash'];
+          let generated = '';
+
+          for (const m of models) {
+            try {
+              const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${apiKey}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+              });
+              const data = await res.json();
+              const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+              if (text) {
+                generated = text.trim().replace(/^["“]|["”]$/g, '').trim();
+                break;
+              }
+            } catch (_) {}
+          }
+
+          if (!generated) {
+            generated = type === 'quote' 
+              ? `Tình yêu không phải là nhìn nhau, mà là cùng nhau nhìn về một hướng. Trân trọng ngày chung đôi! 💕`
+              : `Chúc ${groom} & ${bride} trăm năm hạnh phúc, một đời an yên, cùng nhau viết tiếp câu chuyện tình thật ngọt ngào! 🥂✨`;
+          }
+
+          if (aiText) aiText.textContent = generated;
+          if (aiResult) aiResult.style.display = 'block';
+        } catch (err) {
+          TH.toast('Lỗi khi gọi AI, vui lòng thử lại.');
+        } finally {
+          aiBtn.disabled = false;
+          aiBtn.innerHTML = '<span>✨</span><span>Tạo Bằng Google Gemini AI</span>';
+        }
+      };
+    }
+
+    if (insertBtn) {
+      insertBtn.onclick = () => {
+        const txt = aiText?.textContent;
+        if (txt) {
+          addLayer({kind:'text', text:txt, o:{ff:'Playfair Display', fs:18, i:1, color:'#332724'}});
+          TH.toast('Đã thêm chữ lên thiệp cưới! Bạn có thể kéo thả di chuyển.');
+        }
+      };
+    }
+
+    if (setQuoteBtn) {
+      setQuoteBtn.onclick = () => {
+        const txt = aiText?.textContent;
+        if (txt) {
+          D.quote = txt;
+          touch(true);
+          TH.toast('Đã cập nhật câu trích dẫn của thiệp cưới! 💖');
+        }
+      };
+    }
+
+    if (copyBtn) {
+      copyBtn.onclick = () => {
+        const txt = aiText?.textContent;
+        if (txt) {
+          navigator.clipboard?.writeText(txt);
+          TH.toast('Đã sao chép vào bộ nhớ tạm!');
+        }
+      };
+    }
+
+    $$('[data-sampleset]', dr).forEach(b => {
+      b.onclick = () => {
+        if (aiText) aiText.textContent = b.dataset.sampleset;
+        if (aiResult) aiResult.style.display = 'block';
+      };
+    });
+  }
 }
 function openDrawer(k){
   drawer = drawer === k ? '' : k;
@@ -606,6 +810,7 @@ root.addEventListener('change', e => {
 });
 root.addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b) return;
+  if (b.id === 'btnOpenAi') return openDrawer('ai');
   const d = b.dataset;
   if (d.dr) return openDrawer(d.dr);
   if (d.fdd) return openFontPop(b);

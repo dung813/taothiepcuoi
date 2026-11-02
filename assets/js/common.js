@@ -198,73 +198,62 @@ document.addEventListener('click', e => {
   });
 });
 
-/* ---------- Khung thẻ mẫu: Hệ thống thẻ hiện đại, chuẩn Photo-Centric theo web mẫu ----------
-   6 kiểu layout: Phong bì nhung & dấu sáp, Polaroid băng keo & hoa khô, Cổng vòm hoàng gia / Song Hỷ,
-   Song ảnh hoa lá màu nước, Dải phim triptych, Toàn cảnh điện ảnh chữ nghệ thuật. */
-const FRAME_OF = {
-  // 1. Phong bì nhung & Con dấu sáp 3D + Nhánh hoa
-  'mau-don':        { kind: 'envelope', envColor: '#721921', bg: '#F6ECE1' }, // Velvet Burgundy (Mẫu 9)
-  'hoang-kim':      { kind: 'envelope', envColor: '#344D38', bg: '#F2EFEB' }, // Olive Green (Mẫu 3)
-  'oai-huong':      { kind: 'envelope', envColor: '#553A70', bg: '#ECE4F4' }, // Plum Lavender (Mẫu 6)
-  'thanh-lich':     { kind: 'envelope', envColor: '#9C4635', bg: '#F4ECE6' }, // Terracotta (Mẫu 16)
-  'be-kem':         { kind: 'envelope', envColor: '#8E4652', bg: '#F6ECEB' }, // Dusty Rose (Mẫu 19)
-
-  // 2. Polaroid dán băng dính kraft & Hoa khô & Dấu sáp
-  'vuon-xanh':      { kind: 'polaroid', bg: '#EFE6D8' }, // Warm Sand (Mẫu 2)
-  'toi-gian-trang': { kind: 'polaroid', bg: '#E8DFD3' }, // Warm Oatmeal (Mẫu 10)
-  'la-non':         { kind: 'polaroid', bg: '#E3EDE4' }, // Celadon Eucalyptus (Mẫu 17)
-  'anh-bac':        { kind: 'polaroid', bg: '#E5DFD7' }, // Warm Stone (Mẫu 20)
-  'co-dien':        { kind: 'polaroid', bg: '#ECE3D2' }, // Antique Parchment (Mẫu 12)
-
-  // 3. Cổng vòm hoàng gia & Song Hỷ đỏ truyền thống
-  'song-hy':        { kind: 'arch', archColor: '#85121A', bg: '#FAF5EE', groomRole: 'Trưởng Nam', brideRole: 'Út Nữ' }, // Imperial Crimson (Mẫu 4)
-  'dem-sao':        { kind: 'arch', archColor: '#153621', bg: '#FAF6EE', groomRole: 'Trưởng Nam', brideRole: 'Út Nữ' }, // Royal Emerald (Mẫu 8)
-  'nang-vang':      { kind: 'arch', archColor: '#9C7228', bg: '#FBF5E9', groomRole: 'Trưởng Nam', brideRole: 'Út Nữ' }, // Golden Amber (Mẫu 13)
-  'bien-xanh':      { kind: 'arch', archColor: '#1A364B', bg: '#EDF3F7', groomRole: 'Trưởng Nam', brideRole: 'Út Nữ' }, // Slate Navy (Mẫu 5)
-  'rung-thong':     { kind: 'arch', archColor: '#1A3322', bg: '#EEF3EE', groomRole: 'Trưởng Nam', brideRole: 'Út Nữ' }, // Pine Moss (Mẫu 15)
-
-  // 4. Song ảnh hoa lá màu nước (Hai khung ảnh riêng cho chú rể & cô dâu)
-  'hong-pastel':    { kind: 'botanic-dual', bg: '#EDF3EB' }, // Sage Green (Mẫu 1)
-  'tiec-vuon':      { kind: 'botanic-dual', bg: '#E6EFE2' }, // Garden Foliage (Mẫu 14)
-
-  // 5. Dải phim Polaroid Triptych (Ảnh chính + 3 ảnh mini)
-  'giay-kraft':     { kind: 'filmstrip', bg: '#94442E' }, // Cinnamon Brick (Mẫu 7)
-  'ngay-nang':      { kind: 'filmstrip', bg: '#7A242B' }, // Wine Crimson (Mẫu 18)
-
-  // 6. Toàn cảnh điện ảnh chữ nghệ thuật
-  'hoang-hon':      { kind: 'cinematic', bg: '#1C1917', script: 'Our Love Begins' } // Sunset Cinematic (Mẫu 11)
-};
+/* ---------- Khung thẻ mẫu: Hệ thống 20 mẫu độc bản, mỗi mẫu 1 kiểu bắt mắt & màu sắc riêng biệt ----------
+   Chuẩn Photo-Centric theo web mẫu zenlove.me:
+   1. hong-pastel:   Song ảnh thảo mộc (botanical-dual)
+   2. vuon-xanh:     Polaroid kraft & hoa khô (polaroid-tape)
+   3. hoang-kim:     Phong bì rêu ô-liu đồng nội (envelope-olive)
+   4. song-hy:       Cổng vòm đỏ cung đình Song Hỷ (imperial-red-arch)
+   5. bien-xanh:     Cổng vòm xanh biển sâu & nguyệt quế (slate-navy-arch)
+   6. oai-huong:     Phong bì tím mận & oải hương (envelope-lavender)
+   7. giay-kraft:    Dải phim triptych nâu đất (filmstrip-triptych)
+   8. dem-sao:       Cổng vòm lục bảo hoàng gia (royal-green-arch)
+   9. mau-don:       Phong bì nhung đỏ rượu & hoa mẫu đơn (envelope-burgundy)
+   10. toi-gian-trang: Tạp chí thời trang editorial INVITÉ (fashion-editorial)
+   11. hoang-hon:    Toàn cảnh hoàng hôn điện ảnh (cinematic-script)
+   12. co-dien:      Salon cổ điển khung vàng & đèn chùm (baroque-chandelier)
+   13. nang-vang:    Mái vòm lịch cưới hoàng kim (arch-calendar)
+   14. tiec-vuon:    Bộ ba ảnh dọc dây leo hoa hồng (triptych-floral)
+   15. rung-thong:   Rừng thông huyền bí xanh rêu đậm (pine-forest)
+   16. thanh-lich:   Phong bì san hô đất nung (envelope-terracotta)
+   17. la-non:       Giấy xé thủ công & băng keo chéo (torn-paper-craft)
+   18. ngay-nang:    Dải phim photobooth Hàn Quốc 4 ô (photobooth-strip)
+   19. be-kem:       Tranh cuộn thủy mặc hạc vàng Song Hỷ (crane-traditional)
+   20. anh-bac:      Ban công cổ điển Pháp & Studio Noir (french-balcony-noir) */
 
 const ddmmyyyy = d => `${String(d.getDate()).padStart(2,'0')} · ${String(d.getMonth()+1).padStart(2,'0')} · ${d.getFullYear()}`;
 
 TH.frameTpl = (t, o = {}) => {
-  const cfg = FRAME_OF[t.id] || { kind: 'polaroid', bg: '#EFE6D8' };
-  const kind = cfg.kind;
   const d = o.date ? new Date(o.date) : new Date(Date.now() + 60*864e5);
   const src = o.photo === undefined ? t.thumb : o.photo;
   const groom = TH.esc(o.groom || 'Minh Khôi');
   const bride = TH.esc(o.bride || 'Thu Hà');
+  const photos = t.photos || [src, src, src, src];
+  const ff = `style="--ff:${TH.fontStack(t.font)}"`;
 
-  if (kind === 'envelope') {
-    const envColor = cfg.envColor || '#721921';
-    return `<div class="fr fr-envelope" style="--bg:${cfg.bg};--env:${envColor};--ff:${TH.fontStack(t.font)}">
-      <div class="fr-env-top"><span class="fr-tag">SAVE THE DATE</span></div>
-      <div class="fr-env-card">
-        <div class="fr-photo-wrap"><div class="fr-photo" style="background-image:url('${src}')"></div></div>
-        <div class="fr-floral-sprig" aria-hidden="true">
-          <svg viewBox="0 0 50 70" fill="none"><path d="M25 65 Q20 30 5 10" stroke="#4A5847" stroke-width="2"/><circle cx="10" cy="18" r="8" fill="#8B1E2B" opacity=".9"/><circle cx="6" cy="14" r="5" fill="#D65866" opacity=".8"/><circle cx="22" cy="30" r="7" fill="#751622" opacity=".9"/><path d="M12 28 Q2 32 8 45" fill="#586B52" opacity=".8"/></svg>
+  // 1. MẪU 1: HỒNG PASTEL - Song ảnh thảo mộc
+  if (t.id === 'hong-pastel') {
+    const p1 = photos[0] || src, p2 = photos[1] || src;
+    return `<div class="fr fr-botanical-dual" ${ff}>
+      <div class="fr-bot-top"><span class="fr-bot-leaf">🌿</span><span class="fr-tag">WEDDING INVITATION</span></div>
+      <div class="fr-bot-pair">
+        <div class="fr-bot-item groom">
+          <div class="fr-photo" style="background-image:url('${p1}')"></div>
+          <div class="fr-bot-info"><small>Trưởng Nam</small><b>${groom}</b></div>
         </div>
-        <div class="fr-env-pocket"><div class="fr-seal gold" aria-hidden="true"><span>💍</span></div></div>
+        <div class="fr-bot-bar"></div>
+        <div class="fr-bot-item bride">
+          <div class="fr-photo" style="background-image:url('${p2}')"></div>
+          <div class="fr-bot-info"><small>Út Nữ</small><b>${bride}</b></div>
+        </div>
       </div>
-      <div class="fr-env-bottom">
-        <div class="fr-name-line">${groom}</div>
-        <div class="fr-name-line">${bride}</div>
-      </div>
+      <div class="fr-date">${ddmmyyyy(d)}</div>
     </div>`;
   }
 
-  if (kind === 'polaroid') {
-    return `<div class="fr fr-polaroid" style="--bg:${cfg.bg};--ff:${TH.fontStack(t.font)}">
+  // 2. MẪU 2: KHU VƯỜN XANH - Polaroid kraft & hoa khô
+  if (t.id === 'vuon-xanh') {
+    return `<div class="fr fr-polaroid-tape" ${ff}>
       <div class="fr-pol-top">
         <span class="fr-tag">THE WEDDING OF</span>
         <div class="fr-names-script">${groom} <i>&amp;</i> ${bride}</div>
@@ -281,58 +270,74 @@ TH.frameTpl = (t, o = {}) => {
     </div>`;
   }
 
-  if (kind === 'arch') {
-    const archColor = cfg.archColor || '#153621';
-    const groomRole = cfg.groomRole || 'Trưởng Nam';
-    const brideRole = cfg.brideRole || 'Út Nữ';
-    return `<div class="fr fr-arch" style="--bg:${cfg.bg};--arch:${archColor};--ff:${TH.fontStack(t.font)}">
-      <div class="fr-arch-header">
-        <span class="fr-arch-welcome">WELCOME TO OUR WEDDING</span>
+  // 3. MẪU 3: HOÀNG KIM - Phong bì rêu ô-liu đồng nội
+  if (t.id === 'hoang-kim') {
+    return `<div class="fr fr-envelope-olive" ${ff}>
+      <div style="display:flex;justify-content:space-between;align-items:center;z-index:5"><span class="fr-tag" style="color:#2E4733">SAVE OUR DATE</span></div>
+      <div class="fr-env-card">
+        <div class="fr-photo-wrap"><div class="fr-photo" style="background-image:url('${src}')"></div></div>
+        <div class="fr-env-pocket"><div class="fr-seal gold" aria-hidden="true"><span>🌿</span></div></div>
+      </div>
+      <div style="text-align:center;z-index:5">
+        <div class="fr-name-line">${groom}</div>
+        <div class="fr-name-line">${bride}</div>
+      </div>
+    </div>`;
+  }
+
+  // 4. MẪU 4: SONG HỶ ĐỎ - Cổng vòm đỏ cung đình Song Hỷ
+  if (t.id === 'song-hy') {
+    return `<div class="fr fr-imperial-red-arch" ${ff}>
+      <div class="fr-arch-header-red">
+        <span class="fr-arch-welcome">CUNG HỶ TÂN HÔN</span>
         <div class="fr-arch-family">
-          <div class="fr-arch-col"><small>${groomRole}</small><b>${groom}</b></div>
+          <div class="fr-arch-col"><small>Trưởng Nam</small><b>${groom}</b></div>
           <div class="fr-arch-hy">囍</div>
-          <div class="fr-arch-col"><small>${brideRole}</small><b>${bride}</b></div>
+          <div class="fr-arch-col"><small>Út Nữ</small><b>${bride}</b></div>
         </div>
-        <span class="fr-arch-motto">LOVE NEVER FAILS</span>
+        <span style="font:600 2cqw var(--f-body);letter-spacing:.25em;color:#f6e3a5;margin-top:1.5cqw">TRĂM NĂM HẠNH PHÚC</span>
       </div>
-      <div class="fr-arch-window">
-        <div class="fr-photo" style="background-image:url('${src}')"></div>
+      <div class="fr-arch-window"><div class="fr-photo" style="background-image:url('${src}')"></div></div>
+    </div>`;
+  }
+
+  // 5. MẪU 5: BIỂN XANH - Cổng vòm xanh biển sâu & nguyệt quế
+  if (t.id === 'bien-xanh') {
+    return `<div class="fr fr-slate-navy-arch" ${ff}>
+      <div class="fr-arch-header-navy">
+        <div class="fr-navy-crest">⚓</div>
+        <span class="fr-navy-title">THE WEDDING CELEBRATION</span>
+        <div class="fr-arch-family" style="margin-top:1cqw">
+          <div class="fr-arch-col"><small>Chú rể</small><b>${groom}</b></div>
+          <div style="font-size:3.5cqw;color:#79B2D9">&amp;</div>
+          <div class="fr-arch-col"><small>Cô dâu</small><b>${bride}</b></div>
+        </div>
+      </div>
+      <div class="fr-arch-window"><div class="fr-photo" style="background-image:url('${src}')"></div></div>
+    </div>`;
+  }
+
+  // 6. MẪU 6: OẢI HƯƠNG - Phong bì tím mận & oải hương
+  if (t.id === 'oai-huong') {
+    return `<div class="fr fr-envelope-lavender" ${ff}>
+      <div style="display:flex;justify-content:space-between;align-items:center;z-index:5"><span class="fr-tag" style="color:#553A70">WEDDING INVITATION</span></div>
+      <div class="fr-env-card">
+        <div class="fr-photo-wrap"><div class="fr-photo" style="background-image:url('${src}')"></div></div>
+        <div class="fr-env-pocket"><div class="fr-seal purple" aria-hidden="true"><span>💐</span></div></div>
+      </div>
+      <div style="text-align:center;z-index:5">
+        <div class="fr-name-line">${groom}</div>
+        <div class="fr-name-line">${bride}</div>
       </div>
     </div>`;
   }
 
-  if (kind === 'botanic-dual') {
-    const groomSrc = (t.photos && t.photos[0]) || src;
-    const brideSrc = (t.photos && t.photos[1]) || src;
-    return `<div class="fr fr-botanic-dual" style="--bg:${cfg.bg};--ff:${TH.fontStack(t.font)}">
-      <div class="fr-bot-top">
-        <span class="fr-bot-leaf">🌿</span>
-        <span class="fr-tag">WEDDING INVITATION</span>
-      </div>
-      <div class="fr-bot-pair">
-        <div class="fr-bot-item groom">
-          <div class="fr-photo" style="background-image:url('${groomSrc}')"></div>
-          <div class="fr-bot-info"><small>Trưởng Nam</small><b>${groom}</b></div>
-        </div>
-        <div class="fr-bot-bar"></div>
-        <div class="fr-bot-item bride">
-          <div class="fr-photo" style="background-image:url('${brideSrc}')"></div>
-          <div class="fr-bot-info"><small>Út Nữ</small><b>${bride}</b></div>
-        </div>
-      </div>
-      <div class="fr-date">${ddmmyyyy(d)}</div>
-    </div>`;
-  }
-
-  if (kind === 'filmstrip') {
-    const s1 = (t.photos && t.photos[1]) || src;
-    const s2 = (t.photos && t.photos[2]) || src;
-    const s3 = (t.photos && t.photos[3]) || src;
-    return `<div class="fr fr-filmstrip" style="--bg:${cfg.bg};--ff:${TH.fontStack(t.font)}">
-      <div class="fr-film-top"><span class="fr-tag-light">WEDDING INVITATION</span></div>
-      <div class="fr-film-main">
-        <div class="fr-photo" style="background-image:url('${src}')"></div>
-      </div>
+  // 7. MẪU 7: GIẤY KRAFT - Dải phim triptych nâu đất
+  if (t.id === 'giay-kraft') {
+    const s1 = photos[1] || src, s2 = photos[2] || src, s3 = photos[3] || src;
+    return `<div class="fr fr-filmstrip-triptych" ${ff}>
+      <div style="text-align:center"><span class="fr-tag-light">WEDDING INVITATION</span></div>
+      <div class="fr-film-main"><div class="fr-photo" style="background-image:url('${src}')"></div></div>
       <div class="fr-film-banner">
         <div class="fr-names-script" style="color:#222">${groom} <i>&amp;</i> ${bride}</div>
         <div class="fr-date-mini">${ddmmyyyy(d)}</div>
@@ -345,16 +350,207 @@ TH.frameTpl = (t, o = {}) => {
     </div>`;
   }
 
-  // Cinematic
-  const scriptText = cfg.script || 'Our Love Begins';
-  return `<div class="fr fr-cinematic" style="--bg:#1C1917;--ff:${TH.fontStack(t.font)}">
-    <div class="fr-photo" style="background-image:url('${src}')"></div>
-    <div class="fr-cine-overlay"></div>
-    <div class="fr-cine-content">
-      <div class="fr-cine-script">${scriptText}</div>
-      <div class="fr-cine-names">${groom} <i>&amp;</i> ${bride}</div>
-      <div class="fr-date-light">${ddmmyyyy(d)}</div>
-    </div>
+  // 8. MẪU 8: ĐÊM ĐẦY SAO - Cổng vòm lục bảo hoàng gia
+  if (t.id === 'dem-sao') {
+    return `<div class="fr fr-royal-green-arch" ${ff}>
+      <div class="fr-arch-header-green">
+        <span class="fr-arch-welcome">WELCOME TO OUR WEDDING</span>
+        <div class="fr-arch-family">
+          <div class="fr-arch-col"><small>Trưởng Nam</small><b>${groom}</b></div>
+          <div class="fr-arch-hy">囍</div>
+          <div class="fr-arch-col"><small>Út Nữ</small><b>${bride}</b></div>
+        </div>
+        <span class="fr-arch-motto">LOVE NEVER FAILS</span>
+      </div>
+      <div class="fr-arch-window"><div class="fr-photo" style="background-image:url('${src}')"></div></div>
+    </div>`;
+  }
+
+  // 9. MẪU 9: MẪU ĐƠN - Phong bì nhung đỏ rượu & hoa mẫu đơn
+  if (t.id === 'mau-don') {
+    return `<div class="fr fr-envelope-burgundy" ${ff}>
+      <div style="display:flex;justify-content:space-between;align-items:center;z-index:5"><span class="fr-tag">SAVE THE DATE</span></div>
+      <div class="fr-env-card">
+        <div class="fr-photo-wrap"><div class="fr-photo" style="background-image:url('${src}')"></div></div>
+        <div class="fr-floral-sprig" aria-hidden="true">
+          <svg viewBox="0 0 50 70" fill="none"><path d="M25 65 Q20 30 5 10" stroke="#4A5847" stroke-width="2"/><circle cx="10" cy="18" r="8" fill="#8B1E2B" opacity=".9"/><circle cx="6" cy="14" r="5" fill="#D65866" opacity=".8"/><circle cx="22" cy="30" r="7" fill="#751622" opacity=".9"/><path d="M12 28 Q2 32 8 45" fill="#586B52" opacity=".8"/></svg>
+        </div>
+        <div class="fr-env-pocket"><div class="fr-seal gold" aria-hidden="true"><span>💍</span></div></div>
+      </div>
+      <div style="text-align:center;z-index:5">
+        <div class="fr-name-line">${groom}</div>
+        <div class="fr-name-line">${bride}</div>
+      </div>
+    </div>`;
+  }
+
+  // 10. MẪU 10: TRẮNG TINH KHÔI - Tạp chí thời trang editorial INVITÉ
+  if (t.id === 'toi-gian-trang') {
+    return `<div class="fr fr-fashion-editorial" ${ff}>
+      <div class="fr-mag-head">
+        <div class="fr-mag-title">INVITATION</div>
+        <div class="fr-mag-issue">ISSUE 26</div>
+      </div>
+      <div class="fr-mag-photo-box">
+        <div class="fr-photo" style="background-image:url('${src}')"></div>
+        <div class="fr-mag-badge">${ddmmyyyy(d)}</div>
+      </div>
+      <div class="fr-mag-bottom">
+        <div class="fr-mag-names">${groom} &amp; ${bride}</div>
+        <div style="font:600 2cqw var(--f-body);letter-spacing:.1em">SPECIAL DAY</div>
+      </div>
+    </div>`;
+  }
+
+  // 11. MẪU 11: HOÀNG HÔN - Toàn cảnh hoàng hôn điện ảnh
+  if (t.id === 'hoang-hon') {
+    return `<div class="fr fr-cinematic-script" ${ff}>
+      <div class="fr-photo" style="background-image:url('${src}')"></div>
+      <div class="fr-cine-overlay"></div>
+      <div class="fr-cine-content">
+        <div class="fr-cine-script">Our Love Begins</div>
+        <div class="fr-cine-names">${groom} <i>&amp;</i> ${bride}</div>
+        <div class="fr-date-light">${ddmmyyyy(d)}</div>
+      </div>
+    </div>`;
+  }
+
+  // 12. MẪU 12: CỔ ĐIỂN CHÂU ÂU - Salon cổ điển khung vàng & đèn chùm
+  if (t.id === 'co-dien') {
+    return `<div class="fr fr-baroque-chandelier" ${ff}>
+      <div class="fr-baroque-border">
+        <svg class="fr-baroque-corner fr-corner-tl" viewBox="0 0 40 40" fill="currentColor"><path d="M0 0 H40 V10 H10 V40 H0 Z"/></svg>
+        <svg class="fr-baroque-corner fr-corner-tr" viewBox="0 0 40 40" fill="currentColor"><path d="M0 0 H40 V10 H10 V40 H0 Z"/></svg>
+        <svg class="fr-baroque-corner fr-corner-bl" viewBox="0 0 40 40" fill="currentColor"><path d="M0 0 H40 V10 H10 V40 H0 Z"/></svg>
+        <svg class="fr-baroque-corner fr-corner-br" viewBox="0 0 40 40" fill="currentColor"><path d="M0 0 H40 V10 H10 V40 H0 Z"/></svg>
+        <div class="fr-chandelier-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2v4M8 6h8M6 10c0 4 6 7 6 7s6-3 6-7M9 10v4M15 10v4M12 17v5"/></svg></div>
+        <div class="fr-baroque-names">${groom} &amp; ${bride}</div>
+        <div class="fr-baroque-photo-wrap"><div class="fr-photo" style="background-image:url('${src}')"></div></div>
+        <div style="font:600 2.2cqw var(--f-body);letter-spacing:.2em;color:#96783C">${ddmmyyyy(d)}</div>
+      </div>
+    </div>`;
+  }
+
+  // 13. MẪU 13: NẮNG VÀNG - Mái vòm lịch cưới hoàng kim
+  if (t.id === 'nang-vang') {
+    return `<div class="fr fr-arch-calendar" ${ff}>
+      <div class="fr-cal-arch"><div class="fr-photo" style="background-image:url('${src}')"></div></div>
+      <div class="fr-cal-bottom">
+        <div class="fr-cal-names">${groom} &amp; ${bride}</div>
+        <div class="fr-cal-grid">
+          <span class="fr-cal-day-head">T2</span><span class="fr-cal-day-head">T3</span><span class="fr-cal-day-head">T4</span><span class="fr-cal-day-head">T5</span><span class="fr-cal-day-head">T6</span><span class="fr-cal-day-head">T7</span><span class="fr-cal-day-head">CN</span>
+          <span>01</span><span>02</span><span>03</span><span>04</span><span class="fr-cal-day special">05</span><span>06</span><span>07</span>
+          <span>08</span><span>09</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span>
+        </div>
+        <div style="font:600 2cqw var(--f-body);letter-spacing:.18em;color:#A07428">SAVE THE DATE · ${ddmmyyyy(d)}</div>
+      </div>
+    </div>`;
+  }
+
+  // 14. MẪU 14: TIỆC VƯỜN - Bộ ba ảnh dọc dây leo hoa hồng
+  if (t.id === 'tiec-vuon') {
+    const s1 = photos[0] || src, s2 = photos[1] || src, s3 = photos[2] || src;
+    return `<div class="fr fr-triptych-floral" ${ff}>
+      <div class="fr-floral-garland">🌸 🌿 🌸</div>
+      <div class="fr-trip-title">Save the Date</div>
+      <div class="fr-trip-names">${groom} &amp; ${bride}</div>
+      <div class="fr-trip-grid">
+        <div class="fr-trip-col"><div class="fr-photo" style="background-image:url('${s1}')"></div></div>
+        <div class="fr-trip-col"><div class="fr-photo" style="background-image:url('${s2}')"></div></div>
+        <div class="fr-trip-col"><div class="fr-photo" style="background-image:url('${s3}')"></div></div>
+      </div>
+      <div class="fr-date" style="color:#8B4553">${ddmmyyyy(d)}</div>
+    </div>`;
+  }
+
+  // 15. MẪU 15: RỪNG THÔNG - Rừng thông huyền bí xanh rêu đậm
+  if (t.id === 'rung-thong') {
+    return `<div class="fr fr-pine-forest" ${ff}>
+      <div class="fr-pine-top">
+        <div class="fr-pine-needle">🌲</div>
+        <div class="fr-pine-tag">THE WEDDING CELEBRATION</div>
+      </div>
+      <div class="fr-pine-names">${groom} &amp; ${bride}</div>
+      <div class="fr-pine-photo-frame"><div class="fr-photo" style="background-image:url('${src}')"></div></div>
+      <div class="fr-date" style="color:#D4AF37">${ddmmyyyy(d)}</div>
+    </div>`;
+  }
+
+  // 16. MẪU 16: THANH LỊCH - Phong bì san hô đất nung
+  if (t.id === 'thanh-lich') {
+    return `<div class="fr fr-envelope-terracotta" ${ff}>
+      <div style="display:flex;justify-content:space-between;align-items:center;z-index:5"><span class="fr-tag" style="color:#9C4635">WEDDING DAY</span></div>
+      <div class="fr-env-card">
+        <div class="fr-photo-wrap"><div class="fr-photo" style="background-image:url('${src}')"></div></div>
+        <div class="fr-env-pocket"><div class="fr-seal white" aria-hidden="true"><span>🌸</span></div></div>
+      </div>
+      <div style="text-align:center;z-index:5">
+        <div class="fr-name-line">${groom}</div>
+        <div class="fr-name-line">${bride}</div>
+      </div>
+    </div>`;
+  }
+
+  // 17. MẪU 17: LÁ NON - Giấy xé thủ công & băng keo chéo
+  if (t.id === 'la-non') {
+    return `<div class="fr fr-torn-paper-craft" ${ff}>
+      <div class="fr-torn-sheet">
+        <span class="fr-tape-diag-tl" aria-hidden="true"></span>
+        <span class="fr-tape-diag-br" aria-hidden="true"></span>
+        <div style="text-align:center"><span class="fr-tag" style="color:#4B6B4D">NATURAL BOTANICAL</span></div>
+        <div class="fr-names-script" style="color:#2F4A32;text-align:center">${groom} <i>&amp;</i> ${bride}</div>
+        <div class="fr-torn-photo"><div class="fr-photo" style="background-image:url('${src}')"></div></div>
+        <div class="fr-date" style="color:#4B6B4D">${ddmmyyyy(d)}</div>
+      </div>
+    </div>`;
+  }
+
+  // 18. MẪU 18: NGÀY NẮNG - Dải phim photobooth Hàn Quốc 4 ô
+  if (t.id === 'ngay-nang') {
+    const s1 = photos[0] || src, s2 = photos[1] || src, s3 = photos[2] || src, s4 = photos[3] || src;
+    return `<div class="fr fr-photobooth-strip" ${ff}>
+      <div class="fr-booth-card">
+        <div class="fr-booth-header">${groom} &amp; ${bride}</div>
+        <div class="fr-booth-grid">
+          <div class="fr-booth-item" style="background-image:url('${s1}')"></div>
+          <div class="fr-booth-item" style="background-image:url('${s2}')"></div>
+          <div class="fr-booth-item" style="background-image:url('${s3}')"></div>
+          <div class="fr-booth-item" style="background-image:url('${s4}')"></div>
+        </div>
+        <div class="fr-booth-footer"><span>PHOTOBOOTH</span><span>${ddmmyyyy(d)}</span></div>
+      </div>
+    </div>`;
+  }
+
+  // 19. MẪU 19: BE KEM - Tranh cuộn thủy mặc hạc vàng Song Hỷ
+  if (t.id === 'be-kem') {
+    return `<div class="fr fr-crane-traditional" ${ff}>
+      <div class="fr-crane-header">
+        <span class="fr-tag" style="color:#8E1920">THIỆP BÁO HỶ</span>
+        <span class="fr-crane-hy">囍</span>
+      </div>
+      <div class="fr-crane-names">${groom} &amp; ${bride}</div>
+      <div class="fr-crane-frame"><div class="fr-photo" style="background-image:url('${src}')"></div></div>
+      <div class="fr-date" style="color:#8E1920">${ddmmyyyy(d)}</div>
+    </div>`;
+  }
+
+  // 20. MẪU 20: ÁNH BẠC - Ban công cổ điển Pháp & Studio Noir
+  if (t.id === 'anh-bac') {
+    return `<div class="fr fr-french-balcony-noir" ${ff}>
+      <div class="fr-balcony-arch">
+        <div class="fr-balcony-title">HAPPY WEDDING</div>
+        <div class="fr-balcony-names">${groom} &amp; ${bride}</div>
+        <div class="fr-balcony-photo"><div class="fr-photo" style="background-image:url('${src}')"></div></div>
+        <div class="fr-date" style="color:#59544F;margin-top:2cqw">${ddmmyyyy(d)}</div>
+      </div>
+    </div>`;
+  }
+
+  // Fallback an toàn
+  return `<div class="fr fr-polaroid-tape" ${ff}>
+    <div class="fr-pol-frame"><div class="fr-photo" style="background-image:url('${src}')"></div></div>
+    <div class="fr-names-script" style="text-align:center">${groom} &amp; ${bride}</div>
   </div>`;
 };
 /* Nhãn Hot (4 mẫu nhiều lượt xem nhất) / Mới (4 mẫu thêm gần nhất) */
