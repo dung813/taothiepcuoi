@@ -358,7 +358,8 @@ body { background: var(--bg); }
 
   window.updateSlugPreview = function () {
     const cs = $('#coupleSlug').value.trim() || '<couple-slug>';
-    $('#slugPreview').innerHTML = `URL sẽ có dạng: <b>https://wedstory.vn/dam-cuoi-${cs}/<i>guest-slug</i></b>`;
+    const base = window.location.origin;
+    $('#slugPreview').innerHTML = `URL sẽ có dạng: <b>${base}/dam-cuoi-${cs}/<i>guest-slug</i></b>`;
   };
 
   // Tự động điền thông tin nếu mở từ thiệp đã tạo ?id=...
@@ -618,8 +619,9 @@ body { background: var(--bg); }
 
     tbody.innerHTML = results.map((row, i) => {
       const cs = coupleSlug || toSlug((window._groomNick || '') + '-' + (window._brideNick || ''));
+      const baseHost = window.location.origin;
       const cardUrl = cs
-        ? `https://wedstory.vn/dam-cuoi-${cs}/${row.guest_slug}`
+        ? `${baseHost}/dam-cuoi-${cs}/${row.guest_slug}`
         : row.pretty_url || '#';
 
       const shareText = buildShareText(row, cardUrl);
@@ -666,8 +668,9 @@ body { background: var(--bg); }
     const row = window._aiResults?.[idx];
     if (!row) return null;
     const cs = window._currentCoupleSlug || '';
+    const baseHost = window.location.origin;
     const cardUrl = cs
-      ? `https://wedstory.vn/dam-cuoi-${cs}/${row.guest_slug}`
+      ? `${baseHost}/dam-cuoi-${cs}/${row.guest_slug}`
       : row.pretty_url || window.location.href;
     const text = buildShareText(row, cardUrl);
     return { row, cardUrl, text };
@@ -725,8 +728,9 @@ body { background: var(--bg); }
   window.copyAllLinks = async function () {
     if (!window._aiResults?.length) return showToast('Chưa có kết quả AI');
     const cs = window._currentCoupleSlug || '';
+    const baseHost = window.location.origin;
     const lines = window._aiResults.map(r => {
-      const url = cs ? `https://wedstory.vn/dam-cuoi-${cs}/${r.guest_slug}` : r.pretty_url || '';
+      const url = cs ? `${baseHost}/dam-cuoi-${cs}/${r.guest_slug}` : r.pretty_url || '';
       return `${r.name}: ${url}`;
     }).join('\n');
     await copyToClipboard(lines);
