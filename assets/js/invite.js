@@ -385,7 +385,15 @@ function shareDialog(id, D){
     $m('#gFb').href = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url);
     $m('#gMs').href = 'fb-messenger://share/?link=' + encodeURIComponent(url);
     $m('#gSms').href = 'sms:?&body=' + encodeURIComponent(txt);
-    $m('#gNative').onclick = () => navigator.share ? navigator.share({title:'Thiệp cưới', text:txt, url}).catch(()=>{}) : navigator.clipboard.writeText(txt).then(()=>TH.toast('Đã sao chép lời mời — dán vào Zalo nhé'));
+    $m('#gNative').onclick = () => {
+      if (typeof handleShareAction === 'function') {
+        handleShareAction(txt);
+      } else if (navigator.share) {
+        navigator.share({title:'Thiệp cưới', text:txt, url}).catch(()=>{});
+      } else {
+        navigator.clipboard.writeText(txt).then(()=>TH.toast('Đã sao chép lời mời — dán vào Zalo nhé'));
+      }
+    };
     clearTimeout(timer); timer = setTimeout(drawQr, 250);   // vẽ lại QR khi ngừng gõ tên
   };
   $m('#gName').oninput = upd; upd(); drawQr();

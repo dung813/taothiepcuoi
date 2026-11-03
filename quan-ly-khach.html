@@ -692,13 +692,49 @@ body { background: var(--bg); }
     }
   };
 
-  // 📱 Zalo: Copy text + mở Zalo
-  window.sendZalo = async function (idx) {
+  /**
+   * Xử lý chia sẻ Zalo đa nền tảng (Mobile/PC) với Deep link & Fallback
+   * @param {string} shareText - Nội dung lời mời cần copy và chia sẻ
+   */
+  window.handleShareAction = function (shareText) {
+    const content = shareText || '';
+
+    // Sao chép nội dung vào Clipboard bằng JS thuần
+    copyToClipboard(content).finally(function() {
+      // 4. Cập nhật lại câu thông báo (alert) để hướng dẫn người dùng
+      alert('✅ Đã copy nội dung! Hệ thống đang gọi Zalo, hãy chọn người nhận và nhấn Dán (Ctrl+V) để gửi thiệp nhé.');
+
+      // 1. Phát hiện thiết bị: Nếu người dùng dùng Mobile (iOS/Android) thì mở https://zalo.me
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent || navigator.vendor || window.opera);
+
+      if (isMobile) {
+        window.location.href = 'https://zalo.me';
+      } else {
+        // 2. Nếu dùng PC: Ưu tiên mở phần mềm Zalo PC qua Deep link zalo://
+        let appOpened = false;
+        const onBlur = function() {
+          appOpened = true;
+        };
+        window.addEventListener('blur', onBlur, { once: true });
+
+        window.location.href = 'zalo://';
+
+        // 3. Xử lý dự phòng (Fallback): Dùng setTimeout khoảng 1.5 giây, nếu Zalo PC không phản hồi thì tự động mở web https://chat.zalo.me/ trong tab mới
+        setTimeout(function() {
+          window.removeEventListener('blur', onBlur);
+          if (!appOpened && !document.hidden) {
+            window.open('https://chat.zalo.me/', '_blank');
+          }
+        }, 1500);
+      }
+    });
+  };
+
+  // 📱 Zalo: Copy text + Deep link Zalo PC / Mobile / Web fallback
+  window.sendZalo = function (idx) {
     const d = getRowData(idx);
     if (!d) return;
-    await copyToClipboard(d.text);
-    showToast('📋 Đã copy lời mời vào clipboard!\nMở Zalo → Dán (Ctrl+V/giữ để dán) → Gửi');
-    setTimeout(() => window.open('https://chat.zalo.me/', '_blank', 'noopener'), 600);
+    window.handleShareAction(d.text);
   };
 
   // 💬 Messenger: Copy text + mở Messenger
