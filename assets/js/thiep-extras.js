@@ -93,35 +93,48 @@ if (TH.speech.supported) speechSynthesis.getVoices(); // nạp sẵn danh sách 
 TH.geminiApiKey = atob('QVEuQWI4Uk42TGNKYlpZUXBkNmVCeldTUHBGUUFEUWdTRU8zeHhWM1VCanVtY3JPSVFaalE=');
 
 /**
- * Cá nhân hoá Lời mời chính (message) và Thông điệp mở đầu (quote) theo từng Nhóm khách mời bằng Gemini AI
+ * TỰ ĐỘNG NHẬN DIỆN & PHÂN TÍCH THÔNG MINH BẰNG GEMINI AI:
+ * Đọc hiểu ngữ cảnh khách mời (VD: "Anh Nguyễn Văn A - Trưởng phòng Kinh doanh", "Thằng Tùng béo bạn cấp 3")
+ * Tự động phân loại, suy luận vai vế, điều chỉnh mức độ trang trọng/gần gũi và sinh lời mời + thông điệp chính xác.
  */
-TH.generateAiInvitation = async ({
-  guestGroup = 'Bạn thân',
+TH.analyzeAndGenerateAiInvitation = async ({
+  guestContext = '',
   groom = 'chú rể',
   bride = 'cô dâu',
-  tone = 'Tự nhiên & Chuẩn mực theo nhóm',
   notes = ''
 } = {}) => {
-  const grp = (guestGroup || '').trim() || 'Bạn thân';
-  const prompt = `Bạn là trợ lý AI cao cấp của nền tảng thiệp cưới thông minh WedStory.
-Hãy sáng tác nội dung thiệp cưới cá nhân hoá dành riêng cho nhóm khách mời: "${grp}".
-Cô dâu & Chú rể: ${groom} & ${bride}.
-Phong cách / Giọng điệu: "${tone}".
-${notes ? `Ghi chú thêm: "${notes}".` : ''}
+  const context = (guestContext || '').trim() || 'Bạn thân thiết';
 
-YÊU CẦU VĂN PHONG CHUẨN XÁC THEO NHÓM:
-- Bạn thân: Xưng hô thân mật, gần gũi, hóm hỉnh ("tụi mình", "hai đứa", rủ quẩy hết mình, không câu nệ).
-- Đồng nghiệp / Cấp trên (Sếp): Lịch thiệp, trang trọng, trân trọng sự đồng hành trong công việc ("chúng tôi", "quý anh chị / quý đồng nghiệp").
-- Họ hàng lớn tuổi (Bác, Cô, Chú): Lễ phép, kính cẩn, báo tin và kính mời các bậc tiền bối đến chung vui và ban phước lành cho con cháu.
-- Bạn cấp 3 / Đại học: Đong đầy kỷ niệm thanh xuân ngồi chung giảng đường, hân hoan tái ngộ trong ngày hạnh phúc.
-- Đối tác & Khách quý: Chuẩn mực, trang trọng, trang nhã, nhấn mạnh niềm vinh hạnh to lớn khi được đón tiếp Quý khách.
-- Anh / Chị / Em: Gần gũi, ấm áp, tình thân gia đình ngọt ngào.
+  const systemInstruction = `Bạn là chuyên gia tâm lý ngôn từ và trợ lý AI cao cấp của nền tảng thiệp cưới thông minh WedStory.
+Người dùng sẽ cung cấp một đoạn thông tin/mô tả tự do về khách mời (ví dụ: "Anh Nguyễn Văn A - Trưởng phòng Kinh doanh", "Thằng Tùng béo bạn cấp 3", "Bác Ba - Trưởng họ bên nội", "Chị Mai đồng nghiệp phòng Kế toán"...).
 
-Trả về DUY NHẤT một chuỗi JSON hợp lệ (không kèm markdown ngoài JSON):
+NHIỆM VỤ CỦA BẠN:
+1. TỰ ĐỘNG ĐỌC HIỂU & PHÂN TÍCH:
+   - Tự nhận diện vai vế, mối quan hệ (Cấp trên/Sếp, Đối tác VIP, Bạn thân, Bậc tiền bối/Họ hàng lớn tuổi, Bạn cấp 3/Đại học, Anh chị em...).
+   - Tự động quyết định văn phong:
+     + Cấp trên / Sếp / Đối tác: Trang trọng, lịch thiệp, tôn kính, trân trọng sự dìu dắt và đồng hành.
+     + Bạn thân / Bạn lầy lội / Bạn cấp 3: Thân mật, hài hước, dí dỏm, xưng tụi mình/hai đứa, rủ quẩy hết mình, không câu nệ.
+     + Họ hàng lớn tuổi / Bác Cô Chú: Kính cẩn, lễ phép, xưng cháu/con, báo tin hỷ và kính mời các bậc tiền bối đến ban phúc lành.
+     + Đồng nghiệp: Lịch thiệp, ấm áp, văn minh, gắn kết.
+   - Xưng hô chuẩn xác theo tên/danh xưng được cung cấp trong mô tả.
+
+2. TRẢ VỀ DUY NHẤT MỘT KHỐI JSON HỢP LỆ:
 {
+  "detectedCategory": "Nhóm đối tượng nhận diện được",
+  "detectedTone": "Giọng điệu văn phong đã chọn",
+  "analysis": "1 câu giải thích ngắn gọn về cách AI phân tích ngữ cảnh",
   "quote": "Câu thông điệp mở đầu ngắn gọn (1-2 câu)",
   "message": "Nội dung lời mời chính trên thiệp (khoảng 2-4 câu)"
 }`;
+
+  const prompt = `${systemInstruction}
+
+THÔNG TIN ĐẦU VÀO:
+- Mô tả khách mời: "${context}"
+- Cô dâu & Chú rể: ${groom} & ${bride}
+${notes ? `- Ghi chú thêm: "${notes}"` : ''}
+
+Hãy tự động phân tích ngữ cảnh và tạo kết quả JSON:`;
 
   const models = ['gemini-3.5-flash', 'gemini-3-flash-preview', 'gemini-3.8-flash'];
   for (const m of models) {
@@ -142,9 +155,12 @@ Trả về DUY NHẤT một chuỗi JSON hợp lệ (không kèm markdown ngoài
           const parsed = JSON.parse(clean);
           if (parsed.message) {
             return {
+              detectedCategory: parsed.detectedCategory || 'Khách mời',
+              detectedTone: parsed.detectedTone || 'Tự nhiên & Chuẩn mực',
+              analysis: parsed.analysis || `Đã nhận diện ngữ cảnh cho: "${context}"`,
               message: parsed.message.replace(/^["“]|["”]$/g, '').trim(),
               quote: (parsed.quote || '').replace(/^["“]|["”]$/g, '').trim(),
-              group: grp
+              group: parsed.detectedCategory || 'Khách mời'
             };
           }
         } catch (_) {}
@@ -152,9 +168,91 @@ Trả về DUY NHẤT một chuỗi JSON hợp lệ (không kèm markdown ngoài
     } catch (_) {}
   }
 
-  // Fallback offline
-  return TH.getFallbackInvitation(grp, groom, bride);
+  // Fallback offline thông minh tự động nhận diện
+  return TH.detectContextFallback(context, groom, bride);
 };
+
+/**
+ * Tự động phân tích ngữ cảnh khi offline
+ */
+TH.detectContextFallback = (context = '', groom = 'chú rể', bride = 'cô dâu') => {
+  const c = context.toLowerCase();
+
+  if (c.includes('sếp') || c.includes('trưởng phòng') || c.includes('giám đốc') || c.includes('quản lý') || c.includes('leader') || c.includes('boss') || c.includes('chủ tịch') || c.includes('đối tác') || c.includes('khách hàng') || c.includes('vip')) {
+    return {
+      detectedCategory: '💼 Cấp trên / Đối tác & Khách quý',
+      detectedTone: 'Trang trọng, lịch thiệp & Tôn kính',
+      analysis: `Nhận diện ngữ cảnh cấp trên / lãnh đạo từ "${context}". Áp dụng văn phong lịch thiệp, tôn kính và bày tỏ lòng biết ơn sự dìu dắt trong công việc.`,
+      quote: `Trân quý sự gắn kết và vinh hạnh được đón tiếp Quý lãnh đạo, Quý đối tác trong ngày trọng đại của chúng tôi.`,
+      message: `Sự chỉ bảo, đồng hành và giúp đỡ của ${context} trong suốt thời gian qua là niềm vinh hạnh to lớn cho chúng tôi. Trân trọng kính mời đến dự buổi tiệc chung vui để cùng nâng ly chúc mừng cho khởi đầu mới của ${groom} & ${bride}.`,
+      group: 'Cấp trên / Đối tác'
+    };
+  }
+
+  if (c.includes('thằng') || c.includes('con') || c.includes('béo') || c.includes('còi') || c.includes('bạn thân') || c.includes('nối khố') || c.includes('cấp 3') || c.includes('cấp ba') || c.includes('cấp 2') || c.includes('đại học') || c.includes('sinh viên') || c.includes('học sinh') || c.includes('quẩy') || c.includes('lầy') || c.includes('ruột')) {
+    const isClassmate = c.includes('cấp 3') || c.includes('cấp ba') || c.includes('đại học') || c.includes('học sinh') || c.includes('sinh viên');
+    return {
+      detectedCategory: isClassmate ? '🎓 Bạn học (Cấp 3 / Đại học)' : '👭 Bạn thân / Bạn nối khố',
+      detectedTone: 'Thân mật, hài hước & Tự nhiên',
+      analysis: `Nhận diện bạn bè thân thiết từ "${context}". Áp dụng xưng hô thân mật "tụi mình / hai đứa", hẹn quẩy hết mình và không câu nệ khách sáo.`,
+      quote: isClassmate
+        ? `Thanh xuân có nhau chung lối, ngày chung đôi có nhau chứng kiến!`
+        : `Tình bạn diệu kỳ nhất là cùng chứng kiến nhau bước vào ngày hạnh phúc nhất.`,
+      message: `Tụi mình sắp về chung một nhà rồi! Ngày vui nhất của ${groom} & ${bride} không thể nào trọn vẹn nếu thiếu đi sự có mặt của ${context}. Nhớ lên đồ thật đẹp, chuẩn bị chiếc bụng đói và đến quẩy hết mình cùng tụi mình nhé! 🥂💕`,
+      group: isClassmate ? 'Bạn học' : 'Bạn thân'
+    };
+  }
+
+  if (c.includes('bác') || c.includes('cô') || c.includes('chú') || c.includes('ông') || c.includes('bà') || c.includes('họ') || c.includes('trưởng') || c.includes('nội') || c.includes('ngoại') || c.includes('dòng họ')) {
+    return {
+      detectedCategory: '🏡 Họ hàng lớn tuổi (Bậc tiền bối)',
+      detectedTone: 'Lễ phép, kính cẩn & Đầm ấm gia phong',
+      analysis: `Nhận diện bậc tiền bối / họ hàng từ "${context}". Áp dụng văn phong kính cẩn, xưng cháu lễ phép theo đúng truyền thống gia phong.`,
+      quote: `Ơn sâu dưỡng dục sinh thành, phước lành con cháu sum vầy trăm năm.`,
+      message: `Chúng cháu xin kính cẩn báo tin lễ thành hôn và trân trọng kính mời ${context} cùng toàn thể gia đình đến dự bữa cơm thân mật chung vui cùng hai họ. Sự hiện diện và lời chúc phúc của các bậc tiền bối là niềm phúc lành và hạnh phúc lớn lao cho chặng đường tương lai của chúng cháu.`,
+      group: 'Họ hàng lớn tuổi'
+    };
+  }
+
+  if (c.includes('đồng nghiệp') || c.includes('công ty') || c.includes('phòng') || c.includes('team') || c.includes('cơ quan')) {
+    return {
+      detectedCategory: '💼 Đồng nghiệp / Cơ quan',
+      detectedTone: 'Lịch thiệp, ấm áp & Trang nhã',
+      analysis: `Nhận diện đồng nghiệp từ "${context}". Áp dụng văn phong lịch sự, hòa đồng và trân quý tình đồng nghiệp.`,
+      quote: `Trân quý sự gắn kết và sẻ chia của Quý đồng nghiệp trong ngày vui trọng đại.`,
+      message: `Sự đồng hành và những khoảnh khắc gắn kết cùng ${context} là kỷ niệm thật đẹp đối với chúng tôi. Trân trọng kính mời đến dự buổi tiệc thành hôn để cùng chia sẻ niềm hạnh phúc và chúc phúc cho tổ ấm mới của ${groom} & ${bride}.`,
+      group: 'Đồng nghiệp'
+    };
+  }
+
+  return {
+    detectedCategory: '💌 Khách mời trân quý',
+    detectedTone: 'Chân thành & Ấm áp',
+    analysis: `Nhận diện thông tin khách mời: "${context}". Áp dụng văn phong chân thành, đầm ấm và lịch thiệp.`,
+    quote: `Yêu nhau không phải là nhìn nhau, mà là cùng nhau nhìn về một hướng.`,
+    message: `Trân trọng kính mời ${context} đến dự buổi tiệc chung vui cùng gia đình chúng tôi. Sự hiện diện và lời chúc phúc của quý vị là niềm vinh hạnh to lớn cho đôi uyên ương ${groom} & ${bride} trên hành trình xây đắp tổ ấm mới.`,
+    group: 'Khách mời'
+  };
+};
+
+/**
+ * Cá nhân hoá Lời mời theo nhóm (backward compatibility)
+ */
+TH.generateAiInvitation = async ({
+  guestGroup = 'Bạn thân',
+  groom = 'chú rể',
+  bride = 'cô dâu',
+  tone = 'Tự nhiên & Chuẩn mực theo nhóm',
+  notes = ''
+} = {}) => {
+  return TH.analyzeAndGenerateAiInvitation({
+    guestContext: guestGroup,
+    groom,
+    bride,
+    notes: tone ? `${tone}. ${notes}` : notes
+  });
+};
+
 
 /**
  * Mẫu lời mời và trích dẫn chuẩn mực cho từng nhóm khi offline

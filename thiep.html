@@ -8,9 +8,126 @@
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&family=Great+Vibes&family=Dancing+Script:wght@500;600;700&family=Pinyon+Script&subset=vietnamese&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/style.css">
 <link rel="stylesheet" href="assets/css/thiep.css">
+<style>
+/* ── Banner lời mời cá nhân hoá từ Pretty Link ── */
+.personal-banner {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 9990;
+  background: linear-gradient(135deg, #9E2B47 0%, #C84B68 100%);
+  color: #fff;
+  padding: 10px 20px;
+  text-align: center;
+  font-family: 'Be Vietnam Pro', sans-serif;
+  animation: slideDown .45s cubic-bezier(.22,1,.36,1) both;
+  box-shadow: 0 4px 20px rgba(158,43,71,.35);
+}
+@keyframes slideDown {
+  from { transform: translateY(-110%); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+.personal-banner .pb-salute {
+  font-size: clamp(.82rem, 2.5vw, 1rem);
+  font-weight: 700;
+  letter-spacing: .02em;
+  opacity: .95;
+}
+.personal-banner .pb-msg {
+  font-size: clamp(.75rem, 2vw, .88rem);
+  opacity: .85;
+  margin-top: 3px;
+  line-height: 1.55;
+}
+.personal-banner .pb-close {
+  position: absolute;
+  top: 8px; right: 12px;
+  background: rgba(255,255,255,.2);
+  border: none; border-radius: 50%;
+  width: 26px; height: 26px;
+  cursor: pointer; color: #fff;
+  font-size: 1rem; line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+}
+.personal-banner .pb-close:hover { background: rgba(255,255,255,.35); }
+body.has-personal-banner { padding-top: 72px; }
+@media (max-width: 480px) {
+  body.has-personal-banner { padding-top: 90px; }
+  .personal-banner { padding: 10px 36px 10px 16px; }
+}
+</style>
 </head>
 <body class="inv">
+
+<!-- Banner cá nhân hoá — chỉ xuất hiện khi truy cập qua Pretty Link hoặc ?couple=&guest= -->
+<div id="personalBanner" style="display:none"></div>
+
 <div id="app"></div>
+
+<script>
+/* ── Đọc tham số cá nhân hoá từ URL ─────────────────────────────
+   Hỗ trợ:
+   1. Pretty Link rewrite : /dam-cuoi-minh-khoa-thu-ha/bac-ca
+      → Vercel rewrite tới /thiep.html?couple=minh-khoa-thu-ha&guest=bac-ca
+   2. Query params trực tiếp : ?couple=...&guest=...
+   3. Query param ?to=... (định dạng cũ — chỉ tên)
+   ──────────────────────────────────────────────────────────────── */
+(function initPersonalBanner() {
+  'use strict';
+  const qs = new URLSearchParams(location.search);
+  const couple    = qs.get('couple') || '';
+  const guestSlug = qs.get('guest')  || qs.get('to') || '';
+
+  if (!guestSlug && !couple) return;
+
+  function slugToDisplay(slug) {
+    if (!slug) return '';
+    return slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+  }
+
+  function toSlug(s) {
+    return String(s || '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[đĐ]/g, c => c === 'đ' ? 'd' : 'D')
+      .toLowerCase().trim()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '');
+  }
+
+  function escHtml(s) {
+    return String(s).replace(/[&<>"']/g, c =>
+      ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+
+  const rawKey = toSlug(guestSlug);
+  let savedData = null;
+  try {
+    savedData = JSON.parse(sessionStorage.getItem('ai_msg_' + rawKey) || localStorage.getItem('ai_msg_' + rawKey) || 'null');
+  } catch (e) {}
+
+  const guestName = savedData?.name || slugToDisplay(guestSlug);
+  const salutation = savedData?.salutation || (guestName ? `Kính gửi ${guestName}` : 'Kính gửi Quý Khách');
+  const message = savedData?.message || 'Trân trọng kính mời bạn đến dự lễ cưới của chúng tôi. Sự hiện diện của bạn là niềm vinh hạnh lớn lao!';
+
+  if (guestSlug) {
+    const banner = document.getElementById('personalBanner');
+    banner.className = 'personal-banner';
+    banner.style.display = 'block';
+    banner.innerHTML =
+      '<button class="pb-close" onclick="this.closest(\'.personal-banner\').remove();document.body.classList.remove(\'has-personal-banner\')" aria-label="Đóng">&times;</button>' +
+      '<div class="pb-salute">💌 ' + escHtml(salutation) + '</div>' +
+      '<div class="pb-msg">' + escHtml(message) + '</div>';
+    document.body.classList.add('has-personal-banner');
+  }
+
+  try {
+    if (guestName) document.title = 'Thiệp cưới – ' + guestName;
+    const desc = document.querySelector('meta[name="description"]');
+    if (desc) desc.content = salutation + '. ' + message;
+  } catch (e) {}
+})();
+</script>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="assets/js/data.js"></script>
@@ -19,5 +136,76 @@
 <script src="assets/js/thiep-extras.js"></script>
 <script src="assets/js/thiep-edit.js"></script>
 <script src="assets/js/thiep.js"></script>
+
+<script>
+/* ── Tự động hiển thị Tên riêng/Xưng hô & Lời nhắn trực tiếp lên khung thiệp cưới ── */
+(function applyPersonalizationToCard() {
+  'use strict';
+  const qs = new URLSearchParams(location.search);
+  const couple = qs.get('couple') || '';
+  const guestSlug = qs.get('guest') || qs.get('to') || '';
+  if (!couple && !guestSlug) return;
+
+  function slugToDisplay(s) {
+    if (!s) return '';
+    return s.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+  }
+
+  function toSlug(s) {
+    return String(s || '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[đĐ]/g, c => c === 'đ' ? 'd' : 'D')
+      .toLowerCase().trim()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '');
+  }
+
+  const rawKey = toSlug(guestSlug);
+  let savedData = null;
+  try {
+    savedData = JSON.parse(sessionStorage.getItem('ai_msg_' + rawKey) || localStorage.getItem('ai_msg_' + rawKey) || 'null');
+  } catch (e) {}
+
+  const displayName = savedData?.salutation || savedData?.name || slugToDisplay(guestSlug);
+  const personalizedMessage = savedData?.message || (guestSlug ? `Trân trọng kính mời ${displayName} đến chung vui trong ngày hạnh phúc của chúng mình.` : null);
+
+  // 1. Cập nhật lời nhắn cá nhân hóa trực tiếp lên thiệp cưới
+  const msgEl = document.querySelector('[data-b="message"]');
+  if (msgEl && personalizedMessage) {
+    msgEl.textContent = personalizedMessage;
+  }
+
+  // 2. Cập nhật dòng Tên riêng/Xưng hô trên thiệp
+  if (displayName) {
+    const guestLine = document.querySelector('.guest-line');
+    if (guestLine) {
+      const bEl = guestLine.querySelector('b');
+      if (bEl) bEl.textContent = displayName;
+    } else {
+      const coupleEl = document.querySelector('.sec-hero .couple') || document.querySelector('.couple');
+      if (coupleEl) {
+        const newLine = document.createElement('div');
+        newLine.className = 'guest-line reveal';
+        newLine.style.cssText = 'margin:18px 0 10px;text-align:center';
+        newLine.innerHTML = '<small style="letter-spacing:.2em;text-transform:uppercase;font-size:.7rem;opacity:.7;display:block">Kính mời</small><b style="font-size:1.2rem;color:var(--t-accent,#9E2B47)">' + displayName + '</b>';
+        coupleEl.after(newLine);
+      }
+    }
+  }
+
+  // 3. Cập nhật tên cặp đôi nếu mở link phân cấp /dam-cuoi-:couple/...
+  if (couple) {
+    const parts = couple.split('-');
+    if (parts.length >= 2) {
+      const mid = Math.floor(parts.length / 2);
+      const gName = slugToDisplay(parts.slice(0, mid).join('-'));
+      const bName = slugToDisplay(parts.slice(mid).join('-'));
+      document.querySelectorAll('[data-b="groom.nick"]').forEach(el => el.textContent = gName);
+      document.querySelectorAll('[data-b="bride.nick"]').forEach(el => el.textContent = bName);
+    }
+  }
+})();
+</script>
 </body>
 </html>

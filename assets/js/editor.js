@@ -115,94 +115,72 @@ const ANIMS = [['','Không'],['fade','Hiện dần'],['up','Trượt lên'],['do
   ['spin','Xoay vào'],['blur','Mờ → rõ'],['flip','Lật'],['float','Bồng bềnh ∞'],['pulse','Nhịp tim ∞'],['swing','Đung đưa ∞'],['shine','Lấp lánh ∞']];
 
 const DRAWERS = {
-  ai: () => {
-    const curGroup = D._lastAiGroup || 'Bạn thân';
-    const hasCustom = !['Bạn thân', 'Đồng nghiệp & Sếp', 'Họ hàng lớn tuổi (Bác, Cô, Chú)', 'Bạn cấp 3 / Đại học', 'Đối tác & Khách quý', 'Anh / Chị / Em'].includes(curGroup);
-    return `
+  ai: () => `
     <div style="background:linear-gradient(135deg,#fff8f6,#fdf1ed);border:1px solid #f3d4cc;border-radius:14px;padding:14px;margin-bottom:14px">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
         <span style="font-size:1.35rem">✨</span>
         <div>
-          <b style="color:#9b382d;font-size:1.02rem;display:block">Cá Nhân Hoá Lời Mời AI</b>
-          <small style="color:#8a5e55">Gemini 3.5 Flash · Cá nhân hoá theo nhóm khách</small>
+          <b style="color:#9b382d;font-size:1.02rem;display:block">AI Tự Nhận Diện &amp; Phân Tích Lời Mời</b>
+          <small style="color:#8a5e55">Gemini 3.5 Flash · Tự động đọc hiểu ngữ cảnh</small>
         </div>
-        <span style="font-size:10px;background:#b85042;color:#fff;padding:2px 7px;border-radius:10px;font-weight:600;margin-left:auto">Gemini 3.5</span>
+        <span style="font-size:10px;background:#b85042;color:#fff;padding:2px 7px;border-radius:10px;font-weight:600;margin-left:auto">Tự động 100%</span>
       </div>
       <p class="hint" style="margin:4px 0 0;color:#6b524c;font-size:0.83rem;line-height:1.45">
-        Tự động tạo <b>Lời mời chính</b> và <b>Thông điệp mở đầu</b> trên thiệp với văn phong chuẩn mực (thân mật, lịch thiệp hoặc kính cẩn) phù hợp từng nhóm khách mời.
+        Không cần chọn nhóm thủ công! Chỉ cần nhập tên, chức vụ hoặc một câu mô tả ngắn về khách mời — AI sẽ tự suy luận vai vế, chọn mức độ trang trọng và sáng tác lời mời chuẩn xác.
       </p>
     </div>
 
     <!-- Chọn chế độ -->
     <div style="display:flex;background:#f3e9e6;border-radius:10px;padding:3px;margin-bottom:14px;gap:4px">
       <button type="button" class="btn btn-sm" id="edAiTabInvite" style="flex:1;background:#fff;border:0;color:#9b382d;font-weight:700;box-shadow:0 1px 4px rgba(0,0,0,0.06);border-radius:8px;padding:7px">
-        💌 Cá nhân hoá lời mời
+        💌 Cá nhân hoá lời mời (Tự động)
       </button>
       <button type="button" class="btn btn-sm" id="edAiTabWish" style="flex:1;background:transparent;border:0;color:#7a625d;font-weight:600;border-radius:8px;padding:7px">
         💬 Lời chúc đám cưới
       </button>
     </div>
 
-    <!-- KHỐI 1: CÁ NHÂN HOÁ LỜI MỜI THEO NHÓM (CHÍNH) -->
+    <!-- KHỐI 1: CÁ NHÂN HOÁ TỰ ĐỘNG THEO NGỮ CẢNH (CHÍNH) -->
     <div id="edAiInviteSection">
       <div class="field">
         <label style="display:flex;align-items:center;justify-content:space-between">
-          <span><b>1. Chọn Nhóm khách mời</b></span>
-          <small style="color:#9b382d;font-weight:600">Được tối ưu văn phong</small>
+          <span><b>Nhập tên, chức danh hoặc mối quan hệ:</b></span>
+          <small style="color:#9b382d;font-weight:600">AI tự phân loại</small>
         </label>
-        
-        <!-- Các nhóm khách mời mẫu nhanh -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px">
-          ${[
-            ['Bạn thân', '👭 Bạn thân / Bạn nối khố', 'Thân mật, hóm hỉnh'],
-            ['Đồng nghiệp & Sếp', '💼 Đồng nghiệp / Sếp', 'Lịch thiệp, trang trọng'],
-            ['Họ hàng lớn tuổi (Bác, Cô, Chú)', '🏡 Họ hàng lớn tuổi', 'Lễ phép, kính cẩn'],
-            ['Bạn cấp 3 / Đại học', '🎓 Bạn cấp 3 / Đại học', 'Thanh xuân, hoài niệm'],
-            ['Đối tác & Khách quý', '🤝 Đối tác & Khách quý', 'Trang nhã, đẳng cấp'],
-            ['Anh / Chị / Em', '🌸 Anh / Chị / Em', 'Gần gũi, ấm áp']
-          ].map(([val, label, sub]) => `
-            <button type="button" class="btn btn-outline btn-sm ed-grp-pill ${curGroup === val ? 'is-active' : ''}" data-grp="${esc(val)}" style="padding:7px 9px;text-align:left;height:auto;display:flex;flex-direction:column;gap:2px;border-radius:10px;${curGroup === val ? 'border-color:#b85042;background:#fff4f2;color:#9b382d;font-weight:700' : 'background:#fff'}">
-              <span style="font-size:0.83rem">${label}</span>
-              <small style="font-size:10px;opacity:0.75;font-weight:normal">${sub}</small>
-            </button>
-          `).join('')}
-        </div>
+        <textarea id="edAiSmartContext" rows="2" placeholder="Ví dụ: 'Anh Nguyễn Văn A - Trưởng phòng Kinh doanh', hoặc 'Thằng Tùng béo bạn cấp 3'..." style="width:100%;padding:10px 12px;border-radius:10px;border:1.5px solid #d8a69d;font-size:0.9rem;line-height:1.45;color:#332724;background:#fff"></textarea>
+      </div>
 
-        <div style="display:flex;gap:6px;align-items:center;margin-top:4px">
-          <input type="text" id="edAiCustomGroup" placeholder="Hoặc tự nhập tên nhóm (VD: CLB Cầu lông, Team Marketing...)" value="${hasCustom ? esc(curGroup) : ''}" style="width:100%;font-size:0.85rem">
+      <!-- Gợi ý mẫu nhanh 1-chạm -->
+      <div style="margin-bottom:12px">
+        <small style="display:block;font-size:11px;color:#7a625d;font-weight:600;margin-bottom:5px">💡 Gợi ý chạm nhanh để thử:</small>
+        <div style="display:flex;flex-wrap:wrap;gap:5px">
+          <button type="button" class="btn btn-outline btn-sm ed-quick-prompt" data-prompt="Anh Nguyễn Văn A - Trưởng phòng Kinh doanh" style="font-size:0.75rem;padding:4px 9px;border-radius:999px">💼 Anh Minh - Trưởng phòng</button>
+          <button type="button" class="btn btn-outline btn-sm ed-quick-prompt" data-prompt="Thằng Tùng béo bạn cấp 3" style="font-size:0.75rem;padding:4px 9px;border-radius:999px">👭 Tùng béo bạn cấp 3</button>
+          <button type="button" class="btn btn-outline btn-sm ed-quick-prompt" data-prompt="Bác Ba - Trưởng họ bên nội" style="font-size:0.75rem;padding:4px 9px;border-radius:999px">🏡 Bác Ba - Trưởng họ</button>
+          <button type="button" class="btn btn-outline btn-sm ed-quick-prompt" data-prompt="Chị Lan đồng nghiệp phòng Marketing" style="font-size:0.75rem;padding:4px 9px;border-radius:999px">🌸 Chị Lan đồng nghiệp</button>
+          <button type="button" class="btn btn-outline btn-sm ed-quick-prompt" data-prompt="Đối tác chiến lược VIP công ty" style="font-size:0.75rem;padding:4px 9px;border-radius:999px">🤝 Đối tác VIP</button>
         </div>
       </div>
 
-      <div class="field">
-        <label><b>2. Phong cách &amp; Văn phong</b></label>
-        <select id="edAiGroupTone" style="width:100%;padding:8px 10px;border-radius:9px;border:1px solid var(--ed-line);background:#fff;font-size:0.88rem">
-          <option value="Tự nhiên & Chuẩn mực theo nhóm">✨ Tự động theo chuẩn văn phong của nhóm (Khuyên dùng)</option>
-          <option value="Thân mật, vui vẻ & Hóm hỉnh">😄 Thân mật, vui tươi &amp; Hài hước (Tụi mình, hai đứa...)</option>
-          <option value="Lễ phép, kính cẩn & Đầm ấm gia phong">👵 Lễ phép, kính cẩn &amp; Chuẩn truyền thống (Con cháu kính cẩn...)</option>
-          <option value="Trang trọng, lịch thiệp & Tôn quý">🎩 Trang trọng, lịch thiệp &amp; Đẳng cấp (Chúng tôi, kính mời Quý khách...)</option>
-          <option value="Lãng mạn, tinh tế & Cảm xúc">🌹 Lãng mạn, sâu lắng &amp; Tinh tế</option>
-          <option value="Ngắn gọn, súc tích & Tinh gọn">⚡ Ngắn gọn, súc tích &amp; Hiện đại</option>
-        </select>
+      <div class="field" style="margin-bottom:12px">
+        <label>Ghi chú thêm nếu muốn (tuỳ chọn):</label>
+        <input type="text" id="edAiNotes" placeholder="VD: Nhắc thêm kỷ niệm vui, xưng hô hai cháu với Bác..." style="font-size:0.85rem">
       </div>
 
-      <div class="field">
-        <label>Ghi chú thêm cho AI (tuỳ chọn)</label>
-        <input type="text" id="edAiNotes" placeholder="VD: Nhắc lại thời sinh viên, xưng hô hai cháu với Bác..." style="font-size:0.85rem">
-      </div>
-
-      <button type="button" class="btn btn-primary" id="edAiGenGroupBtn" style="width:100%;background:linear-gradient(135deg,#b85042,#9b382d);border:0;box-shadow:0 6px 16px rgba(184,80,66,.25);padding:11px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:12px;border-radius:10px">
-        <span>✨</span><span>Gemini AI Tạo Lời Mời Cho Nhóm Này</span>
+      <button type="button" class="btn btn-primary" id="edAiSmartGenBtn" style="width:100%;background:linear-gradient(135deg,#b85042,#9b382d);border:0;box-shadow:0 6px 16px rgba(184,80,66,.25);padding:12px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:14px;border-radius:10px">
+        <span>✨</span><span>AI Phân Tích &amp; Tự Động Tạo Lời Mời</span>
       </button>
 
       <!-- KHUNG HIỂN THỊ KẾT QUẢ VÀ ÁP DỤNG TRỰC TIẾP LÊN THIỆP -->
       <div id="edAiGroupResult" style="background:#fff;border:1.5px solid #eecbc4;border-radius:12px;padding:12px;margin-bottom:14px;box-shadow:0 4px 14px rgba(184,80,66,0.06)">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-          <span style="font-size:11px;font-weight:700;text-transform:uppercase;color:#9b382d;letter-spacing:0.05em">
-            Nội dung lời mời cá nhân hoá:
-          </span>
-          <span id="edAiBadgeGroup" style="font-size:11px;background:#fde8e4;color:#9b382d;padding:2px 8px;border-radius:12px;font-weight:600">
-            ${esc(curGroup)}
-          </span>
+        <!-- Badge phân loại & phân tích từ AI -->
+        <div id="edAiAnalysisCard" style="background:#fff7f5;border:1px solid #f2d0c8;border-radius:9px;padding:10px 12px;margin-bottom:12px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+            <span style="font-size:11px;font-weight:700;color:#9b382d;text-transform:uppercase">🏷️ AI Nhận Diện:</span>
+            <span id="edAiDetectedCat" style="font-size:11px;background:#fde8e4;color:#9b382d;padding:2px 8px;border-radius:10px;font-weight:700">Chưa phân tích</span>
+          </div>
+          <div style="font-size:11px;color:#574844;margin-bottom:3px"><b>🎭 Văn phong:</b> <span id="edAiDetectedTone">Tự động chọn theo đối tượng</span></div>
+          <div style="font-size:11px;color:#7a625d;font-style:italic" id="edAiAnalysis">Nhập thông tin khách mời ở trên và bấm nút tạo để AI tự động phân loại.</div>
         </div>
 
         <div style="margin-bottom:10px">
@@ -232,21 +210,6 @@ const DRAWERS = {
             ➕ Thêm chữ tự do
           </button>
         </div>
-      </div>
-
-      <!-- THANH CHUYỂN ĐỔI XEM TRƯỚC THEO NHÓM -->
-      <div style="border-top:1px solid var(--ed-line);padding-top:12px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-          <b style="font-size:0.82rem;color:#332724">👁️ Chuyển đổi xem thử theo nhóm:</b>
-        </div>
-        <div style="display:flex;flex-wrap:wrap;gap:5px" id="edAiQuickSwitchers">
-          ${['Bạn thân', 'Đồng nghiệp & Sếp', 'Họ hàng lớn tuổi (Bác, Cô, Chú)', 'Bạn cấp 3 / Đại học', 'Đối tác & Khách quý', 'Anh / Chị / Em'].map(g => `
-            <button type="button" class="btn btn-outline btn-sm ed-switch-grp" data-switchgrp="${esc(g)}" style="font-size:0.74rem;padding:4px 8px;border-radius:999px">
-              ${g === 'Bạn thân' ? '👭' : g.includes('Đồng nghiệp') ? '💼' : g.includes('Họ hàng') ? '🏡' : g.includes('cấp 3') ? '🎓' : g.includes('Đối tác') ? '🤝' : '🌸'} ${esc(g.split(' ')[0])}
-            </button>
-          `).join('')}
-        </div>
-        <p class="hint" style="margin:6px 0 0;font-size:11px">Bấm vào nhóm để đổi nội dung và xem giao diện thiệp biến đổi trực tiếp.</p>
       </div>
     </div>
 
@@ -291,8 +254,7 @@ const DRAWERS = {
           ➕ Đưa thành chữ tự do lên thiệp cưới
         </button>
       </div>
-    </div>`;
-  },
+    </div>`,
 
 
   info: () => `
@@ -447,118 +409,84 @@ function buildDrawer(){
       };
     }
 
-    // Nhóm khách mời đang chọn
-    let selectedGroup = D._lastAiGroup || 'Bạn thân';
-    const customInput = $('#edAiCustomGroup', dr);
-    const badgeGroup = $('#edAiBadgeGroup', dr);
+    const contextInput = $('#edAiSmartContext', dr);
+    const smartGenBtn = $('#edAiSmartGenBtn', dr);
+    const detectedCat = $('#edAiDetectedCat', dr);
+    const detectedTone = $('#edAiDetectedTone', dr);
+    const analysisText = $('#edAiAnalysis', dr);
     const msgText = $('#edAiMsgText', dr);
     const quoteText = $('#edAiQuoteText', dr);
-    const toneSelect = $('#edAiGroupTone', dr);
     const notesInput = $('#edAiNotes', dr);
-    const genGroupBtn = $('#edAiGenGroupBtn', dr);
     const applyDirectBtn = $('#edAiApplyDirectBtn', dr);
     const copyAllBtn = $('#edAiCopyAll', dr);
     const addFreeBtn = $('#edAiResetCard', dr);
 
-    // Khởi tạo lưu trữ nội dung theo nhóm
-    D.groupMessages = D.groupMessages || {};
-
-    const selectGroup = (grpName) => {
-      selectedGroup = grpName.trim() || 'Bạn thân';
-      D._lastAiGroup = selectedGroup;
-      if (badgeGroup) badgeGroup.textContent = selectedGroup;
-
-      $$('.ed-grp-pill', dr).forEach(p => {
-        const isMatch = p.dataset.grp === selectedGroup;
-        p.style.borderColor = isMatch ? '#b85042' : 'var(--ed-line)';
-        p.style.background = isMatch ? '#fff4f2' : '#fff';
-        p.style.color = isMatch ? '#9b382d' : 'inherit';
-        p.style.fontWeight = isMatch ? '700' : 'normal';
-      });
-
-      // Nếu đã có nội dung lưu trước đó cho nhóm này, nạp vào ngay
-      if (D.groupMessages[selectedGroup]) {
-        if (msgText) msgText.value = D.groupMessages[selectedGroup].message || '';
-        if (quoteText) quoteText.value = D.groupMessages[selectedGroup].quote || '';
-      } else {
-        // Nạp mẫu sẵn phù hợp theo nhóm để người dùng xem ngay
-        const groom = D.groom?.nick || D.groom?.name || 'Chú rể';
-        const bride = D.bride?.nick || D.bride?.name || 'Cô dâu';
-        const fallback = TH.getFallbackInvitation?.(selectedGroup, groom, bride);
-        if (fallback) {
-          if (msgText && !D.message) msgText.value = fallback.message;
-          if (quoteText && !D.quote) quoteText.value = fallback.quote;
+    // Bấm các chip gợi ý nhanh (1-chạm)
+    $$('.ed-quick-prompt', dr).forEach(btn => {
+      btn.onclick = () => {
+        const p = btn.dataset.prompt;
+        if (contextInput) {
+          contextInput.value = p;
+          contextInput.focus();
         }
-      }
-    };
-
-    // Bấm chọn nhóm từ các pill
-    $$('.ed-grp-pill', dr).forEach(p => {
-      p.onclick = () => {
-        if (customInput) customInput.value = '';
-        selectGroup(p.dataset.grp);
       };
     });
 
-    // Khi người dùng gõ tên nhóm tuỳ chỉnh
-    if (customInput) {
-      customInput.oninput = () => {
-        const val = customInput.value.trim();
-        if (val) selectGroup(val);
-      };
-    }
-
-    // Nút Sinh lời mời bằng Gemini AI
-    if (genGroupBtn) {
-      genGroupBtn.onclick = async () => {
-        genGroupBtn.disabled = true;
-        genGroupBtn.innerHTML = '<span>⏳</span><span>Gemini AI đang soạn lời mời cá nhân hoá…</span>';
+    // Nút AI TỰ ĐỘNG PHÂN TÍCH & TẠO LỜI MỜI
+    if (smartGenBtn) {
+      smartGenBtn.onclick = async () => {
+        smartGenBtn.disabled = true;
+        smartGenBtn.innerHTML = '<span>⏳</span><span>Gemini AI đang phân tích ngữ cảnh &amp; tạo lời mời…</span>';
         try {
           const groom = D.groom?.nick || D.groom?.name || 'Chú rể';
           const bride = D.bride?.nick || D.bride?.name || 'Cô dâu';
-          const grp = selectedGroup || 'Bạn thân';
-          const tone = toneSelect?.value || 'Tự nhiên & Chuẩn mực theo nhóm';
+          const ctx = contextInput?.value?.trim() || 'Bạn thân thiết';
           const notes = notesInput?.value || '';
 
-          const result = await TH.generateAiInvitation({
-            guestGroup: grp,
+          const result = await TH.analyzeAndGenerateAiInvitation({
+            guestContext: ctx,
             groom,
             bride,
-            tone,
             notes
           });
 
           if (result && result.message) {
+            // Cập nhật thông tin phân tích nhận diện
+            if (detectedCat) detectedCat.textContent = result.detectedCategory || 'Khách quý';
+            if (detectedTone) detectedTone.textContent = result.detectedTone || 'Tự nhiên & Chuẩn mực';
+            if (analysisText) analysisText.textContent = result.analysis || `Đã đọc hiểu ngữ cảnh cho: "${ctx}"`;
+
+            // Cập nhật các ô soạn thảo
             if (msgText) msgText.value = result.message;
             if (quoteText) quoteText.value = result.quote || '';
 
-            // Tự động lưu và cập nhật trực tiếp vào thiệp cưới xem trước!
+            // Tự động áp dụng thẳng lên thiệp xem trước
             D.message = result.message;
             if (result.quote) D.quote = result.quote;
-            D.groupMessages[grp] = {
-              name: grp,
+            D.groupMessages = D.groupMessages || {};
+            D.groupMessages[result.detectedCategory || 'Khách mời'] = {
+              name: result.detectedCategory || 'Khách mời',
               message: result.message,
               quote: result.quote || ''
             };
 
-            // Đồng bộ ngay lập tức sang iframe xem trước
+            // Đồng bộ trực tiếp sang iframe xem trước
             touch(true);
-            // Cuộn khung xem trước đến phần Lời mời & Lời ngỏ để người dùng thấy ngay
             pvPost({type:'th-scroll', sel:'.sec-couple'});
 
-            TH.toast(`✨ Đã cá nhân hoá lời mời cho "${grp}" và cập nhật lên thiệp xem trước! 💌`);
+            TH.toast(`✨ Đã nhận diện "${result.detectedCategory}" & cập nhật thiệp xem trước! 💌`);
           }
         } catch (err) {
-          console.error('Lỗi khi gọi AI cá nhân hoá lời mời:', err);
+          console.error('Lỗi khi AI phân tích ngữ cảnh:', err);
           TH.toast('Không thể kết nối AI, vui lòng thử lại.');
         } finally {
-          genGroupBtn.disabled = false;
-          genGroupBtn.innerHTML = '<span>✨</span><span>Gemini AI Tạo Lời Mời Cho Nhóm Này</span>';
+          smartGenBtn.disabled = false;
+          smartGenBtn.innerHTML = '<span>✨</span><span>AI Phân Tích &amp; Tự Động Tạo Lời Mời</span>';
         }
       };
     }
 
-    // Nút ÁP DỤNG TRỰC TIẾP LÊN THIỆP XEM TRƯỚC
+    // Nút Áp dụng thủ công nếu người dùng có sửa chữ
     if (applyDirectBtn) {
       applyDirectBtn.onclick = () => {
         const newMsg = msgText?.value?.trim();
@@ -566,52 +494,25 @@ function buildDrawer(){
         if (newMsg) D.message = newMsg;
         if (newQuote !== undefined) D.quote = newQuote;
 
-        D.groupMessages[selectedGroup] = {
-          name: selectedGroup,
+        const cat = detectedCat?.textContent || 'Khách mời';
+        D.groupMessages = D.groupMessages || {};
+        D.groupMessages[cat] = {
+          name: cat,
           message: newMsg || D.message,
           quote: newQuote || D.quote
         };
 
-        // Gửi sang iframe xem trước và cuộn đến khu vực hiển thị
         touch(true);
         pvPost({type:'th-scroll', sel:'.sec-couple'});
-        TH.toast(`👁️ Đã hiển thị lời mời nhóm "${selectedGroup}" lên thiệp cưới xem trước! 💕`);
+        TH.toast(`👁️ Đã cập nhật nội dung lời mời lên thiệp cưới xem trước! 💕`);
       };
     }
-
-    // Chuyển đổi nhanh xem trước giữa các nhóm
-    $$('.ed-switch-grp', dr).forEach(btn => {
-      btn.onclick = () => {
-        const grp = btn.dataset.switchgrp;
-        selectGroup(grp);
-        const groom = D.groom?.nick || D.groom?.name || 'Chú rể';
-        const bride = D.bride?.nick || D.bride?.name || 'Cô dâu';
-
-        // Lấy nội dung đã lưu hoặc nội dung mẫu chuẩn của nhóm
-        let targetMsg = D.groupMessages[grp]?.message;
-        let targetQuote = D.groupMessages[grp]?.quote;
-        if (!targetMsg) {
-          const sample = TH.getFallbackInvitation(grp, groom, bride);
-          targetMsg = sample.message;
-          targetQuote = sample.quote;
-          D.groupMessages[grp] = { name: grp, message: targetMsg, quote: targetQuote };
-        }
-
-        if (msgText) msgText.value = targetMsg;
-        if (quoteText) quoteText.value = targetQuote;
-        D.message = targetMsg;
-        D.quote = targetQuote;
-
-        touch(true);
-        pvPost({type:'th-scroll', sel:'.sec-couple'});
-        TH.toast(`Đang xem thiệp cưới gửi nhóm: ${grp} ✨`);
-      };
-    });
 
     // Sao chép nội dung
     if (copyAllBtn) {
       copyAllBtn.onclick = () => {
-        const txt = `[${selectedGroup}]\n` + (quoteText?.value ? `“${quoteText.value}”\n\n` : '') + (msgText?.value || '');
+        const cat = detectedCat?.textContent || 'Khách mời';
+        const txt = `[${cat}]\n` + (quoteText?.value ? `“${quoteText.value}”\n\n` : '') + (msgText?.value || '');
         navigator.clipboard?.writeText(txt);
         TH.toast('Đã sao chép lời mời vào bộ nhớ tạm!');
       };
