@@ -291,6 +291,364 @@ kbd{display:inline-block;padding:1px 6px;border:1px solid var(--ed-line);border-
   .quick-strip{padding:0 10px 10px}.qs{flex-basis:64px}.qs-img{width:64px;height:64px}
 }
 @media(max-width:420px){.top-r .btn{padding:8px 10px}}
+
+/* ================= Quản lý khách mời & Trợ lý AI (Modal Overlay) ================= */
+:root {
+  --gm-rose: #C84B68;
+  --gm-burg: #9E2B47;
+  --gm-rose-l: #fdf0f3;
+  --gm-rose-m: #f5c6d3;
+  --gm-ink: #2b1d24;
+  --gm-muted: #7a5d67;
+  --gm-border: #e8d0d9;
+  --gm-bg: #faf7f8;
+  --gm-green: #1f7a37;
+  --gm-green-bg: #e6f6eb;
+  --gm-amber: #b45309;
+  --gm-amber-bg: #fffbeb;
+}
+
+.gm-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  box-sizing: border-box;
+}
+.gm-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(18, 10, 15, 0.72);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.gm-modal-dialog {
+  position: relative;
+  width: 100%;
+  max-width: 1180px;
+  max-height: 92vh;
+  background: #faf7f8;
+  border-radius: 20px;
+  border: 1.5px solid rgba(200, 75, 104, 0.25);
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.45);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 10000;
+  animation: gmModalPop .22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes gmModalPop {
+  from { opacity: 0; transform: scale(0.96) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.gm-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 22px;
+  background: #fff;
+  border-bottom: 1.5px solid var(--gm-border);
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+.gm-modal-header-l {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.gm-modal-logo {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: var(--gm-burg);
+  letter-spacing: .02em;
+}
+.gm-modal-logo em { color: var(--gm-rose); font-style: normal; }
+.gm-modal-subtitle {
+  font-size: .84rem;
+  color: var(--gm-muted);
+  border-left: 1.5px solid var(--gm-border);
+  padding-left: 10px;
+}
+
+.gm-modal-tabs {
+  display: inline-flex;
+  background: #fdf5f8;
+  padding: 4px;
+  border-radius: 999px;
+  border: 1px solid var(--gm-border);
+  gap: 4px;
+}
+.gm-modal-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  border-radius: 999px;
+  border: 0;
+  background: transparent;
+  color: var(--gm-muted);
+  font: 600 .82rem 'Be Vietnam Pro', sans-serif;
+  cursor: pointer;
+  transition: all .2s;
+  white-space: nowrap;
+}
+.gm-modal-tab-btn:hover { color: var(--gm-burg); background: #fff; }
+.gm-modal-tab-btn.active {
+  background: linear-gradient(135deg, var(--gm-burg) 0%, var(--gm-rose) 100%);
+  color: #fff;
+  box-shadow: 0 3px 10px rgba(158,43,71,.24);
+}
+.gm-hot-badge {
+  background: #ffec3d;
+  color: #8c5d00;
+  font-size: .65rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 999px;
+  letter-spacing: .03em;
+}
+
+.gm-modal-close {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 0;
+  background: #f5edf0;
+  color: var(--gm-muted);
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all .15s;
+}
+.gm-modal-close:hover { background: #eddfe4; color: var(--gm-burg); }
+
+.gm-modal-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ── GM Card & Elements inside Modal ── */
+.gm-card {
+  background: #fff;
+  border: 1px solid var(--gm-border);
+  border-radius: 16px;
+  padding: 22px 24px;
+  box-shadow: 0 3px 16px rgba(200,75,104,.05);
+}
+.gm-card-title {
+  font: 700 1.1rem 'Playfair Display', serif;
+  color: var(--gm-burg);
+  margin: 0 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.gm-card-title .left { display: flex; align-items: center; gap: 10px; }
+
+.gm-step-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  background: var(--gm-burg);
+  color: #fff;
+  font: 700 .8rem 'Be Vietnam Pro', sans-serif;
+  flex-shrink: 0;
+}
+
+.gm-field label { display: block; font: 600 .82rem 'Be Vietnam Pro', sans-serif; color: var(--gm-muted); margin-bottom: 5px; }
+.gm-field input, .gm-field select, .gm-field textarea {
+  width: 100%; padding: 9px 12px;
+  border: 1.5px solid var(--gm-border); border-radius: 10px;
+  font: 500 .9rem 'Be Vietnam Pro', sans-serif; color: var(--gm-ink);
+  background: #fff; transition: border-color .15s;
+  box-sizing: border-box;
+}
+.gm-field input:focus, .gm-field select:focus, .gm-field textarea:focus { outline: none; border-color: var(--gm-rose); }
+
+.gm-couple-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: end; }
+.gm-slug-preview { font-size: .8rem; color: var(--gm-muted); margin-top: 4px; }
+.gm-slug-preview b { color: var(--gm-burg); }
+
+/* ── GM Table Styling ── */
+.gm-tbl-wrap { overflow-x: auto; border-radius: 12px; border: 1.5px solid var(--gm-border); margin-top: 14px; }
+.gm-tbl-custom { width: 100%; border-collapse: collapse; font-size: .86rem; text-align: left; }
+.gm-tbl-custom th {
+  background: linear-gradient(135deg, var(--gm-burg), var(--gm-rose));
+  color: #fff; padding: 11px 13px; white-space: nowrap;
+  font: 700 .78rem 'Be Vietnam Pro', sans-serif; letter-spacing: .02em;
+}
+.gm-tbl-custom td { padding: 8px 11px; border-bottom: 1px solid var(--gm-border); vertical-align: middle; }
+.gm-tbl-custom tr:last-child td { border-bottom: none; }
+.gm-tbl-custom tr:hover td { background: var(--gm-rose-l); }
+.gm-tbl-custom input, .gm-tbl-custom select {
+  padding: 5px 8px; border: 1px solid var(--gm-border); border-radius: 8px; font-size: .83rem;
+}
+
+/* ── Buttons ── */
+.gm-btn-ai {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 12px 24px; border-radius: 12px; border: none;
+  background: linear-gradient(135deg, var(--gm-burg) 0%, var(--gm-rose) 100%);
+  color: #fff; font: 700 .95rem 'Be Vietnam Pro', sans-serif;
+  cursor: pointer; box-shadow: 0 5px 18px rgba(158,43,71,.26);
+  transition: all .15s;
+}
+.gm-btn-ai:hover { filter: brightness(1.07); transform: translateY(-1px); }
+.gm-btn-ai:disabled { opacity: .55; cursor: not-allowed; transform: none; filter: none; }
+
+.gm-btn-outline-rose {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 14px; border-radius: 9px;
+  border: 1.5px solid var(--gm-rose); color: var(--gm-burg);
+  background: #fff; font: 600 .82rem 'Be Vietnam Pro', sans-serif;
+  cursor: pointer; transition: all .15s; white-space: nowrap;
+}
+.gm-btn-outline-rose:hover { background: var(--gm-rose-l); border-color: var(--gm-burg); }
+
+.gm-btn-del {
+  background: none; border: 0; color: #dc2626; cursor: pointer; padding: 4px 8px; border-radius: 6px; font-size: 1.1rem;
+}
+.gm-btn-del:hover { background: #fee2e2; }
+
+/* ── KPI & Forecast ── */
+.gm-kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 18px; }
+.gm-kpi-box {
+  background: #fff; border: 1px solid var(--gm-border); border-radius: 12px; padding: 14px 18px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.03); text-align: center;
+}
+.gm-kpi-box small { color: var(--gm-muted); font-size: .78rem; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+.gm-kpi-box b { display: block; font-size: 1.8rem; color: var(--gm-burg); margin-top: 3px; font-family: 'Playfair Display', serif; }
+
+.gm-forecast-highlight {
+  background: linear-gradient(135deg, #fff6f8 0%, #fdf0f4 100%);
+  border: 1.5px solid #f2c0cc;
+  border-radius: 14px;
+  padding: 18px 22px;
+  margin-bottom: 20px;
+}
+.gm-fh-title { font-weight: 700; color: var(--gm-burg); font-size: 1.05rem; display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+.gm-fh-metrics { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 12px; }
+.gm-fh-metric {
+  background: #fff; border: 1px solid #fad2dc; border-radius: 11px; padding: 10px 16px; flex: 1; min-width: 150px;
+}
+.gm-fh-metric small { color: var(--gm-muted); font-size: .78rem; font-weight: 600; display: block; }
+.gm-fh-metric span { font-size: 1.35rem; font-weight: 800; color: var(--gm-burg); }
+.gm-fh-advice {
+  background: #fff; border-left: 4px solid var(--gm-burg); border-radius: 8px; padding: 10px 14px;
+  color: #4a2831; font-size: .88rem; line-height: 1.55;
+}
+
+/* ── Table Suggestions ── */
+.gm-tables-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin-top: 14px; }
+.gm-table-card {
+  background: #fff; border: 1.5px solid var(--gm-border); border-radius: 12px; padding: 14px 16px;
+  display: flex; flex-direction: column; gap: 8px; transition: transform .15s, border-color .15s;
+}
+.gm-table-card:hover { transform: translateY(-2px); border-color: var(--gm-rose); }
+.gm-tc-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.gm-tc-name { font-weight: 700; color: var(--gm-burg); font-size: .95rem; }
+.gm-tc-count { background: var(--gm-rose-l); color: var(--gm-burg); padding: 3px 9px; border-radius: 999px; font-weight: 700; font-size: .75rem; white-space: nowrap; }
+.gm-tc-loc { font-size: .78rem; color: var(--gm-muted); display: flex; align-items: center; gap: 4px; }
+.gm-tc-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.gm-tc-chip {
+  background: #fdf3f5; color: #502732; border: 1px solid #f6d2dc;
+  border-radius: 7px; padding: 3px 8px; font-size: .78rem; font-weight: 500;
+}
+
+/* ── RSVP Reminder ── */
+.gm-rsvp-box {
+  background: #fff; border: 1.5px solid var(--gm-border); border-radius: 14px; padding: 18px 22px; margin-top: 20px;
+}
+.gm-rsvp-tabs { display: flex; gap: 8px; margin-bottom: 12px; }
+.gm-rsvp-tab-btn {
+  padding: 6px 14px; border-radius: 8px; border: 1px solid var(--gm-border);
+  background: #fdfafb; color: var(--gm-muted); font: 600 .8rem 'Be Vietnam Pro', sans-serif; cursor: pointer;
+}
+.gm-rsvp-tab-btn.active { background: var(--gm-burg); color: #fff; border-color: var(--gm-burg); }
+.gm-rsvp-text-area {
+  background: #fffafb; border: 1px solid var(--gm-border); border-radius: 10px; padding: 12px 14px;
+  font-size: .88rem; line-height: 1.55; color: var(--gm-ink); white-space: pre-wrap; margin-bottom: 12px;
+}
+
+/* ── Upload & Preview ── */
+.gm-upload-zone {
+  border: 2px dashed var(--gm-rose-m);
+  border-radius: 14px;
+  background: var(--gm-rose-l);
+  padding: 32px 18px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color .2s, background .2s;
+  display: block;
+}
+.gm-upload-zone:hover, .gm-upload-zone.drag { border-color: var(--gm-rose); background: #fff0f3; }
+.gm-upload-zone input[type=file] { display: none; }
+.gm-upload-zone .uz-ico { font-size: 2.2rem; margin-bottom: 6px; }
+.gm-upload-zone b { display: block; color: var(--gm-burg); font-size: .98rem; margin-bottom: 4px; }
+.gm-upload-zone small { color: var(--gm-muted); font-size: .82rem; }
+
+.gm-preview-wrap { overflow-x: auto; margin-top: 14px; border-radius: 11px; border: 1px solid var(--gm-border); }
+.gm-preview-wrap table { width: 100%; border-collapse: collapse; font-size: .86rem; }
+.gm-preview-wrap th {
+  background: linear-gradient(135deg, var(--gm-burg), var(--gm-rose));
+  color: #fff; padding: 9px 12px; text-align: left; white-space: nowrap;
+  font: 600 .78rem 'Be Vietnam Pro', sans-serif; letter-spacing: .02em;
+}
+.gm-preview-wrap td { padding: 8px 12px; border-bottom: 1px solid var(--gm-border); color: var(--gm-ink); }
+.gm-preview-wrap tr:last-child td { border-bottom: none; }
+.gm-preview-wrap tr:hover td { background: var(--gm-rose-l); }
+
+.gm-badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font: 600 .7rem 'Be Vietnam Pro', sans-serif; }
+.gm-badge-family { background: #fde8ee; color: #9E2B47; }
+.gm-badge-friend  { background: #e8f4ff; color: #1a5fa8; }
+.gm-badge-work    { background: #edfae8; color: #28742e; }
+.gm-badge-other   { background: #f0ede8; color: #5c4c38; }
+
+/* ── Result Table ── */
+.gm-result-wrap { overflow-x: auto; border-radius: 12px; border: 1px solid var(--gm-border); }
+.gm-result-table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+.gm-result-table th {
+  background: linear-gradient(135deg, var(--gm-burg), var(--gm-rose));
+  color: #fff; padding: 10px 14px; text-align: left; white-space: nowrap;
+  font: 700 .76rem 'Be Vietnam Pro', sans-serif;
+}
+.gm-result-table td { padding: 10px 14px; border-bottom: 1px solid var(--gm-border); vertical-align: top; }
+.gm-result-table tr:hover td { background: var(--gm-rose-l); }
+.gm-result-table .msg-cell { max-width: 260px; font-size: .82rem; line-height: 1.5; color: #3d2c33; }
+.gm-result-table .link-cell { max-width: 200px; word-break: break-all; font-family: monospace; font-size: .78rem; }
+.gm-result-table .link-cell a { color: var(--gm-rose); text-decoration: none; }
+.gm-result-table .link-cell a:hover { text-decoration: underline; }
+
+.gm-act-btns { display: flex; flex-direction: column; gap: 4px; min-width: 120px; }
+.gm-act-btn { border: 0; border-radius: 7px; padding: 5px 9px; font: 600 .74rem 'Be Vietnam Pro', sans-serif; cursor: pointer; text-align: left; transition: opacity .15s; }
+.gm-act-btn:hover { opacity: .88; }
+.gm-act-btn.primary { background: var(--gm-rose); color: #fff; }
+.gm-act-btn.zalo    { background: #0068ff; color: #fff; }
+.gm-act-btn.mess    { background: #0084ff; color: #fff; }
+
+/* ── Progress Bar ── */
+.gm-prog-bar { height: 5px; border-radius: 3px; background: var(--gm-border); overflow: hidden; margin: 10px 0 6px; }
+.gm-prog-bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--gm-burg), var(--gm-rose)); border-radius: 3px; transition: width .4s; }
+.gm-status-row { display: flex; align-items: center; gap: 8px; font-size: .82rem; color: var(--gm-muted); }
+.gm-status-row .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--gm-rose); display: inline-block; }
+.gm-status-row .dot.ok { background: #2ea44f; }
 </style>
 </head>
 <body>
@@ -320,7 +678,7 @@ kbd{display:inline-block;padding:1px 6px;border:1px solid var(--ed-line);border-
         <button data-mode="view" aria-pressed="false" title="Dùng thử thiệp như khách mời (bấm nút, gửi lời chúc…)"><svg viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg><span class="lb-t">Xem thử</span></button>
       </div>
       <button type="button" class="btn btn-sm" id="btnOpenAi" style="background:linear-gradient(135deg,#fcf0ed,#fae4df);color:#9b382d;border:1.5px solid #d8a69d;font-weight:600;display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:6px 14px;cursor:pointer;box-shadow:0 2px 8px rgba(184,80,66,.12);margin:0 4px"><span>✨</span><span>AI Lời Mời</span></button>
-      <a href="quan-ly-khach.html" target="_blank" class="btn btn-sm" id="btnOpenExcelAi" style="background:linear-gradient(135deg,#9E2B47,#C84B68);color:#fff;border:0;font-weight:600;display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:6px 14px;cursor:pointer;box-shadow:0 2px 8px rgba(158,43,71,.25);margin:0 4px;text-decoration:none"><span>📊</span><span>Tải Excel &amp; Gửi 1-chạm</span></a>
+      <button type="button" class="btn btn-sm" id="btnOpenExcelAi" onclick="openGuestManagementModal()" style="background:linear-gradient(135deg,#9E2B47,#C84B68);color:#fff;border:0;font-weight:600;display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:6px 14px;cursor:pointer;box-shadow:0 2px 8px rgba(158,43,71,.25);margin:0 4px"><span>📊</span><span>Tải Excel &amp; Gửi 1-chạm</span></button>
       <div class="seg dev-seg" role="group" aria-label="Thiết bị xem trước">
         <button data-dev="phone" class="on" aria-pressed="true" title="Giao diện điện thoại"><svg viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg><span class="lb-t">Điện thoại</span></button>
         <button data-dev="desktop" aria-pressed="false" title="Giao diện máy tính"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M1.5 20h21M9 16l-.5 4M15 16l.5 4"/></svg><span class="lb-t">Máy tính</span></button>
@@ -413,11 +771,1095 @@ function handleShareAction(shareText) {
 }
 window.handleShareAction = handleShareAction;
 
+/* ================================================================
+   CONTROLLER: Quản lý khách mời & Trợ lý AI Modal (SPA)
+   ================================================================ */
 (function() {
-  const pId = new URLSearchParams(location.search).get('id');
-  const btn = document.getElementById('btnOpenExcelAi');
-  if (pId && btn) btn.href = 'quan-ly-khach.html?id=' + encodeURIComponent(pId);
+  'use strict';
+
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+  function showToast(msg) {
+    if (window.TH && typeof window.TH.toast === 'function') {
+      window.TH.toast(msg);
+    } else {
+      alert(msg);
+    }
+  }
+
+  const toSlug = (s) =>
+    String(s ?? '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[đĐ]/g, (c) => (c === 'đ' ? 'd' : 'D'))
+      .toLowerCase().trim()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '');
+
+  let renderedOnce = false;
+
+  /* ── MỞ & ĐÓNG MODAL ─────────────────────────────────────────── */
+  window.openGuestManagementModal = function() {
+    const modal = document.getElementById('guestManagementModal');
+    if (!modal) return;
+    modal.style.display = 'flex';
+    modal.setAttribute('aria-hidden', 'false');
+
+    // Tự động đồng bộ thông tin cặp đôi từ Editor
+    try {
+      let gName = '';
+      let bName = '';
+      let wDate = '';
+      if (window.D) {
+        gName = window.D.groom?.nick || window.D.groom?.name || '';
+        bName = window.D.bride?.nick || window.D.bride?.name || '';
+        if (window.D.events && window.D.events[0]?.date) wDate = window.D.events[0].date;
+      }
+      if (!gName && window.TH?.invites) {
+        const pId = new URLSearchParams(location.search).get('id');
+        const inv = window.TH.invites.get(pId);
+        if (inv) {
+          gName = inv.groom?.nick || inv.groom?.name || '';
+          bName = inv.bride?.nick || inv.bride?.name || '';
+          if (inv.date) wDate = inv.date;
+        }
+      }
+      if (gName && $('#groomName') && !$('#groomName').value) $('#groomName').value = gName;
+      if (bName && $('#brideName') && !$('#brideName').value) $('#brideName').value = bName;
+      if (gName && bName && $('#aiCoupleName') && (!$('#aiCoupleName').value || $('#aiCoupleName').value === 'Minh Khoa & Thu Hà')) {
+        $('#aiCoupleName').value = `${gName} & ${bName}`;
+      }
+      if (wDate && $('#aiWeddingDate')) $('#aiWeddingDate').value = wDate;
+      autoSlug();
+    } catch (_) {}
+
+    // Render bảng nếu chưa render
+    if (!renderedOnce) {
+      renderAssistantTable();
+      renderedOnce = true;
+    }
+  };
+
+  window.closeGuestManagementModal = function() {
+    const modal = document.getElementById('guestManagementModal');
+    if (modal) {
+      modal.style.display = 'none';
+      modal.setAttribute('aria-hidden', 'true');
+    }
+  };
+
+  window.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      const modal = document.getElementById('guestManagementModal');
+      if (modal && modal.style.display !== 'none') {
+        closeGuestManagementModal();
+      }
+    }
+  });
+
+  /* ── CHUYỂN TAB TRONG MODAL ───────────────────────────────────── */
+  window.switchModalTab = function(tab) {
+    const viewA = $('#modalViewAssistant');
+    const viewP = $('#modalViewPersonalize');
+    const btnA = $('#modalTabBtnAssistant');
+    const btnP = $('#modalTabBtnPersonalize');
+
+    if (tab === 'assistant') {
+      if (viewA) viewA.style.display = 'block';
+      if (viewP) viewP.style.display = 'none';
+      if (btnA) btnA.classList.add('active');
+      if (btnP) btnP.classList.remove('active');
+    } else {
+      if (viewA) viewA.style.display = 'none';
+      if (viewP) viewP.style.display = 'block';
+      if (btnP) btnP.classList.add('active');
+      if (btnA) btnA.classList.remove('active');
+    }
+  };
+
+  /* ==============================================================
+     TAB 1: TRỢ LÝ AI DỰ BÁO SỐ KHÁCH & XẾP BÀN TIỆC
+     ============================================================== */
+  const DEMO_GUESTS = [
+    { name: 'Bác Nguyễn Văn An', group: 'Họ hàng nhà trai', status: 'confirmed', plusOnes: 1, note: 'Bác trưởng họ nội' },
+    { name: 'Chú Lê Văn Sáu', group: 'Họ hàng nhà trai', status: 'confirmed', plusOnes: 1, note: 'Gia đình chú ruột' },
+    { name: 'Anh Trần Minh Tuấn', group: 'Bạn đại học', status: 'pending', plusOnes: 1, note: 'Bạn cùng phòng KTX' },
+    { name: 'Chị Hoàng Thùy Lan', group: 'Đồng nghiệp công ty', status: 'confirmed', plusOnes: 0, note: 'Trưởng phòng Marketing' },
+    { name: 'Bạn Nguyễn Mạnh Hùng', group: 'Bạn cấp 3', status: 'pending', plusOnes: 0, note: 'Hội bạn thân cấp 3' },
+    { name: 'Cô Phạm Thị Hoa', group: 'Họ hàng nhà gái', status: 'confirmed', plusOnes: 1, note: 'Cô ruột bên ngoại' },
+    { name: 'Đặng Minh Đức', group: 'Bạn đại học', status: 'declined', plusOnes: 0, note: 'Bận công tác nước ngoài' },
+    { name: 'Vũ Hoàng Nam', group: 'Bạn đá bóng', status: 'pending', plusOnes: 1, note: 'Đội trưởng bóng đá' }
+  ];
+
+  let assistantGuests = [...DEMO_GUESTS];
+  let currentAssistantData = null;
+  let currentRsvpTab = 'polite';
+
+  function renderAssistantTable() {
+    const tbody = $('#assistantGuestBody');
+    if (!tbody) return;
+    if (!assistantGuests.length) {
+      tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:22px;color:var(--gm-muted)">Chưa có khách mời nào. Bấm <b>"⚡ Nạp 8 khách mẫu demo"</b> hoặc <b>"➕ Thêm khách"</b> để bắt đầu.</td></tr>`;
+      return;
+    }
+
+    const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+    tbody.innerHTML = assistantGuests.map((g, idx) => `
+      <tr data-index="${idx}">
+        <td style="color:var(--gm-muted);font-size:.8rem">${idx + 1}</td>
+        <td>
+          <input type="text" value="${esc(g.name)}" onchange="updateGuestItem(${idx}, 'name', this.value)" style="width:100%" placeholder="Tên khách">
+        </td>
+        <td>
+          <input type="text" value="${esc(g.group)}" onchange="updateGuestItem(${idx}, 'group', this.value)" style="width:130px" placeholder="Nhóm">
+        </td>
+        <td>
+          <select onchange="updateGuestItem(${idx}, 'status', this.value)" style="font-weight:600">
+            <option value="confirmed" ${g.status === 'confirmed' ? 'selected' : ''}>✅ Sẽ đến</option>
+            <option value="pending" ${g.status === 'pending' ? 'selected' : ''}>⏳ Đang chờ</option>
+            <option value="declined" ${g.status === 'declined' ? 'selected' : ''}>❌ Không đến</option>
+          </select>
+        </td>
+        <td>
+          <input type="number" min="0" max="10" value="${g.plusOnes}" onchange="updateGuestItem(${idx}, 'plusOnes', this.value)" style="width:65px">
+        </td>
+        <td style="font-weight:700;color:var(--gm-burg)">
+          ${1 + Number(g.plusOnes || 0)} người
+        </td>
+        <td>
+          <input type="text" value="${esc(g.note || '')}" onchange="updateGuestItem(${idx}, 'note', this.value)" style="width:100%" placeholder="Ghi chú (ăn chay, quan hệ...)">
+        </td>
+        <td style="text-align:center">
+          <button type="button" class="gm-btn-del" onclick="removeGuestItem(${idx})" title="Xoá khách này">×</button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  window.updateGuestItem = function(idx, field, val) {
+    if (!assistantGuests[idx]) return;
+    if (field === 'plusOnes') val = Math.max(0, parseInt(val) || 0);
+    assistantGuests[idx][field] = val;
+    renderAssistantTable();
+  };
+
+  window.removeGuestItem = function(idx) {
+    assistantGuests.splice(idx, 1);
+    renderAssistantTable();
+    showToast('Đã xóa khách khỏi danh sách');
+  };
+
+  window.addNewGuestRow = function() {
+    assistantGuests.push({
+      name: `Khách mời ${assistantGuests.length + 1}`,
+      group: 'Bạn bè',
+      status: 'pending',
+      plusOnes: 0,
+      note: ''
+    });
+    renderAssistantTable();
+    showToast('Đã thêm dòng khách mới');
+  };
+
+  window.loadDemoGuests = function() {
+    assistantGuests = JSON.parse(JSON.stringify(DEMO_GUESTS));
+    renderAssistantTable();
+    showToast('✅ Đã nạp 8 khách mời mẫu!');
+  };
+
+  window.clearGuestTable = function() {
+    if (confirm('Bạn có chắc muốn xóa toàn bộ danh sách khách hiện tại?')) {
+      assistantGuests = [];
+      renderAssistantTable();
+      $('#assistantResultSection').style.display = 'none';
+      showToast('Đã xóa sạch danh sách');
+    }
+  };
+
+  // Upload Excel cho Tab Trợ lý
+  document.addEventListener('change', async (e) => {
+    if (e.target && e.target.id === 'assistantFileInput') {
+      const file = e.target.files[0];
+      if (!file) return;
+      try {
+        const rows = await readFileToRows(file);
+        const guests = rowsToGuests(rows);
+        if (!guests.length) return showToast('Không tìm thấy khách nào trong file.');
+        assistantGuests = guests.map(g => ({
+          name: g.name,
+          group: g.group || 'Khách mời',
+          status: 'pending',
+          plusOnes: 0,
+          note: g.note || ''
+        }));
+        renderAssistantTable();
+        showToast(`✅ Đã nạp ${assistantGuests.length} khách từ "${file.name}"!`);
+      } catch (err) {
+        showToast('❌ Lỗi đọc file: ' + err.message);
+      }
+    }
+  });
+
+  /* ── GỌI API GEMINI TRỢ LÝ AI DỰ BÁO & XẾP BÀN ───────────────── */
+  window.runGuestAssistant = async function() {
+    if (!assistantGuests.length) return showToast('Danh sách khách đang trống. Hãy nạp khách trước.');
+
+    const btn = $('#btnRunAssistant');
+    const progWrap = $('#assistantProgress');
+    const bar = $('#assistantBar');
+    const dot = $('#assistantDot');
+    const statusText = $('#assistantStatus');
+
+    btn.disabled = true;
+    btn.innerHTML = '<span>⏳</span><span>Trợ lý AI đang phân tích &amp; tính toán...</span>';
+    progWrap.style.display = 'block';
+    dot.classList.remove('ok');
+    bar.style.width = '20%';
+    statusText.textContent = `Đang gửi ${assistantGuests.length} khách tới Gemini AI phân tích...`;
+
+    try {
+      const coupleName = $('#aiCoupleName').value.trim() || 'Minh Khoa & Thu Hà';
+      const weddingDate = $('#aiWeddingDate').value.trim() || '25/12/2026';
+      const tableCapacity = Number($('#aiTableCap').value || 10);
+
+      bar.style.width = '60%';
+      statusText.textContent = 'AI đang dự báo số lượng thực tế & phân bổ bàn tiệc thông minh...';
+
+      const res = await fetch('/api/ai-guest-assistant', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          coupleName,
+          weddingDate,
+          tableCapacity,
+          guests: assistantGuests
+        })
+      });
+
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({ error: res.statusText }));
+        throw new Error(errJson.error || `HTTP ${res.status}`);
+      }
+
+      const result = await res.json();
+      const data = result.data || result;
+      currentAssistantData = data;
+
+      bar.style.width = '100%';
+      dot.classList.add('ok');
+      statusText.textContent = '✅ Đã hoàn thành phân tích & gợi ý xếp bàn!';
+
+      renderAssistantResult(data);
+      $('#assistantResultSection').style.display = 'block';
+      setTimeout(() => {
+        $('#assistantResultSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 200);
+
+      showToast('✨ Trợ lý AI đã dự báo và gợi ý xếp bàn xong!');
+    } catch (err) {
+      console.error('Lỗi khi gọi Trợ lý AI:', err);
+      statusText.textContent = '❌ Lỗi: ' + err.message;
+      showToast('❌ ' + err.message);
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '<span>✨</span><span>Phân tích &amp; Gợi ý xếp bàn với AI</span>';
+    }
+  };
+
+  function renderAssistantResult(data) {
+    if (!data) return;
+    const f = data.forecast || {};
+    const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+    $('#kpiTotal').textContent = f.totalInvited ?? assistantGuests.length;
+    $('#kpiConfirmed').textContent = f.confirmedGuests ?? 0;
+    $('#kpiPending').textContent = f.pendingGuests ?? 0;
+    $('#kpiDeclined').textContent = f.declinedGuests ?? 0;
+
+    $('#fhActual').textContent = `~${f.estimatedActualGuests || 0} người`;
+    $('#fhTables').textContent = `${f.recommendedTables || 1} bàn`;
+    $('#fhSpare').textContent = `${f.spareTables || 1} bàn`;
+    $('#fhRate').textContent = f.estimatedAttendanceRate || '~80%';
+    $('#fhAdvice').innerHTML = `<b>💡 Lời khuyên chuyên gia tiệc cưới:</b> ${esc(f.summaryAdvice || 'Nên chủ động liên hệ chốt bàn trước ngày cưới 7 ngày.')}`;
+
+    const tablesBox = $('#tablesContainer');
+    const tables = data.tableSuggestions || [];
+    if (!tables.length) {
+      tablesBox.innerHTML = '<p style="color:var(--gm-muted)">Chưa có gợi ý bàn tiệc.</p>';
+    } else {
+      tablesBox.innerHTML = tables.map((t, i) => `
+        <div class="gm-table-card">
+          <div class="gm-tc-head">
+            <div>
+              <div class="gm-tc-name">${esc(t.tableName || `Bàn ${i + 1}`)}</div>
+              <div class="gm-tc-loc">📍 ${esc(t.seatingTips || 'Khu vực trung tâm')}</div>
+            </div>
+            <span class="gm-tc-count">${t.count || (t.guests?.length || 0)} khách</span>
+          </div>
+          <div class="gm-tc-chips">
+            ${(t.guests || []).map(g => `<span class="gm-tc-chip">👤 ${esc(g)}</span>`).join('')}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    updateRsvpMessageContent();
+  }
+
+  function updateRsvpMessageContent() {
+    if (!currentAssistantData || !currentAssistantData.rsvpReminder) return;
+    const r = currentAssistantData.rsvpReminder;
+    const msg = currentRsvpTab === 'polite' ? r.politeMessage : r.friendlyMessage;
+    const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    $('#rsvpMessageContent').textContent = msg || 'Chưa có mẫu tin nhắn.';
+    if (r.sendingTimingAdvice) {
+      $('#rsvpTimingAdvice').innerHTML = `💡 <b>Thời điểm vàng:</b> ${esc(r.sendingTimingAdvice)}`;
+    }
+  }
+
+  window.switchRsvpTab = function(type) {
+    currentRsvpTab = type;
+    $('#btnRsvpPolite').classList.toggle('active', type === 'polite');
+    $('#btnRsvpFriendly').classList.toggle('active', type === 'friendly');
+    updateRsvpMessageContent();
+  };
+
+  window.copyRsvpMessage = async function() {
+    const text = $('#rsvpMessageContent').textContent;
+    await copyToClipboard(text);
+    showToast('📋 Đã sao chép mẫu tin nhắn vào Clipboard!');
+  };
+
+  window.openZaloForReminder = function() {
+    const text = $('#rsvpMessageContent').textContent;
+    if (typeof window.handleShareAction === 'function') {
+      window.handleShareAction(text);
+    } else {
+      copyToClipboard(text);
+      showToast('📋 Đã sao chép tin nhắn! Đang mở Zalo...');
+      window.open('https://chat.zalo.me/', '_blank');
+    }
+  };
+
+  /* ==============================================================
+     TAB 2: CÁ NHÂN HÓA LỜI MỜI PRETTY LINK TỪ EXCEL
+     ============================================================== */
+  let guestList = [];
+  let aiResults = [];
+
+  window.autoSlug = function () {
+    const g = toSlug($('#groomName')?.value || '');
+    const b = toSlug($('#brideName')?.value || '');
+    if (!g && !b) return;
+    const slug = [g, b].filter(Boolean).join('-');
+    if ($('#coupleSlug')) $('#coupleSlug').value = slug;
+    updateSlugPreview();
+  };
+
+  window.updateSlugPreview = function () {
+    const cs = $('#coupleSlug')?.value.trim() || '<couple-slug>';
+    const base = window.location.origin;
+    if ($('#slugPreview')) $('#slugPreview').innerHTML = `URL sẽ có dạng: <b>${base}/dam-cuoi-${cs}/<i>guest-slug</i></b>`;
+  };
+
+  document.addEventListener('input', (e) => {
+    if (e.target && (e.target.id === 'groomName' || e.target.id === 'brideName')) {
+      autoSlug();
+    }
+  });
+
+  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  const fold = (s) => String(s ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[đĐ]/g, 'd').toLowerCase().trim();
+
+  const COL_PATTERNS = {
+    name:       /^(ho (va )?ten|ten|ten khach|name|full ?name|guest)$/,
+    group:      /(nhom|group|quan he|moi quan he)/,
+    salutation: /(xung ho|danh xung|salutation|greeting)/,
+    note:       /(ghi chu|note|chu thich)/,
+    phone:      /(dien thoai|sdt|phone|zalo|mobile)/,
+    email:      /(e-?mail|gmail)/,
+  };
+
+  function detectColumns(headerRow) {
+    const map = {};
+    headerRow.forEach((cell, i) => {
+      const f = fold(cell);
+      Object.entries(COL_PATTERNS).forEach(([key, re]) => {
+        if (!(key in map) && re.test(f)) map[key] = i;
+      });
+    });
+    return map;
+  }
+
+  function rowsToGuests(rows) {
+    if (!rows.length) return [];
+    const first5 = rows.slice(0, 5);
+    let headerIdx = -1, colMap = {};
+    for (let i = 0; i < first5.length; i++) {
+      const m = detectColumns(first5[i]);
+      if ('name' in m) { headerIdx = i; colMap = m; break; }
+    }
+
+    const dataRows = headerIdx >= 0 ? rows.slice(headerIdx + 1) : rows;
+    return dataRows.map(r => {
+      let obj;
+      if (headerIdx >= 0) {
+        obj = {};
+        Object.entries(colMap).forEach(([k, j]) => { obj[k] = String(r[j] ?? '').trim(); });
+      } else {
+        obj = {};
+        r.forEach(c => {
+          const s = String(c ?? '').trim();
+          if (!obj.email && EMAIL_RE.test(s)) obj.email = s;
+          else if (!obj.name && /\p{L}/u.test(s) && !/\d/.test(s)) obj.name = s;
+          else if (!obj.group && obj.name && s) obj.group = s;
+        });
+      }
+      const name = (obj.name || '').replace(/\s+/g, ' ').trim();
+      if (!name) return null;
+      return { name, group: obj.group || '', salutation: obj.salutation || '', note: obj.note || '' };
+    }).filter(Boolean);
+  }
+
+  function parseCsv(text) {
+    const BOM = '\uFEFF';
+    if (text.startsWith(BOM)) text = text.slice(1);
+    const first = text.split(/\r?\n/, 1)[0];
+    const delim = ['\t', ';', ','].map(d => [d, first.split(d).length]).sort((a, b) => b[1] - a[1])[0][0];
+    const rows = []; let row = [], cell = '', q = false;
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      if (q) { if (c === '"') { if (text[i+1] === '"') { cell += '"'; i++; } else q = false; } else cell += c; continue; }
+      if (c === '"') q = true;
+      else if (c === delim) { row.push(cell); cell = ''; }
+      else if (c === '\n' || c === '\r') { if (c === '\r' && text[i+1] === '\n') i++; row.push(cell); rows.push(row); row = []; cell = ''; }
+      else cell += c;
+    }
+    if (cell || row.length) { row.push(cell); rows.push(row); }
+    return rows;
+  }
+
+  async function readFileToRows(file) {
+    const ext = file.name.split('.').pop().toLowerCase();
+    if (['xlsx','xls','ods'].includes(ext)) {
+      const wb = XLSX.read(await file.arrayBuffer(), { type: 'array' });
+      return XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, raw: false, defval: '' });
+    }
+    if (['csv','txt','tsv'].includes(ext)) {
+      const buf = await file.arrayBuffer();
+      let text = new TextDecoder('utf-8').decode(buf);
+      if (text.includes('\uFFFD')) text = new TextDecoder('windows-1258').decode(buf);
+      return parseCsv(text);
+    }
+    throw new Error('Định dạng không hỗ trợ. Dùng .xlsx, .xls hoặc .csv');
+  }
+
+  function groupBadge(grp) {
+    const g = fold(grp);
+    if (/(ho hang|gia dinh|ba|me|anh|chi|chu|bac|co|ong|ba)/.test(g)) return `<span class="gm-badge gm-badge-family">${grp || '—'}</span>`;
+    if (/(ban than|ban be|ban|hoi ban)/.test(g)) return `<span class="gm-badge gm-badge-friend">${grp || '—'}</span>`;
+    if (/(dong nghiep|cong ty|doi tac|sep|giam doc)/.test(g)) return `<span class="gm-badge gm-badge-work">${grp || '—'}</span>`;
+    return `<span class="gm-badge gm-badge-other">${grp || '—'}</span>`;
+  }
+
+  function renderPreview(guests) {
+    const MAX_PREVIEW = 8;
+    const shown = guests.slice(0, MAX_PREVIEW);
+    const more = guests.length - shown.length;
+    const rows = shown.map(g => `
+      <tr>
+        <td>${g.name}</td>
+        <td>${groupBadge(g.group)}</td>
+        <td>${g.salutation || '<span style="color:#bbb">—</span>'}</td>
+        <td>${g.note || '<span style="color:#bbb">—</span>'}</td>
+      </tr>`).join('');
+    $('#previewTable').innerHTML = `
+      <table>
+        <thead><tr><th>Tên khách</th><th>Nhóm</th><th>Xưng hô gợi ý</th><th>Ghi chú</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+      ${more > 0 ? `<div style="padding:8px 14px;font-size:.82rem;color:var(--gm-muted)">… và ${more} khách khác</div>` : ''}`;
+  }
+
+  async function handleFile(file) {
+    if (!file) return;
+    try {
+      const rows = await readFileToRows(file);
+      const guests = rowsToGuests(rows);
+      if (!guests.length) return showToast('Không tìm thấy khách nào trong file. Kiểm tra lại cột Họ tên.');
+      guestList = guests;
+      aiResults = [];
+      $('#step4').style.display = 'none';
+      $('#importMsg').textContent = `Đọc được ${guests.length} khách từ "${file.name}"`;
+      $('#previewArea').style.display = 'block';
+      renderPreview(guests);
+      $('#btnRunAI').disabled = false;
+      showToast(`✅ Đọc thành công ${guests.length} khách!`);
+    } catch (err) {
+      showToast('❌ Lỗi đọc file: ' + err.message);
+    }
+  }
+
+  document.addEventListener('change', (e) => {
+    if (e.target && e.target.id === 'fileInput') {
+      handleFile(e.target.files[0]);
+    }
+  });
+
+  document.addEventListener('dragover', (e) => {
+    const zone = e.target.closest('#uploadZone');
+    if (zone) { e.preventDefault(); zone.classList.add('drag'); }
+  });
+  document.addEventListener('dragleave', (e) => {
+    const zone = e.target.closest('#uploadZone');
+    if (zone) zone.classList.remove('drag');
+  });
+  document.addEventListener('drop', (e) => {
+    const zone = e.target.closest('#uploadZone');
+    if (zone) {
+      e.preventDefault();
+      zone.classList.remove('drag');
+      if (e.dataTransfer && e.dataTransfer.files.length) {
+        handleFile(e.dataTransfer.files[0]);
+      }
+    }
+  });
+
+  window.downloadSample = function () {
+    const rows = [
+      ['STT', 'Họ tên', 'Nhóm', 'Xưng hô', 'Ghi chú'],
+      [1, 'Bác Nguyễn Văn An', 'Họ hàng', 'Bác', 'Bác trưởng họ bên nội'],
+      [2, 'Thằng Tùng béo', 'Bạn thân', 'Mày', 'Bạn cấp 3, hay chơi game chung'],
+      [3, 'Chị Lan Marketing', 'Đồng nghiệp', 'Chị Lan', 'Sếp trực tiếp dự án'],
+      [4, 'Anh Minh đối tác', 'Đối tác', 'Anh Minh', 'CEO công ty ABC'],
+    ];
+    if (window.XLSX) {
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.aoa_to_sheet(rows);
+      ws['!cols'] = [4,28,18,14,30].map(wch => ({wch}));
+      XLSX.utils.book_append_sheet(wb, ws, 'Khách mời');
+      XLSX.writeFile(wb, 'mau-danh-sach-khach-moi.xlsx');
+    }
+  };
+
+  window.runAI = async function () {
+    if (!guestList.length) return showToast('Hãy tải lên file danh sách khách trước.');
+    const coupleSlug = $('#coupleSlug').value.trim();
+    const groom = $('#groomName').value.trim() || 'Chú rể';
+    const bride = $('#brideName').value.trim() || 'Cô dâu';
+
+    const btn = $('#btnRunAI');
+    btn.disabled = true;
+    btn.innerHTML = '<span>⏳</span><span>Gemini AI đang xử lý…</span>';
+
+    const progWrap = $('#aiProgress');
+    const bar = $('#aiBar');
+    const dot = $('#aiDot');
+    const statusEl = $('#aiStatus');
+    progWrap.style.display = 'block';
+    dot.classList.remove('ok');
+    bar.style.width = '10%';
+    statusEl.textContent = `Đang gửi ${guestList.length} khách tới Gemini AI…`;
+
+    try {
+      const BATCH = 50;
+      const batches = [];
+      for (let i = 0; i < guestList.length; i += BATCH) batches.push(guestList.slice(i, i + BATCH));
+
+      let allResults = [];
+      for (let b = 0; b < batches.length; b++) {
+        bar.style.width = Math.round(((b + 0.5) / batches.length) * 90) + '%';
+        statusEl.textContent = `Batch ${b + 1}/${batches.length}: đang xử lý ${batches[b].length} khách…`;
+
+        const res = await fetch('/api/ai-personalize', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ guests: batches[b], groom, bride, coupleSlug }),
+        });
+
+        if (!res.ok) {
+          const errJson = await res.json().catch(() => ({ error: res.statusText }));
+          throw new Error(errJson.error || `HTTP ${res.status}`);
+        }
+
+        const data = await res.json();
+        if (!Array.isArray(data)) throw new Error('API trả về dữ liệu không hợp lệ');
+        allResults = allResults.concat(data);
+      }
+
+      aiResults = allResults;
+      bar.style.width = '100%';
+      dot.classList.add('ok');
+      statusEl.textContent = `✅ Hoàn thành! Đã cá nhân hoá ${aiResults.length} lời mời.`;
+      renderResultTable(aiResults, coupleSlug);
+      $('#step4').style.display = 'block';
+      setTimeout(() => $('#step4').scrollIntoView({ behavior: 'smooth', block: 'start' }), 200);
+      showToast(`✨ AI đã sinh lời mời cho ${aiResults.length} khách!`);
+    } catch (err) {
+      statusEl.textContent = '❌ Lỗi: ' + err.message;
+      showToast('❌ ' + err.message);
+      console.error('AI personalize error:', err);
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '<span>✨</span><span>Chạy AI cá nhân hoá tất cả khách</span>';
+    }
+  };
+
+  function buildShareText(row, url) {
+    return `${row.salutation}\n${row.message}\n\n👉 Mời bạn xem thiệp tại: ${url}`;
+  }
+
+  function renderResultTable(results, coupleSlug) {
+    const tbody = $('#resultBody');
+    if (!results.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--gm-muted);padding:24px">Không có dữ liệu</td></tr>'; return; }
+
+    tbody.innerHTML = results.map((row, i) => {
+      const cs = coupleSlug || toSlug(($('#groomName')?.value || '') + '-' + ($('#brideName')?.value || ''));
+      const baseHost = window.location.origin;
+      const cardUrl = cs
+        ? `${baseHost}/dam-cuoi-${cs}/${row.guest_slug}`
+        : row.pretty_url || '#';
+
+      return `<tr>
+        <td style="font-size:.8rem;color:var(--gm-muted)">${i + 1}</td>
+        <td><b>${row.name}</b></td>
+        <td>${groupBadge(row.group)}</td>
+        <td style="font-style:italic;color:var(--gm-burg)">${row.salutation || '—'}</td>
+        <td class="msg-cell">${row.message || '<span style="color:#bbb">—</span>'}</td>
+        <td class="link-cell">
+          <a href="${cardUrl}" target="_blank" rel="noopener">${cardUrl !== '#' ? cardUrl : '—'}</a>
+        </td>
+        <td>
+          <div class="gm-act-btns">
+            <button class="gm-act-btn primary" onclick="shareFast(${i})" title="Gọi Web Share API">⚡ Chia sẻ nhanh</button>
+            <button class="gm-act-btn zalo" onclick="sendZalo(${i})" title="Mở Zalo PC hoặc Web">📱 Zalo</button>
+            <button class="gm-act-btn mess" onclick="sendMessenger(${i})" title="Mở Messenger">💬 Messenger</button>
+          </div>
+        </td>
+      </tr>`;
+    }).join('');
+
+    window._currentCoupleSlug = coupleSlug;
+    window._aiResults = results;
+
+    results.forEach(row => {
+      if (row.guest_slug) {
+        const key = 'ai_msg_' + row.guest_slug.toLowerCase().replace(/[^a-z0-9-]/g, '');
+        try {
+          sessionStorage.setItem(key, JSON.stringify(row));
+          localStorage.setItem(key, JSON.stringify(row));
+        } catch (e) {}
+      }
+    });
+  }
+
+  function getRowData(idx) {
+    const row = window._aiResults?.[idx];
+    if (!row) return null;
+    const cs = window._currentCoupleSlug || '';
+    const baseHost = window.location.origin;
+    const cardUrl = cs
+      ? `${baseHost}/dam-cuoi-${cs}/${row.guest_slug}`
+      : row.pretty_url || window.location.href;
+    const text = buildShareText(row, cardUrl);
+    return { row, cardUrl, text };
+  }
+
+  window.shareFast = async function (idx) {
+    const d = getRowData(idx);
+    if (!d) return;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: 'Thiệp mời cưới', text: d.text, url: d.cardUrl });
+      } catch (e) {
+        if (e.name !== 'AbortError') showToast('Không thể chia sẻ: ' + e.message);
+      }
+    } else {
+      await copyToClipboard(d.text);
+      showToast('📋 Đã copy lời mời! Dán vào ứng dụng bạn muốn gửi.');
+    }
+  };
+
+  window.sendZalo = function (idx) {
+    const d = getRowData(idx);
+    if (!d) return;
+    if (typeof window.handleShareAction === 'function') {
+      window.handleShareAction(d.text);
+    }
+  };
+
+  window.sendMessenger = async function (idx) {
+    const d = getRowData(idx);
+    if (!d) return;
+    await copyToClipboard(d.text);
+    showToast('📋 Đã copy lời mời vào clipboard!\nMở Messenger → Chọn người nhận → Dán → Gửi');
+    setTimeout(() => window.open('https://www.messenger.com/', '_blank', 'noopener'), 600);
+  };
+
+  async function copyToClipboard(text) {
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+        return true;
+      }
+    } catch (e) {}
+    const ta = Object.assign(document.createElement('textarea'), { value: text, style: 'position:fixed;opacity:0' });
+    document.body.append(ta); ta.select();
+    try { document.execCommand('copy'); } finally { ta.remove(); }
+    return true;
+  }
+
+  window.copyAllLinks = async function () {
+    if (!window._aiResults?.length) return showToast('Chưa có kết quả AI');
+    const cs = window._currentCoupleSlug || '';
+    const baseHost = window.location.origin;
+    const lines = window._aiResults.map(r => {
+      const url = cs ? `${baseHost}/dam-cuoi-${cs}/${r.guest_slug}` : r.pretty_url || '';
+      return `${r.name}: ${url}`;
+    }).join('\n');
+    await copyToClipboard(lines);
+    showToast(`📋 Đã copy ${window._aiResults.length} link vào clipboard!`);
+  };
+
+  window.exportResultExcel = async function () {
+    if (!window._aiResults?.length) return showToast('Chưa có kết quả AI để xuất');
+    const cs = window._currentCoupleSlug || '';
+    const baseHost = window.location.origin;
+    const head = ['STT', 'Tên khách', 'Nhóm', 'Xưng hô AI', 'Lời nhắn AI', 'Guest Slug', 'Pretty Link', 'Lời mời đầy đủ'];
+    const rows = window._aiResults.map((r, i) => {
+      const url = cs ? `${baseHost}/dam-cuoi-${cs}/${r.guest_slug}` : r.pretty_url || '';
+      return [i + 1, r.name, r.group, r.salutation, r.message, r.guest_slug, url, buildShareText(r, url)];
+    });
+
+    const groom = $('#groomName')?.value.trim() || 'chure';
+    const bride = $('#brideName')?.value.trim() || 'codau';
+    const fname = `khach-moi-ai-${toSlug(groom)}-${toSlug(bride)}`;
+
+    if (window.XLSX) {
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.aoa_to_sheet([head, ...rows]);
+      ws['!cols'] = [4, 26, 16, 22, 44, 22, 60, 80].map(wch => ({wch}));
+      XLSX.utils.book_append_sheet(wb, ws, 'Kết quả AI');
+      XLSX.writeFile(wb, fname + '.xlsx');
+    }
+    showToast('⬇ Đã xuất Excel kết quả AI!');
+  };
+
 })();
 </script>
+
+<!-- ============================================================== -->
+<!-- MODAL: QUẢN LÝ KHÁCH MỜI & TRỢ LÝ AI (SPA OVERLAY)              -->
+<!-- ============================================================== -->
+<div id="guestManagementModal" class="gm-modal-overlay" style="display:none;" aria-hidden="true" role="dialog" aria-modal="true">
+  <div class="gm-modal-backdrop" onclick="closeGuestManagementModal()"></div>
+  <div class="gm-modal-dialog">
+    <!-- Header -->
+    <div class="gm-modal-header">
+      <div class="gm-modal-header-l">
+        <div class="gm-modal-logo">WED<em>STORY</em></div>
+        <div class="gm-modal-subtitle">
+          <b style="color:var(--gm-burg);display:block;font-size:.92rem">Quản lý khách mời &amp; Trợ lý AI</b>
+          <span>Dự báo khách, gợi ý xếp bàn &amp; Pretty Link 1-chạm</span>
+        </div>
+      </div>
+      
+      <!-- Tab Switcher inside Modal Header -->
+      <div class="gm-modal-tabs">
+        <button type="button" class="gm-modal-tab-btn active" id="modalTabBtnAssistant" onclick="switchModalTab('assistant')">
+          <span>✨</span><span>Trợ lý AI: Dự báo &amp; Xếp bàn</span>
+          <span class="gm-hot-badge">NỔI BẬT</span>
+        </button>
+        <button type="button" class="gm-modal-tab-btn" id="modalTabBtnPersonalize" onclick="switchModalTab('personalize')">
+          <span>💌</span><span>Cá nhân hóa lời mời &amp; Gửi 1-chạm</span>
+        </button>
+      </div>
+
+      <button type="button" class="gm-modal-close" onclick="closeGuestManagementModal()" aria-label="Đóng cửa sổ" title="Đóng (Esc)">✕</button>
+    </div>
+
+    <!-- Scrollable Body -->
+    <div class="gm-modal-body">
+      
+      <!-- ============================================================ -->
+      <!-- TAB 1: TRỢ LÝ AI: DỰ BÁO SỐ KHÁCH & GỢI Ý XẾP BÀN TIỆC        -->
+      <!-- ============================================================ -->
+      <div id="modalViewAssistant" class="gm-tab-view">
+        
+        <!-- KHỐI 1: BẢNG KHÁCH MỜI & THIẾT LẬP -->
+        <div class="gm-card">
+          <div class="gm-card-title">
+            <div class="left">
+              <span class="gm-step-badge">1</span>
+              <span>Danh sách khách mời phân tích</span>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button type="button" class="gm-btn-outline-rose" onclick="loadDemoGuests()">⚡ Nạp 8 khách mẫu demo</button>
+              <button type="button" class="gm-btn-outline-rose" onclick="addNewGuestRow()">➕ Thêm khách</button>
+              <label class="gm-btn-outline-rose" style="cursor:pointer">
+                📁 Nhập Excel/CSV<input type="file" id="assistantFileInput" accept=".xlsx,.xls,.csv" hidden>
+              </label>
+              <button type="button" class="gm-btn-outline-rose" onclick="clearGuestTable()" style="color:#b91c1c;border-color:#fca5a5">🗑 Xóa hết</button>
+            </div>
+          </div>
+
+          <!-- Thiết lập nhanh cho AI -->
+          <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:14px;margin-bottom:14px;background:#fdf9fa;padding:14px 16px;border-radius:12px;border:1px solid var(--gm-border)">
+            <div class="gm-field">
+              <label>Tên cặp đôi (Cô dâu &amp; Chú rể)</label>
+              <input type="text" id="aiCoupleName" value="Minh Khoa &amp; Thu Hà" placeholder="VD: Minh Khoa &amp; Thu Hà">
+            </div>
+            <div class="gm-field">
+              <label>Ngày diễn ra lễ cưới</label>
+              <input type="text" id="aiWeddingDate" value="25/12/2026" placeholder="VD: 25/12/2026">
+            </div>
+            <div class="gm-field">
+              <label>Quy chuẩn bàn tiệc (Số người / bàn)</label>
+              <select id="aiTableCap">
+                <option value="10" selected>Bàn 10 người (Tiêu chuẩn phổ biến nhất)</option>
+                <option value="8">Bàn 8 người (Thân mật)</option>
+                <option value="12">Bàn 12 người (Bàn lớn gia đình)</option>
+                <option value="6">Bàn 6 người (Bàn dài phương Tây)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Bảng khách mời (Editable) -->
+          <div class="gm-tbl-wrap">
+            <table class="gm-tbl-custom" id="assistantGuestTable">
+              <thead>
+                <tr>
+                  <th style="width:40px">#</th>
+                  <th>Tên khách mời</th>
+                  <th>Phân loại nhóm</th>
+                  <th>Trạng thái RSVP</th>
+                  <th style="width:110px">Người đi cùng</th>
+                  <th style="width:90px">Tổng số</th>
+                  <th>Ghi chú</th>
+                  <th style="width:50px"></th>
+                </tr>
+              </thead>
+              <tbody id="assistantGuestBody">
+                <!-- Render động bằng JS -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Nút phân tích AI -->
+          <div style="margin-top:20px;display:flex;flex-direction:column;align-items:flex-start;gap:12px">
+            <button type="button" class="gm-btn-ai" id="btnRunAssistant" onclick="runGuestAssistant()">
+              <span>✨</span><span>Phân tích &amp; Gợi ý xếp bàn với AI</span>
+            </button>
+            <div id="assistantProgress" style="width:100%;display:none">
+              <div class="gm-prog-bar"><i id="assistantBar" style="width:0%"></i></div>
+              <div class="gm-status-row">
+                <span class="dot" id="assistantDot"></span>
+                <span id="assistantStatus">Trợ lý AI đang phân tích dữ liệu khách mời &amp; tính toán số bàn tiệc...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- KHỐI 2: KẾT QUẢ PHÂN TÍCH TỪ TRỢ LÝ AI -->
+        <div class="gm-card" id="assistantResultSection" style="display:none;margin-top:20px">
+          <div class="gm-card-title">
+            <div class="left">
+              <span class="gm-step-badge">2</span>
+              <span>Kết quả phân tích từ Trợ lý AI WedStory</span>
+            </div>
+            <button type="button" class="gm-btn-outline-rose" onclick="window.print()">🖨️ In kết quả</button>
+          </div>
+
+          <!-- 1. KPI & Dự báo -->
+          <div class="gm-kpi-grid">
+            <div class="gm-kpi-box">
+              <small>Tổng khách được mời</small>
+              <b id="kpiTotal">13</b>
+            </div>
+            <div class="gm-kpi-box">
+              <small>Đã xác nhận (Có mặt)</small>
+              <b id="kpiConfirmed" style="color:var(--gm-green)">7</b>
+            </div>
+            <div class="gm-kpi-box">
+              <small>Chưa phản hồi (Đang chờ)</small>
+              <b id="kpiPending" style="color:var(--gm-amber)">5</b>
+            </div>
+            <div class="gm-kpi-box">
+              <small>Đã báo không đến</small>
+              <b id="kpiDeclined" style="color:#6b7280">1</b>
+            </div>
+          </div>
+
+          <div class="gm-forecast-highlight">
+            <div class="gm-fh-title">
+              <span>🎯</span><span>Dự báo tham dự &amp; Khuyến nghị bàn tiệc</span>
+            </div>
+            <div class="gm-fh-metrics">
+              <div class="gm-fh-metric">
+                <small>Dự kiến khách thực tế sẽ đến</small>
+                <span id="fhActual">~9 - 10 người</span>
+              </div>
+              <div class="gm-fh-metric">
+                <small>Số bàn tiệc chính thức nên đặt</small>
+                <span id="fhTables">1 bàn</span>
+              </div>
+              <div class="gm-fh-metric">
+                <small>Số bàn tiệc dự phòng gợi ý</small>
+                <span id="fhSpare">1 bàn</span>
+              </div>
+              <div class="gm-fh-metric">
+                <small>Tỉ lệ tham dự ước tính</small>
+                <span id="fhRate">~70%</span>
+              </div>
+            </div>
+            <div class="gm-fh-advice" id="fhAdvice">
+              Đang tải lời khuyên từ chuyên gia...
+            </div>
+          </div>
+
+          <!-- 2. Gợi ý xếp bàn tiệc -->
+          <div style="margin-top:24px">
+            <h3 style="font-size:1.1rem;color:var(--gm-burg);margin:0 0 4px;font-family:'Playfair Display',serif">
+              🍽️ Gợi ý xếp bàn tiệc thông minh theo nhóm
+            </h3>
+            <p style="color:var(--gm-muted);font-size:.84rem;margin:0 0 12px">
+              AI tự động gom các khách cùng mối quan hệ (họ hàng, bạn đại học, đồng nghiệp) ngồi chung để tạo không khí tiệc ấm cúng, tự nhiên nhất.
+            </p>
+            <div class="gm-tables-grid" id="tablesContainer">
+              <!-- Render động thẻ bàn tiệc -->
+            </div>
+          </div>
+
+          <!-- 3. Mẫu tin nhắn nhắc nhở RSVP -->
+          <div class="gm-rsvp-box">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px">
+              <div>
+                <h4 style="font-size:1rem;color:var(--gm-burg);margin:0;font-family:'Playfair Display',serif">
+                  💌 Mẫu tin nhắn nhắc nhở phản hồi (RSVP) khéo léo
+                </h4>
+                <small style="color:var(--gm-muted)">Gửi riêng cho những khách mời chưa phản hồi để chốt số lượng chuẩn xác</small>
+              </div>
+              <div class="gm-rsvp-tabs">
+                <button type="button" class="gm-rsvp-tab-btn active" id="btnRsvpPolite" onclick="switchRsvpTab('polite')">Họ hàng / Người lớn</button>
+                <button type="button" class="gm-rsvp-tab-btn" id="btnRsvpFriendly" onclick="switchRsvpTab('friendly')">Bạn bè / Đồng nghiệp</button>
+              </div>
+            </div>
+
+            <div class="gm-rsvp-text-area" id="rsvpMessageContent">
+              Đang soạn tin nhắn...
+            </div>
+
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+              <div style="font-size:.8rem;color:var(--gm-muted)" id="rsvpTimingAdvice">
+                💡 Gợi ý thời điểm gửi: Nên gửi trước ngày cưới 5 - 7 ngày vào khoảng 19:30 - 21:00.
+              </div>
+              <div style="display:flex;gap:8px">
+                <button type="button" class="gm-btn-outline-rose" onclick="copyRsvpMessage()">📋 Sao chép tin nhắn</button>
+                <button type="button" class="gm-btn-outline-rose" onclick="openZaloForReminder()" style="background:#0068ff;color:#fff;border-color:#0068ff">📱 Mở Zalo</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- TAB 2: CÁ NHÂN HÓA LỜI MỜI TỪ EXCEL & GỬI 1-CHẠM (PRETTY LINK) -->
+      <!-- ============================================================ -->
+      <div id="modalViewPersonalize" class="gm-tab-view" style="display:none">
+        
+        <!-- BƯỚC 1: Thông tin cặp đôi -->
+        <div class="gm-card" id="step1">
+          <div class="gm-card-title"><div class="left"><span class="gm-step-badge">1</span><span>Thông tin cặp đôi &amp; Pretty Link</span></div></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+            <div class="gm-field">
+              <label>Tên chú rể (viết đầy đủ)</label>
+              <input type="text" id="groomName" placeholder="VD: Minh Khoa" value="">
+            </div>
+            <div class="gm-field">
+              <label>Tên cô dâu (viết đầy đủ)</label>
+              <input type="text" id="brideName" placeholder="VD: Thu Ha" value="">
+            </div>
+          </div>
+          <div class="gm-field" style="margin-bottom:6px">
+            <label>Couple Slug (tự động tạo từ tên — có thể sửa)</label>
+            <div class="gm-couple-row">
+              <input type="text" id="coupleSlug" placeholder="VD: minh-khoa-thu-ha" oninput="updateSlugPreview()">
+              <button type="button" class="gm-btn-outline-rose" onclick="autoSlug()" title="Tạo slug từ tên">⚡ Tự động</button>
+            </div>
+            <div class="gm-slug-preview" id="slugPreview">URL sẽ có dạng: <b>https://wedstory.vn/dam-cuoi-<i>couple-slug</i>/<i>guest-slug</i></b></div>
+          </div>
+        </div>
+
+        <!-- BƯỚC 2: Upload file Excel -->
+        <div class="gm-card" id="step2">
+          <div class="gm-card-title"><div class="left"><span class="gm-step-badge">2</span><span>Tải file danh sách khách (Excel / CSV)</span></div></div>
+          <label class="gm-upload-zone" id="uploadZone">
+            <input type="file" id="fileInput" accept=".xlsx,.xls,.csv,.ods,.txt">
+            <div class="uz-ico">📄</div>
+            <b>Kéo thả hoặc bấm để chọn file</b>
+            <small>Hỗ trợ .xlsx, .xls, .csv · Cột gợi ý: <b>Họ tên, Nhóm, Xưng hô, Ghi chú</b></small>
+          </label>
+          <div style="margin-top:12px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+            <button type="button" class="gm-btn-outline-rose" onclick="downloadSample()" title="Tải file Excel mẫu">⬇ File Excel mẫu</button>
+            <span style="font-size:.8rem;color:var(--gm-muted)">Không có tiêu đề cột vẫn nhận diện được tự động</span>
+          </div>
+          <div id="previewArea" style="display:none;margin-top:16px">
+            <div class="gm-status-row" id="importStatus"><span class="dot ok"></span><span id="importMsg"></span></div>
+            <div class="gm-preview-wrap" id="previewTable" style="margin-top:10px"></div>
+          </div>
+        </div>
+
+        <!-- BƯỚC 3: Gọi AI -->
+        <div class="gm-card" id="step3">
+          <div class="gm-card-title"><div class="left"><span class="gm-step-badge">3</span><span>AI cá nhân hoá lời mời (Gemini)</span></div></div>
+          <p style="color:var(--gm-muted);font-size:.88rem;margin:0 0 16px;line-height:1.55">
+            AI sẽ tự đọc tên, nhóm khách và ghi chú để sinh <b>câu xưng hô</b> và <b>lời nhắn 2–3 câu</b> phù hợp với từng người.<br>
+            <span style="font-size:.78rem">Họ hàng → trang trọng · Bạn thân → gần gũi/hài hước · Đồng nghiệp → lịch sự</span>
+          </p>
+          <div id="aiProgress" style="display:none">
+            <div class="gm-prog-bar"><i id="aiBar" style="width:0%"></i></div>
+            <div class="gm-status-row"><span class="dot" id="aiDot"></span><span id="aiStatus">Đang gọi Gemini AI…</span></div>
+          </div>
+          <button type="button" class="gm-btn-ai" id="btnRunAI" onclick="runAI()" disabled>
+            <span>✨</span><span>Chạy AI cá nhân hoá tất cả khách</span>
+          </button>
+        </div>
+
+        <!-- BƯỚC 4: Bảng kết quả + Gửi -->
+        <div class="gm-card" id="step4" style="display:none">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px">
+            <div class="gm-card-title" style="margin:0"><div class="left"><span class="gm-step-badge">4</span><span>Kết quả &amp; Gửi 1-chạm đa kênh</span></div></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button type="button" class="gm-btn-outline-rose" onclick="exportResultExcel()">⬇ Xuất Excel kèm link</button>
+              <button type="button" class="gm-btn-ai" style="padding:9px 16px;font-size:.85rem" onclick="copyAllLinks()">📋 Copy tất cả link</button>
+            </div>
+          </div>
+          <div class="gm-result-wrap">
+            <table class="gm-result-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Tên khách</th>
+                  <th>Nhóm</th>
+                  <th>Xưng hô AI</th>
+                  <th>Lời nhắn AI</th>
+                  <th>Pretty Link</th>
+                  <th>Thao tác gửi</th>
+                </tr>
+              </thead>
+              <tbody id="resultBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
 </body>
 </html>
