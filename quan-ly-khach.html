@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Quản lý khách mời AI – WEDSTORY</title>
+<title>Quản lý khách mời & Trợ lý AI – WEDSTORY</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/style.css">
@@ -17,6 +17,10 @@
   --muted: #7a5d67;
   --border: #e8d0d9;
   --bg: #faf7f8;
+  --green: #1f7a37;
+  --green-bg: #e6f6eb;
+  --amber: #b45309;
+  --amber-bg: #fffbeb;
 }
 
 body { background: var(--bg); }
@@ -25,14 +29,57 @@ body { background: var(--bg); }
 .gm-hero {
   background: linear-gradient(135deg, #fff0f3 0%, #fdf5f8 60%, #fff 100%);
   border-bottom: 1px solid var(--border);
-  padding: 48px 0 36px;
+  padding: 44px 0 32px;
   text-align: center;
 }
-.gm-hero h1 { font-size: clamp(1.6rem, 4vw, 2.4rem); color: var(--burg); margin: 0 0 10px; }
-.gm-hero p  { color: var(--muted); font-size: 1rem; max-width: 560px; margin: 0 auto 24px; }
+.gm-hero h1 { font-size: clamp(1.6rem, 4vw, 2.3rem); color: var(--burg); margin: 0 0 8px; }
+.gm-hero p  { color: var(--muted); font-size: 1rem; max-width: 620px; margin: 0 auto 20px; line-height: 1.55; }
+
+/* ── Top Tabs Nav ── */
+.gm-tabs-nav {
+  display: inline-flex;
+  background: #fff;
+  padding: 6px;
+  border-radius: 999px;
+  border: 1.5px solid var(--border);
+  box-shadow: 0 4px 16px rgba(200,75,104,.08);
+  gap: 6px;
+  max-width: 90vw;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.gm-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 22px;
+  border-radius: 999px;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font: 600 .9rem 'Be Vietnam Pro', sans-serif;
+  cursor: pointer;
+  transition: all .2s;
+  white-space: nowrap;
+}
+.gm-tab-btn:hover { color: var(--burg); background: var(--rose-l); }
+.gm-tab-btn.active {
+  background: linear-gradient(135deg, var(--burg) 0%, var(--rose) 100%);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(158,43,71,.28);
+}
+.hot-badge {
+  background: #ffec3d;
+  color: #8c5d00;
+  font-size: .68rem;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 999px;
+  letter-spacing: .04em;
+}
 
 /* ── Layout ── */
-.gm-wrap { max-width: 1100px; margin: 0 auto; padding: 32px 20px 80px; display: grid; gap: 28px; }
+.gm-wrap { max-width: 1100px; margin: 0 auto; padding: 28px 20px 80px; display: grid; gap: 24px; }
 
 /* ── Card ── */
 .card {
@@ -43,13 +90,16 @@ body { background: var(--bg); }
   box-shadow: 0 4px 24px rgba(200,75,104,.06);
 }
 .card-title {
-  font: 700 1.05rem 'Playfair Display', serif;
+  font: 700 1.15rem 'Playfair Display', serif;
   color: var(--burg);
-  margin: 0 0 18px;
+  margin: 0 0 16px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
 }
+.card-title .left { display: flex; align-items: center; gap: 10px; }
 
 /* ── Step badges ── */
 .step-badge {
@@ -64,231 +114,444 @@ body { background: var(--bg); }
   flex-shrink: 0;
 }
 
-/* ── Couple slug input row ── */
-.couple-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: end; }
+/* ── Form fields ── */
 .field label { display: block; font: 600 .82rem 'Be Vietnam Pro', sans-serif; color: var(--muted); margin-bottom: 5px; }
-.field input, .field select {
+.field input, .field select, .field textarea {
   width: 100%; padding: 10px 14px;
   border: 1.5px solid var(--border); border-radius: 10px;
-  font: 500 .95rem 'Be Vietnam Pro', sans-serif; color: var(--ink);
+  font: 500 .92rem 'Be Vietnam Pro', sans-serif; color: var(--ink);
   background: #fff; transition: border-color .15s;
   box-sizing: border-box;
 }
-.field input:focus, .field select:focus { outline: none; border-color: var(--rose); }
-.slug-preview { font-size: .8rem; color: var(--muted); margin-top: 4px; }
-.slug-preview b { color: var(--burg); }
+.field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--rose); }
 
-/* ── Upload zone ── */
-.upload-zone {
-  border: 2.5px dashed var(--rose-m);
-  border-radius: 16px;
-  background: var(--rose-l);
-  padding: 36px 20px;
-  text-align: center;
-  cursor: pointer;
-  transition: border-color .2s, background .2s;
-}
-.upload-zone:hover, .upload-zone.drag { border-color: var(--rose); background: #fff0f3; }
-.upload-zone input[type=file] { display: none; }
-.upload-zone .uz-ico { font-size: 2.5rem; margin-bottom: 8px; }
-.upload-zone b { display: block; color: var(--burg); font-size: 1.02rem; margin-bottom: 4px; }
-.upload-zone small { color: var(--muted); font-size: .85rem; }
-
-/* Hoặc nút tải file mẫu */
-.sample-link { color: var(--burg); font-weight: 600; font-size: .85rem; text-decoration: none; }
-.sample-link:hover { text-decoration: underline; }
-
-/* ── Preview table of uploaded guests ── */
-.preview-wrap { overflow-x: auto; margin-top: 16px; border-radius: 12px; border: 1px solid var(--border); }
-.preview-wrap table { width: 100%; border-collapse: collapse; font-size: .88rem; }
-.preview-wrap th {
+/* ── Table Styling ── */
+.tbl-wrap { overflow-x: auto; border-radius: 14px; border: 1.5px solid var(--border); margin-top: 14px; }
+.tbl-custom { width: 100%; border-collapse: collapse; font-size: .88rem; text-align: left; }
+.tbl-custom th {
   background: linear-gradient(135deg, var(--burg), var(--rose));
-  color: #fff; padding: 10px 14px; text-align: left; white-space: nowrap;
-  font: 600 .8rem 'Be Vietnam Pro', sans-serif; letter-spacing: .03em;
+  color: #fff; padding: 12px 14px; white-space: nowrap;
+  font: 700 .8rem 'Be Vietnam Pro', sans-serif; letter-spacing: .02em;
 }
-.preview-wrap td { padding: 9px 14px; border-bottom: 1px solid var(--border); color: var(--ink); }
-.preview-wrap tr:last-child td { border-bottom: none; }
-.preview-wrap tr:hover td { background: var(--rose-l); }
-.badge {
-  display: inline-block; padding: 2px 9px; border-radius: 999px;
-  font: 600 .72rem 'Be Vietnam Pro', sans-serif;
+.tbl-custom td { padding: 9px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.tbl-custom tr:last-child td { border-bottom: none; }
+.tbl-custom tr:hover td { background: var(--rose-l); }
+.tbl-custom input, .tbl-custom select {
+  padding: 6px 10px; border: 1px solid var(--border); border-radius: 8px; font-size: .85rem;
 }
-.badge-family { background: #fde8ee; color: #9E2B47; }
-.badge-friend  { background: #e8f4ff; color: #1a5fa8; }
-.badge-work    { background: #edfae8; color: #28742e; }
-.badge-other   { background: #f0ede8; color: #5c4c38; }
 
-/* ── AI Result table ── */
-.result-table-wrap { overflow-x: auto; border-radius: 14px; border: 1px solid var(--border); }
-.result-table { width: 100%; border-collapse: collapse; font-size: .87rem; }
-.result-table th {
-  background: linear-gradient(135deg, var(--burg), var(--rose));
-  color: #fff; padding: 11px 16px; text-align: left; white-space: nowrap;
-  font: 700 .78rem 'Be Vietnam Pro', sans-serif;
-}
-.result-table td { padding: 10px 16px; border-bottom: 1px solid var(--border); vertical-align: top; }
-.result-table tr:last-child td { border-bottom: none; }
-.result-table tr:hover td { background: var(--rose-l); }
-.result-table .msg-cell { max-width: 320px; line-height: 1.55; }
-.result-table .link-cell a { color: var(--burg); word-break: break-all; font-size: .8rem; }
-
-/* ── Action buttons in table ── */
-.act-btns { display: flex; gap: 6px; flex-wrap: wrap; }
-.act-btn {
+/* ── Status Pills ── */
+.st-pill {
   display: inline-flex; align-items: center; gap: 5px;
-  padding: 6px 11px; border-radius: 9px; border: 1.5px solid var(--border);
-  background: #fff; color: var(--ink); font: 600 .75rem 'Be Vietnam Pro', sans-serif;
-  cursor: pointer; white-space: nowrap; transition: all .15s;
+  padding: 4px 10px; border-radius: 999px; font-weight: 700; font-size: .75rem; white-space: nowrap;
 }
-.act-btn:hover { border-color: var(--rose); color: var(--burg); background: var(--rose-l); }
-.act-btn.primary { background: var(--burg); color: #fff; border-color: var(--burg); }
-.act-btn.primary:hover { background: var(--rose); border-color: var(--rose); }
-.act-btn.zalo { background: #0068ff; color: #fff; border-color: #0068ff; }
-.act-btn.zalo:hover { background: #0055cc; }
-.act-btn.mess { background: #0080fb; color: #fff; border-color: #0080fb; }
-.act-btn.mess:hover { background: #0066d9; }
+.st-confirmed { background: var(--green-bg); color: var(--green); border: 1px solid #c3e6cb; }
+.st-pending   { background: var(--amber-bg); color: var(--amber); border: 1px solid #fde68a; }
+.st-declined  { background: #f3f4f6; color: #6b7280; border: 1px solid #e5e7eb; }
 
-/* ── Big Buttons ── */
+/* ── Action Buttons ── */
 .btn-ai {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  padding: 14px 28px; border-radius: 12px; border: none;
+  padding: 13px 26px; border-radius: 12px; border: none;
   background: linear-gradient(135deg, var(--burg) 0%, var(--rose) 100%);
-  color: #fff; font: 700 1rem 'Be Vietnam Pro', sans-serif;
-  cursor: pointer; box-shadow: 0 6px 20px rgba(158,43,71,.28);
-  transition: filter .15s, transform .1s;
+  color: #fff; font: 700 .98rem 'Be Vietnam Pro', sans-serif;
+  cursor: pointer; box-shadow: 0 6px 20px rgba(158,43,71,.26);
+  transition: all .15s;
 }
 .btn-ai:hover { filter: brightness(1.07); transform: translateY(-1px); }
 .btn-ai:disabled { opacity: .55; cursor: not-allowed; transform: none; filter: none; }
-.btn-outline-rose {
-  display: inline-flex; align-items: center; gap: 8px;
-  padding: 11px 22px; border-radius: 11px;
-  border: 1.5px solid var(--rose); color: var(--burg);
-  background: #fff; font: 600 .9rem 'Be Vietnam Pro', sans-serif;
-  cursor: pointer; transition: background .15s, color .15s;
-}
-.btn-outline-rose:hover { background: var(--rose-l); }
 
-/* ── Toast ── */
-.toast {
-  position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(20px);
-  background: #1d1117; color: #fff;
-  padding: 12px 22px; border-radius: 12px;
-  font: 500 .9rem 'Be Vietnam Pro', sans-serif;
-  box-shadow: 0 8px 32px rgba(0,0,0,.25);
-  opacity: 0; transition: opacity .25s, transform .25s;
-  z-index: 9999; pointer-events: none; white-space: pre-line;
-  max-width: min(90vw, 460px); text-align: center;
+.btn-outline-rose {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 16px; border-radius: 10px;
+  border: 1.5px solid var(--rose); color: var(--burg);
+  background: #fff; font: 600 .85rem 'Be Vietnam Pro', sans-serif;
+  cursor: pointer; transition: all .15s; white-space: nowrap;
 }
-.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.btn-outline-rose:hover { background: var(--rose-l); border-color: var(--burg); }
+
+.btn-del {
+  background: none; border: 0; color: #dc2626; cursor: pointer; padding: 4px 8px; border-radius: 6px; font-size: 1.1rem;
+}
+.btn-del:hover { background: #fee2e2; }
+
+/* ── KPI Grid ── */
+.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 20px; }
+.kpi-box {
+  background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 16px 20px;
+  box-shadow: 0 2px 10px rgba(0,0,0,.03); text-align: center;
+}
+.kpi-box small { color: var(--muted); font-size: .8rem; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+.kpi-box b { display: block; font-size: 1.9rem; color: var(--burg); margin-top: 4px; font-family: 'Playfair Display', serif; }
+
+/* ── Highlight Forecast Box ── */
+.forecast-highlight {
+  background: linear-gradient(135deg, #fff6f8 0%, #fdf0f4 100%);
+  border: 1.5px solid #f2c0cc;
+  border-radius: 16px;
+  padding: 22px 24px;
+  margin-bottom: 22px;
+}
+.fh-title { font-weight: 700; color: var(--burg); font-size: 1.1rem; display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+.fh-metrics { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 14px; }
+.fh-metric {
+  background: #fff; border: 1px solid #fad2dc; border-radius: 12px; padding: 12px 18px; flex: 1; min-width: 170px;
+}
+.fh-metric small { color: var(--muted); font-size: .8rem; font-weight: 600; display: block; }
+.fh-metric span { font-size: 1.45rem; font-weight: 800; color: var(--burg); }
+.fh-advice {
+  background: #fff; border-left: 4px solid var(--burg); border-radius: 8px; padding: 12px 16px;
+  color: #4a2831; font-size: .9rem; line-height: 1.6;
+}
+
+/* ── Table Suggestions Grid ── */
+.tables-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 16px; margin-top: 14px; }
+.table-card {
+  background: #fff; border: 1.5px solid var(--border); border-radius: 14px; padding: 16px 18px;
+  display: flex; flex-direction: column; gap: 10px; transition: transform .15s, border-color .15s;
+}
+.table-card:hover { transform: translateY(-2px); border-color: var(--rose); }
+.tc-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.tc-name { font-weight: 700; color: var(--burg); font-size: .98rem; }
+.tc-count { background: var(--rose-l); color: var(--burg); padding: 3px 10px; border-radius: 999px; font-weight: 700; font-size: .78rem; white-space: nowrap; }
+.tc-loc { font-size: .8rem; color: var(--muted); display: flex; align-items: center; gap: 4px; }
+.tc-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.tc-chip {
+  background: #fdf3f5; color: #502732; border: 1px solid #f6d2dc;
+  border-radius: 8px; padding: 4px 9px; font-size: .8rem; font-weight: 500;
+}
+
+/* ── RSVP Reminder Box ── */
+.rsvp-reminder-box {
+  background: #fff; border: 1.5px solid var(--border); border-radius: 16px; padding: 20px 24px; margin-top: 22px;
+}
+.rsvp-tabs { display: flex; gap: 8px; margin-bottom: 12px; }
+.rsvp-tab-btn {
+  padding: 6px 14px; border-radius: 8px; border: 1px solid var(--border);
+  background: #fdfafb; color: var(--muted); font: 600 .82rem 'Be Vietnam Pro', sans-serif; cursor: pointer;
+}
+.rsvp-tab-btn.active { background: var(--burg); color: #fff; border-color: var(--burg); }
+.rsvp-text-area {
+  background: #fffafb; border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px;
+  font-size: .92rem; line-height: 1.6; color: var(--ink); white-space: pre-wrap; margin-bottom: 12px;
+}
 
 /* ── Progress bar ── */
-.progress-bar { height: 6px; border-radius: 3px; background: var(--border); overflow: hidden; margin: 10px 0; }
+.progress-bar { height: 6px; border-radius: 3px; background: var(--border); overflow: hidden; margin: 12px 0 6px; }
 .progress-bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--burg), var(--rose)); border-radius: 3px; transition: width .4s; }
-
-/* ── Status row ── */
 .status-row { display: flex; align-items: center; gap: 10px; font-size: .88rem; color: var(--muted); }
 .status-row .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--rose); display: inline-block; }
 .status-row .dot.ok { background: #2ea44f; }
 
-/* ── Responsive ── */
+/* ── Toast ── */
+.toast {
+  position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(20px);
+  background: #1d1117; color: #fff; padding: 12px 22px; border-radius: 12px;
+  font: 500 .9rem 'Be Vietnam Pro', sans-serif; box-shadow: 0 8px 32px rgba(0,0,0,.25);
+  opacity: 0; transition: opacity .25s, transform .25s; z-index: 9999; pointer-events: none;
+  max-width: min(90vw, 460px); text-align: center;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
 @media (max-width: 640px) {
   .card { padding: 18px 16px; }
-  .couple-row { grid-template-columns: 1fr; }
-  .act-btns { flex-direction: column; }
+  .fh-metrics { flex-direction: column; }
 }
 </style>
 </head>
 <body>
+
 <div class="gm-hero">
-  <h1>💌 Quản lý khách mời & Gửi thiệp AI</h1>
-  <p>Tải danh sách từ Excel → AI cá nhân hoá lời mời → Tạo Pretty Link phân cấp → Gửi 1-chạm đa kênh</p>
+  <h1>Quản lý khách mời &amp; Trợ lý AI</h1>
+  <p>Dự báo số lượng khách thực tế, tính toán số bàn tiệc, gợi ý xếp bàn theo nhóm và cá nhân hóa thiệp mời 1-chạm.</p>
+  
+  <div class="gm-tabs-nav">
+    <button type="button" class="gm-tab-btn active" id="tabBtnAssistant" onclick="switchMainTab('assistant')">
+      <span>✨</span><span>Trợ lý AI: Dự báo &amp; Xếp bàn</span>
+      <span class="hot-badge">NỔI BẬT</span>
+    </button>
+    <button type="button" class="gm-tab-btn" id="tabBtnPersonalize" onclick="switchMainTab('personalize')">
+      <span>💌</span><span>Cá nhân hóa lời mời &amp; Gửi 1-chạm</span>
+    </button>
+  </div>
 </div>
 
 <div class="gm-wrap">
 
-  <!-- BƯỚC 1: Thông tin cặp đôi -->
-  <div class="card" id="step1">
-    <div class="card-title"><span class="step-badge">1</span> Thông tin cặp đôi & Pretty Link</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
-      <div class="field">
-        <label>Tên chú rể (viết đầy đủ)</label>
-        <input type="text" id="groomName" placeholder="VD: Minh Khoa" value="">
+  <!-- ============================================================== -->
+  <!-- TAB 1: TRỢ LÝ AI: DỰ BÁO SỐ KHÁCH & GỢI Ý XẾP BÀN TIỆC          -->
+  <!-- ============================================================== -->
+  <div id="viewAssistant" class="gm-view">
+    
+    <!-- KHỐI 1: BẢNG KHÁCH MỜI DEMO & THIẾT LẬP -->
+    <div class="card">
+      <div class="card-title">
+        <div class="left">
+          <span class="step-badge">1</span>
+          <span>Danh sách khách mời phân tích</span>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button type="button" class="btn-outline-rose" onclick="loadDemoGuests()">⚡ Nạp 8 khách mẫu demo</button>
+          <button type="button" class="btn-outline-rose" onclick="addNewGuestRow()">➕ Thêm khách</button>
+          <label class="btn-outline-rose" style="cursor:pointer">
+            📁 Nhập Excel/CSV<input type="file" id="assistantFileInput" accept=".xlsx,.xls,.csv" hidden>
+          </label>
+          <button type="button" class="btn-outline-rose" onclick="clearGuestTable()" style="color:#b91c1c;border-color:#fca5a5">🗑 Xóa hết</button>
+        </div>
       </div>
-      <div class="field">
-        <label>Tên cô dâu (viết đầy đủ)</label>
-        <input type="text" id="brideName" placeholder="VD: Thu Ha" value="">
+
+      <!-- Thiết lập nhanh cho AI -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:14px;margin-bottom:14px;background:#fdf9fa;padding:14px 16px;border-radius:12px;border:1px solid var(--border)">
+        <div class="field">
+          <label>Tên cặp đôi (Cô dâu &amp; Chú rể)</label>
+          <input type="text" id="aiCoupleName" value="Minh Khoa &amp; Thu Hà" placeholder="VD: Minh Khoa &amp; Thu Hà">
+        </div>
+        <div class="field">
+          <label>Ngày diễn ra lễ cưới</label>
+          <input type="text" id="aiWeddingDate" value="25/12/2026" placeholder="VD: 25/12/2026">
+        </div>
+        <div class="field">
+          <label>Quy chuẩn bàn tiệc (Số người / bàn)</label>
+          <select id="aiTableCap">
+            <option value="10" selected>Bàn 10 người (Tiêu chuẩn phổ biến nhất)</option>
+            <option value="8">Bàn 8 người (Thân mật)</option>
+            <option value="12">Bàn 12 người (Bàn lớn gia đình)</option>
+            <option value="6">Bàn 6 người (Bàn dài phương Tây)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Bảng khách mời (Editable) -->
+      <div class="tbl-wrap">
+        <table class="tbl-custom" id="assistantGuestTable">
+          <thead>
+            <tr>
+              <th style="width:40px">#</th>
+              <th>Tên khách mời</th>
+              <th>Phân loại nhóm</th>
+              <th>Trạng thái RSVP</th>
+              <th style="width:110px">Người đi cùng</th>
+              <th style="width:90px">Tổng số</th>
+              <th>Ghi chú</th>
+              <th style="width:50px"></th>
+            </tr>
+          </thead>
+          <tbody id="assistantGuestBody">
+            <!-- Render động bằng JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Nút phân tích AI -->
+      <div style="margin-top:20px;display:flex;flex-direction:column;align-items:flex-start;gap:12px">
+        <button type="button" class="btn-ai" id="btnRunAssistant" onclick="runGuestAssistant()">
+          <span>✨</span><span>Phân tích &amp; Gợi ý xếp bàn với AI</span>
+        </button>
+
+        <div id="assistantProgress" style="width:100%;display:none">
+          <div class="progress-bar"><i id="assistantBar" style="width:0%"></i></div>
+          <div class="status-row">
+            <span class="dot" id="assistantDot"></span>
+            <span id="assistantStatus">Trợ lý AI đang phân tích dữ liệu khách mời &amp; tính toán số bàn tiệc...</span>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="field" style="margin-bottom:6px">
-      <label>Couple Slug (tự động tạo từ tên — có thể sửa)</label>
-      <div class="couple-row">
-        <input type="text" id="coupleSlug" placeholder="VD: minh-khoa-thu-ha" oninput="updateSlugPreview()">
-        <button class="btn-outline-rose" onclick="autoSlug()" title="Tạo slug từ tên">⚡ Tự động</button>
+
+    <!-- KHỐI 2: KẾT QUẢ PHÂN TÍCH TỪ TRỢ LÝ AI -->
+    <div class="card" id="assistantResultSection" style="display:none;margin-top:24px">
+      <div class="card-title">
+        <div class="left">
+          <span class="step-badge">2</span>
+          <span>Kết quả phân tích từ Trợ lý AI WedStory</span>
+        </div>
+        <button type="button" class="btn-outline-rose" onclick="window.print()">🖨️ In kết quả</button>
       </div>
-      <div class="slug-preview" id="slugPreview">URL sẽ có dạng: <b>https://wedstory.vn/dam-cuoi-<i>couple-slug</i>/<i>guest-slug</i></b></div>
+
+      <!-- 1. KPI & Dự báo -->
+      <div class="kpi-grid">
+        <div class="kpi-box">
+          <small>Tổng khách được mời</small>
+          <b id="kpiTotal">13</b>
+        </div>
+        <div class="kpi-box">
+          <small>Đã xác nhận (Có mặt)</small>
+          <b id="kpiConfirmed" style="color:var(--green)">7</b>
+        </div>
+        <div class="kpi-box">
+          <small>Chưa phản hồi (Đang chờ)</small>
+          <b id="kpiPending" style="color:var(--amber)">5</b>
+        </div>
+        <div class="kpi-box">
+          <small>Đã báo không đến</small>
+          <b id="kpiDeclined" style="color:#6b7280">1</b>
+        </div>
+      </div>
+
+      <div class="forecast-highlight">
+        <div class="fh-title">
+          <span>🎯</span><span>Dự báo tham dự &amp; Khuyến nghị bàn tiệc</span>
+        </div>
+        <div class="fh-metrics">
+          <div class="fh-metric">
+            <small>Dự kiến khách thực tế sẽ đến</small>
+            <span id="fhActual">~9 - 10 người</span>
+          </div>
+          <div class="fh-metric">
+            <small>Số bàn tiệc chính thức nên đặt</small>
+            <span id="fhTables">1 bàn</span>
+          </div>
+          <div class="fh-metric">
+            <small>Số bàn tiệc dự phòng gợi ý</small>
+            <span id="fhSpare">1 bàn</span>
+          </div>
+          <div class="fh-metric">
+            <small>Tỉ lệ tham dự ước tính</small>
+            <span id="fhRate">~70%</span>
+          </div>
+        </div>
+        <div class="fh-advice" id="fhAdvice">
+          Đang tải lời khuyên từ chuyên gia...
+        </div>
+      </div>
+
+      <!-- 2. Gợi ý xếp bàn tiệc -->
+      <div style="margin-top:28px">
+        <h3 style="font-size:1.15rem;color:var(--burg);margin:0 0 4px;font-family:'Playfair Display',serif">
+          🍽️ Gợi ý xếp bàn tiệc thông minh theo nhóm
+        </h3>
+        <p style="color:var(--muted);font-size:.86rem;margin:0 0 12px">
+          AI tự động gom các khách cùng mối quan hệ (họ hàng, bạn đại học, đồng nghiệp) ngồi chung để tạo không khí tiệc ấm cúng, tự nhiên nhất.
+        </p>
+        <div class="tables-grid" id="tablesContainer">
+          <!-- Render động thẻ bàn tiệc -->
+        </div>
+      </div>
+
+      <!-- 3. Mẫu tin nhắn nhắc nhở RSVP -->
+      <div class="rsvp-reminder-box">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px">
+          <div>
+            <h4 style="font-size:1.05rem;color:var(--burg);margin:0;font-family:'Playfair Display',serif">
+              💌 Mẫu tin nhắn nhắc nhở phản hồi (RSVP) khéo léo
+            </h4>
+            <small style="color:var(--muted)">Gửi riêng cho những khách mời chưa phản hồi để chốt số lượng chuẩn xác</small>
+          </div>
+          <div class="rsvp-tabs">
+            <button type="button" class="rsvp-tab-btn active" id="btnRsvpPolite" onclick="switchRsvpTab('polite')">Họ hàng / Người lớn</button>
+            <button type="button" class="rsvp-tab-btn" id="btnRsvpFriendly" onclick="switchRsvpTab('friendly')">Bạn bè / Đồng nghiệp</button>
+          </div>
+        </div>
+
+        <div class="rsvp-text-area" id="rsvpMessageContent">
+          Đang soạn tin nhắn...
+        </div>
+
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+          <div style="font-size:.82rem;color:var(--muted)" id="rsvpTimingAdvice">
+            💡 Gợi ý thời điểm gửi: Nên gửi trước ngày cưới 5 - 7 ngày vào khoảng 19:30 - 21:00.
+          </div>
+          <div style="display:flex;gap:8px">
+            <button type="button" class="btn-outline-rose" onclick="copyRsvpMessage()">📋 Sao chép tin nhắn</button>
+            <button type="button" class="btn-outline-rose" onclick="openZaloForReminder()" style="background:#0068ff;color:#fff;border-color:#0068ff">📱 Mở Zalo</button>
+          </div>
+        </div>
+      </div>
+
     </div>
+
   </div>
 
-  <!-- BƯỚC 2: Upload file Excel -->
-  <div class="card" id="step2">
-    <div class="card-title"><span class="step-badge">2</span> Tải file danh sách khách (Excel / CSV)</div>
-    <label class="upload-zone" id="uploadZone">
-      <input type="file" id="fileInput" accept=".xlsx,.xls,.csv,.ods,.txt">
-      <div class="uz-ico">📄</div>
-      <b>Kéo thả hoặc bấm để chọn file</b>
-      <small>Hỗ trợ .xlsx, .xls, .csv · Cột gợi ý: <b>Họ tên, Nhóm, Xưng hô, Ghi chú</b></small>
-    </label>
-    <div style="margin-top:12px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
-      <button class="btn-outline-rose" onclick="downloadSample()" title="Tải file Excel mẫu">⬇ File Excel mẫu</button>
-      <span style="font-size:.82rem;color:var(--muted)">Không có tiêu đề cột vẫn nhận diện được tự động</span>
-    </div>
-    <div id="previewArea" style="display:none;margin-top:20px">
-      <div class="status-row" id="importStatus"><span class="dot ok"></span><span id="importMsg"></span></div>
-      <div class="preview-wrap" id="previewTable" style="margin-top:10px"></div>
-    </div>
-  </div>
-
-  <!-- BƯỚC 3: Gọi AI -->
-  <div class="card" id="step3">
-    <div class="card-title"><span class="step-badge">3</span> AI cá nhân hoá lời mời (Gemini)</div>
-    <p style="color:var(--muted);font-size:.9rem;margin:0 0 16px;line-height:1.6">
-      AI sẽ tự đọc tên, nhóm khách và ghi chú để sinh <b>câu xưng hô</b> và <b>lời nhắn 2–3 câu</b> phù hợp với từng người.<br>
-      <span style="font-size:.8rem">Họ hàng → trang trọng · Bạn thân → gần gũi/hài hước · Đồng nghiệp → lịch sự</span>
-    </p>
-    <div id="aiProgress" style="display:none">
-      <div class="progress-bar"><i id="aiBar" style="width:0%"></i></div>
-      <div class="status-row"><span class="dot" id="aiDot"></span><span id="aiStatus">Đang gọi Gemini AI…</span></div>
-    </div>
-    <button class="btn-ai" id="btnRunAI" onclick="runAI()" disabled>
-      <span>✨</span><span>Chạy AI cá nhân hoá tất cả khách</span>
-    </button>
-  </div>
-
-  <!-- BƯỚC 4: Bảng kết quả + Gửi -->
-  <div class="card" id="step4" style="display:none">
-    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:18px">
-      <div class="card-title" style="margin:0"><span class="step-badge">4</span> Kết quả & Gửi 1-chạm đa kênh</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button class="btn-outline-rose" onclick="exportResultExcel()">⬇ Xuất Excel kèm link</button>
-        <button class="btn-ai" style="padding:10px 18px;font-size:.9rem" onclick="copyAllLinks()">📋 Copy tất cả link</button>
+  <!-- ============================================================== -->
+  <!-- TAB 2: CÁ NHÂN HÓA LỜI MỜI TỪ EXCEL & GỬI 1-CHẠM (PRETTY LINK)   -->
+  <!-- ============================================================== -->
+  <div id="viewPersonalize" class="gm-view" style="display:none">
+    
+    <!-- BƯỚC 1: Thông tin cặp đôi -->
+    <div class="card" id="step1">
+      <div class="card-title"><span class="step-badge">1</span> Thông tin cặp đôi &amp; Pretty Link</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+        <div class="field">
+          <label>Tên chú rể (viết đầy đủ)</label>
+          <input type="text" id="groomName" placeholder="VD: Minh Khoa" value="">
+        </div>
+        <div class="field">
+          <label>Tên cô dâu (viết đầy đủ)</label>
+          <input type="text" id="brideName" placeholder="VD: Thu Ha" value="">
+        </div>
+      </div>
+      <div class="field" style="margin-bottom:6px">
+        <label>Couple Slug (tự động tạo từ tên — có thể sửa)</label>
+        <div class="couple-row">
+          <input type="text" id="coupleSlug" placeholder="VD: minh-khoa-thu-ha" oninput="updateSlugPreview()">
+          <button class="btn-outline-rose" onclick="autoSlug()" title="Tạo slug từ tên">⚡ Tự động</button>
+        </div>
+        <div class="slug-preview" id="slugPreview">URL sẽ có dạng: <b>https://wedstory.vn/dam-cuoi-<i>couple-slug</i>/<i>guest-slug</i></b></div>
       </div>
     </div>
-    <div class="result-table-wrap">
-      <table class="result-table">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Tên khách</th>
-            <th>Nhóm</th>
-            <th>Xưng hô AI</th>
-            <th>Lời nhắn AI</th>
-            <th>Pretty Link</th>
-            <th>Thao tác gửi</th>
-          </tr>
-        </thead>
-        <tbody id="resultBody"></tbody>
-      </table>
+
+    <!-- BƯỚC 2: Upload file Excel -->
+    <div class="card" id="step2">
+      <div class="card-title"><span class="step-badge">2</span> Tải file danh sách khách (Excel / CSV)</div>
+      <label class="upload-zone" id="uploadZone">
+        <input type="file" id="fileInput" accept=".xlsx,.xls,.csv,.ods,.txt">
+        <div class="uz-ico">📄</div>
+        <b>Kéo thả hoặc bấm để chọn file</b>
+        <small>Hỗ trợ .xlsx, .xls, .csv · Cột gợi ý: <b>Họ tên, Nhóm, Xưng hô, Ghi chú</b></small>
+      </label>
+      <div style="margin-top:12px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+        <button class="btn-outline-rose" onclick="downloadSample()" title="Tải file Excel mẫu">⬇ File Excel mẫu</button>
+        <span style="font-size:.82rem;color:var(--muted)">Không có tiêu đề cột vẫn nhận diện được tự động</span>
+      </div>
+      <div id="previewArea" style="display:none;margin-top:20px">
+        <div class="status-row" id="importStatus"><span class="dot ok"></span><span id="importMsg"></span></div>
+        <div class="preview-wrap" id="previewTable" style="margin-top:10px"></div>
+      </div>
     </div>
+
+    <!-- BƯỚC 3: Gọi AI -->
+    <div class="card" id="step3">
+      <div class="card-title"><span class="step-badge">3</span> AI cá nhân hoá lời mời (Gemini)</div>
+      <p style="color:var(--muted);font-size:.9rem;margin:0 0 16px;line-height:1.6">
+        AI sẽ tự đọc tên, nhóm khách và ghi chú để sinh <b>câu xưng hô</b> và <b>lời nhắn 2–3 câu</b> phù hợp với từng người.<br>
+        <span style="font-size:.8rem">Họ hàng → trang trọng · Bạn thân → gần gũi/hài hước · Đồng nghiệp → lịch sự</span>
+      </p>
+      <div id="aiProgress" style="display:none">
+        <div class="progress-bar"><i id="aiBar" style="width:0%"></i></div>
+        <div class="status-row"><span class="dot" id="aiDot"></span><span id="aiStatus">Đang gọi Gemini AI…</span></div>
+      </div>
+      <button class="btn-ai" id="btnRunAI" onclick="runAI()" disabled>
+        <span>✨</span><span>Chạy AI cá nhân hoá tất cả khách</span>
+      </button>
+    </div>
+
+    <!-- BƯỚC 4: Bảng kết quả + Gửi -->
+    <div class="card" id="step4" style="display:none">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:18px">
+        <div class="card-title" style="margin:0"><span class="step-badge">4</span> Kết quả &amp; Gửi 1-chạm đa kênh</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn-outline-rose" onclick="exportResultExcel()">⬇ Xuất Excel kèm link</button>
+          <button class="btn-ai" style="padding:10px 18px;font-size:.9rem" onclick="copyAllLinks()">📋 Copy tất cả link</button>
+        </div>
+      </div>
+      <div class="result-table-wrap">
+        <table class="result-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Tên khách</th>
+              <th>Nhóm</th>
+              <th>Xưng hô AI</th>
+              <th>Lời nhắn AI</th>
+              <th>Pretty Link</th>
+              <th>Thao tác gửi</th>
+            </tr>
+          </thead>
+          <tbody id="resultBody"></tbody>
+        </table>
+      </div>
+    </div>
+
   </div>
 
 </div>
@@ -296,33 +559,21 @@ body { background: var(--bg); }
 <!-- Toast -->
 <div class="toast" id="toast"></div>
 
-<!-- SheetJS -->
+<!-- SheetJS & Dữ liệu hệ thống -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="assets/js/data.js"></script>
 <script src="assets/js/common.js"></script>
 
 <script>
 /* ================================================================
-   Wedstory – Quản lý khách mời AI  (quan-ly-khach.html)
-   Tính năng: Excel → AI lời mời → Pretty Link → Gửi đa kênh
+   Wedstory – Quản lý khách mời & Trợ lý AI (quan-ly-khach.html)
    ================================================================ */
 (function () {
   'use strict';
 
-  /* ── Tiện ích ────────────────────────────────────────────────── */
   const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 
-  // Tạo slug không dấu
-  const toSlug = (s) =>
-    String(s ?? '')
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/[đĐ]/g, (c) => (c === 'đ' ? 'd' : 'D'))
-      .toLowerCase().trim()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-|-$/g, '');
-
-  // Toast thông báo
   let _toastTimer;
   function showToast(msg, ms = 3200) {
     const el = $('#toast');
@@ -332,21 +583,307 @@ body { background: var(--bg); }
     _toastTimer = setTimeout(() => el.classList.remove('show'), ms);
   }
 
-  // CSV tạo Blob để tải về
-  const BOM = '\uFEFF';
-  const toCsv = (rows) =>
-    BOM + rows.map(r => r.map(c => `"${String(c ?? '').replace(/"/g, '""')}"`).join(',')).join('\r\n');
-  const saveBlob = (blob, name) => {
-    const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: name });
-    document.body.append(a); a.click(); a.remove();
-    setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+  const toSlug = (s) =>
+    String(s ?? '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[đĐ]/g, (c) => (c === 'đ' ? 'd' : 'D'))
+      .toLowerCase().trim()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '');
+
+  /* ── Chuyển đổi Tab chính ─────────────────────────────────────── */
+  window.switchMainTab = function(tab) {
+    const viewA = $('#viewAssistant');
+    const viewP = $('#viewPersonalize');
+    const btnA = $('#tabBtnAssistant');
+    const btnP = $('#tabBtnPersonalize');
+
+    if (tab === 'assistant') {
+      viewA.style.display = 'block';
+      viewP.style.display = 'none';
+      btnA.classList.add('active');
+      btnP.classList.remove('active');
+    } else {
+      viewA.style.display = 'none';
+      viewP.style.display = 'block';
+      btnP.classList.add('active');
+      btnA.classList.remove('active');
+    }
   };
 
-  /* ── State ───────────────────────────────────────────────────── */
-  let guestList = [];   // { name, group, salutation, note }
-  let aiResults = [];   // { name, group, salutation, message, guest_slug, pretty_url }
+  /* ==============================================================
+     MODULE 1: TRỢ LÝ AI DỰ BÁO SỐ KHÁCH & XẾP BÀN TIỆC
+     ============================================================== */
 
-  /* ── Bước 1: Couple slug ─────────────────────────────────────── */
+  // Dữ liệu mẫu demo (8 khách chuẩn thực tế)
+  const DEMO_GUESTS = [
+    { name: 'Bác Nguyễn Văn An', group: 'Họ hàng nhà trai', status: 'confirmed', plusOnes: 1, note: 'Bác trưởng họ nội' },
+    { name: 'Chú Lê Văn Sáu', group: 'Họ hàng nhà trai', status: 'confirmed', plusOnes: 1, note: 'Gia đình chú ruột' },
+    { name: 'Anh Trần Minh Tuấn', group: 'Bạn đại học', status: 'pending', plusOnes: 1, note: 'Bạn cùng phòng KTX' },
+    { name: 'Chị Hoàng Thùy Lan', group: 'Đồng nghiệp công ty', status: 'confirmed', plusOnes: 0, note: 'Trưởng phòng Marketing' },
+    { name: 'Bạn Nguyễn Mạnh Hùng', group: 'Bạn cấp 3', status: 'pending', plusOnes: 0, note: 'Hội bạn thân cấp 3' },
+    { name: 'Cô Phạm Thị Hoa', group: 'Họ hàng nhà gái', status: 'confirmed', plusOnes: 1, note: 'Cô ruột bên ngoại' },
+    { name: 'Đặng Minh Đức', group: 'Bạn đại học', status: 'declined', plusOnes: 0, note: 'Bận công tác nước ngoài' },
+    { name: 'Vũ Hoàng Nam', group: 'Bạn đá bóng', status: 'pending', plusOnes: 1, note: 'Đội trưởng bóng đá' }
+  ];
+
+  let assistantGuests = [...DEMO_GUESTS];
+  let currentAssistantData = null;
+  let currentRsvpTab = 'polite';
+
+  function renderAssistantTable() {
+    const tbody = $('#assistantGuestBody');
+    if (!assistantGuests.length) {
+      tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--muted)">Chưa có khách mời nào. Bấm <b>"⚡ Nạp 8 khách mẫu demo"</b> hoặc <b>"➕ Thêm khách"</b> để bắt đầu.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = assistantGuests.map((g, idx) => `
+      <tr data-index="${idx}">
+        <td style="color:var(--muted);font-size:.8rem">${idx + 1}</td>
+        <td>
+          <input type="text" value="${TH.esc(g.name)}" onchange="updateGuestItem(${idx}, 'name', this.value)" style="width:100%" placeholder="Tên khách">
+        </td>
+        <td>
+          <input type="text" value="${TH.esc(g.group)}" onchange="updateGuestItem(${idx}, 'group', this.value)" style="width:130px" placeholder="Nhóm">
+        </td>
+        <td>
+          <select onchange="updateGuestItem(${idx}, 'status', this.value)" style="font-weight:600">
+            <option value="confirmed" ${g.status === 'confirmed' ? 'selected' : ''}>✅ Sẽ đến</option>
+            <option value="pending" ${g.status === 'pending' ? 'selected' : ''}>⏳ Đang chờ</option>
+            <option value="declined" ${g.status === 'declined' ? 'selected' : ''}>❌ Không đến</option>
+          </select>
+        </td>
+        <td>
+          <input type="number" min="0" max="10" value="${g.plusOnes}" onchange="updateGuestItem(${idx}, 'plusOnes', this.value)" style="width:70px">
+        </td>
+        <td style="font-weight:700;color:var(--burg)">
+          ${1 + Number(g.plusOnes || 0)} người
+        </td>
+        <td>
+          <input type="text" value="${TH.esc(g.note || '')}" onchange="updateGuestItem(${idx}, 'note', this.value)" style="width:100%" placeholder="Ghi chú (ăn chay, quan hệ...)">
+        </td>
+        <td style="text-align:center">
+          <button type="button" class="btn-del" onclick="removeGuestItem(${idx})" title="Xoá khách này">×</button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  window.updateGuestItem = function(idx, field, val) {
+    if (!assistantGuests[idx]) return;
+    if (field === 'plusOnes') val = Math.max(0, parseInt(val) || 0);
+    assistantGuests[idx][field] = val;
+    renderAssistantTable();
+  };
+
+  window.removeGuestItem = function(idx) {
+    assistantGuests.splice(idx, 1);
+    renderAssistantTable();
+    showToast('Đã xóa khách khỏi danh sách');
+  };
+
+  window.addNewGuestRow = function() {
+    assistantGuests.push({
+      name: `Khách mời ${assistantGuests.length + 1}`,
+      group: 'Bạn bè',
+      status: 'pending',
+      plusOnes: 0,
+      note: ''
+    });
+    renderAssistantTable();
+    showToast('Đã thêm dòng khách mới');
+  };
+
+  window.loadDemoGuests = function() {
+    assistantGuests = JSON.parse(JSON.stringify(DEMO_GUESTS));
+    renderAssistantTable();
+    showToast('✅ Đã nạp 8 khách mời mẫu!');
+  };
+
+  window.clearGuestTable = function() {
+    if (confirm('Bạn có chắc muốn xóa toàn bộ danh sách khách hiện tại?')) {
+      assistantGuests = [];
+      renderAssistantTable();
+      $('#assistantResultSection').style.display = 'none';
+      showToast('Đã xóa sạch danh sách');
+    }
+  };
+
+  // Upload Excel cho Tab Trợ lý
+  $('#assistantFileInput').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    try {
+      const rows = await readFileToRows(file);
+      const guests = rowsToGuests(rows);
+      if (!guests.length) return showToast('Không tìm thấy khách nào trong file.');
+      assistantGuests = guests.map(g => ({
+        name: g.name,
+        group: g.group || 'Khách mời',
+        status: 'pending',
+        plusOnes: 0,
+        note: g.note || ''
+      }));
+      renderAssistantTable();
+      showToast(`✅ Đã nạp ${assistantGuests.length} khách từ "${file.name}"!`);
+    } catch (err) {
+      showToast('❌ Lỗi đọc file: ' + err.message);
+    }
+  });
+
+  /* ── GỌI API GEMINI TRỢ LÝ AI DỰ BÁO & XẾP BÀN ───────────────── */
+  window.runGuestAssistant = async function() {
+    if (!assistantGuests.length) return showToast('Danh sách khách đang trống. Hãy nạp khách trước.');
+
+    const btn = $('#btnRunAssistant');
+    const progWrap = $('#assistantProgress');
+    const bar = $('#assistantBar');
+    const dot = $('#assistantDot');
+    const statusText = $('#assistantStatus');
+
+    btn.disabled = true;
+    btn.innerHTML = '<span>⏳</span><span>Trợ lý AI đang phân tích &amp; tính toán...</span>';
+    progWrap.style.display = 'block';
+    dot.classList.remove('ok');
+    bar.style.width = '20%';
+    statusText.textContent = `Đang gửi ${assistantGuests.length} khách tới Gemini AI phân tích...`;
+
+    try {
+      const coupleName = $('#aiCoupleName').value.trim() || 'Minh Khoa & Thu Hà';
+      const weddingDate = $('#aiWeddingDate').value.trim() || '25/12/2026';
+      const tableCapacity = Number($('#aiTableCap').value || 10);
+
+      bar.style.width = '60%';
+      statusText.textContent = 'AI đang dự báo số lượng thực tế & phân bổ bàn tiệc thông minh...';
+
+      const res = await fetch('/api/ai-guest-assistant', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          coupleName,
+          weddingDate,
+          tableCapacity,
+          guests: assistantGuests
+        })
+      });
+
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({ error: res.statusText }));
+        throw new Error(errJson.error || `HTTP ${res.status}`);
+      }
+
+      const data = await res.json();
+      currentAssistantData = data;
+
+      bar.style.width = '100%';
+      dot.classList.add('ok');
+      statusText.textContent = '✅ Đã hoàn thành phân tích & gợi ý xếp bàn!';
+
+      // Hiển thị kết quả ra giao diện
+      renderAssistantResult(data);
+      $('#assistantResultSection').style.display = 'block';
+      setTimeout(() => {
+        $('#assistantResultSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 200);
+
+      showToast('✨ Trợ lý AI đã dự báo và gợi ý xếp bàn xong!');
+    } catch (err) {
+      console.error('Lỗi khi gọi Trợ lý AI:', err);
+      statusText.textContent = '❌ Lỗi: ' + err.message;
+      showToast('❌ ' + err.message, 5000);
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '<span>✨</span><span>Phân tích &amp; Gợi ý xếp bàn với AI</span>';
+    }
+  };
+
+  /* ── HIỂN THỊ KẾT QUẢ AI DỰ BÁO & XẾP BÀN ──────────────────── */
+  function renderAssistantResult(data) {
+    if (!data) return;
+    const f = data.forecast || {};
+
+    // 1. Cập nhật 4 KPI
+    $('#kpiTotal').textContent = f.totalInvited ?? assistantGuests.length;
+    $('#kpiConfirmed').textContent = f.confirmedGuests ?? 0;
+    $('#kpiPending').textContent = f.pendingGuests ?? 0;
+    $('#kpiDeclined').textContent = f.declinedGuests ?? 0;
+
+    // Highlight metrics
+    $('#fhActual').textContent = `~${f.estimatedActualGuests || 0} người`;
+    $('#fhTables').textContent = `${f.recommendedTables || 1} bàn`;
+    $('#fhSpare').textContent = `${f.spareTables || 1} bàn`;
+    $('#fhRate').textContent = f.estimatedAttendanceRate || '~80%';
+    $('#fhAdvice').innerHTML = `<b>💡 Lời khuyên chuyên gia tiệc cưới:</b> ${TH.esc(f.summaryAdvice || 'Nên chủ động liên hệ chốt bàn trước ngày cưới 7 ngày.')}`;
+
+    // 2. Render thẻ bàn tiệc (Table Suggestions)
+    const tablesBox = $('#tablesContainer');
+    const tables = data.tableSuggestions || [];
+    if (!tables.length) {
+      tablesBox.innerHTML = '<p class="muted">Chưa có gợi ý bàn tiệc.</p>';
+    } else {
+      tablesBox.innerHTML = tables.map((t, i) => `
+        <div class="table-card">
+          <div class="tc-head">
+            <div>
+              <div class="tc-name">${TH.esc(t.tableName || `Bàn ${i + 1}`)}</div>
+              <div class="tc-loc">📍 ${TH.esc(t.seatingTips || 'Khu vực trung tâm')}</div>
+            </div>
+            <span class="tc-count">${t.count || (t.guests?.length || 0)} khách</span>
+          </div>
+          <div class="tc-chips">
+            ${(t.guests || []).map(g => `<span class="tc-chip">👤 ${TH.esc(g)}</span>`).join('')}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // 3. Render mẫu tin nhắn RSVP
+    updateRsvpMessageContent();
+  }
+
+  function updateRsvpMessageContent() {
+    if (!currentAssistantData || !currentAssistantData.rsvpReminder) return;
+    const r = currentAssistantData.rsvpReminder;
+    const msg = currentRsvpTab === 'polite' ? r.politeMessage : r.friendlyMessage;
+    $('#rsvpMessageContent').textContent = msg || 'Chưa có mẫu tin nhắn.';
+    if (r.sendingTimingAdvice) {
+      $('#rsvpTimingAdvice').innerHTML = `💡 <b>Thời điểm vàng:</b> ${TH.esc(r.sendingTimingAdvice)}`;
+    }
+  }
+
+  window.switchRsvpTab = function(type) {
+    currentRsvpTab = type;
+    $('#btnRsvpPolite').classList.toggle('active', type === 'polite');
+    $('#btnRsvpFriendly').classList.toggle('active', type === 'friendly');
+    updateRsvpMessageContent();
+  };
+
+  window.copyRsvpMessage = async function() {
+    const text = $('#rsvpMessageContent').textContent;
+    await copyToClipboard(text);
+    showToast('📋 Đã sao chép mẫu tin nhắn vào Clipboard!');
+  };
+
+  window.openZaloForReminder = function() {
+    const text = $('#rsvpMessageContent').textContent;
+    if (typeof window.handleShareAction === 'function') {
+      window.handleShareAction(text);
+    } else {
+      copyToClipboard(text);
+      showToast('📋 Đã sao chép tin nhắn! Đang mở Zalo...');
+      window.open('https://chat.zalo.me/', '_blank');
+    }
+  };
+
+  /* ==============================================================
+     MODULE 2: TẢI EXCEL & CÁ NHÂN HÓA LỜI MỜI PRETTY LINK (ĐỢT TRƯỚC)
+     ============================================================== */
+
+  let guestList = [];
+  let aiResults = [];
+
   window.autoSlug = function () {
     const g = toSlug($('#groomName').value);
     const b = toSlug($('#brideName').value);
@@ -362,13 +899,15 @@ body { background: var(--bg); }
     $('#slugPreview').innerHTML = `URL sẽ có dạng: <b>${base}/dam-cuoi-${cs}/<i>guest-slug</i></b>`;
   };
 
-  // Tự động điền thông tin nếu mở từ thiệp đã tạo ?id=...
   try {
     const qId = new URLSearchParams(location.search).get('id');
     if (qId && window.TH?.invites) {
       const inv = TH.invites.get(qId);
       if (inv) {
-        if (inv.groom?.nick || inv.groom?.name) $('#groomName').value = inv.groom.nick || inv.groom.name;
+        if (inv.groom?.nick || inv.groom?.name) {
+          $('#groomName').value = inv.groom.nick || inv.groom.name;
+          $('#aiCoupleName').value = `${inv.groom.nick || inv.groom.name} & ${inv.bride.nick || inv.bride.name}`;
+        }
         if (inv.bride?.nick || inv.bride?.name) $('#brideName').value = inv.bride.nick || inv.bride.name;
         autoSlug();
       }
@@ -378,11 +917,9 @@ body { background: var(--bg); }
   $('#groomName').addEventListener('input', autoSlug);
   $('#brideName').addEventListener('input', autoSlug);
 
-  /* ── Bước 2: Upload file ─────────────────────────────────────── */
   const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
   const fold = (s) => String(s ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[đĐ]/g, 'd').toLowerCase().trim();
 
-  // Nhận diện cột
   const COL_PATTERNS = {
     name:       /^(ho (va )?ten|ten|ten khach|name|full ?name|guest)$/,
     group:      /(nhom|group|quan he|moi quan he)/,
@@ -419,7 +956,6 @@ body { background: var(--bg); }
         obj = {};
         Object.entries(colMap).forEach(([k, j]) => { obj[k] = String(r[j] ?? '').trim(); });
       } else {
-        // Đoán theo nội dung
         obj = {};
         r.forEach(c => {
           const s = String(c ?? '').trim();
@@ -513,16 +1049,12 @@ body { background: var(--bg); }
     }
   }
 
-  // File input
   $('#fileInput').addEventListener('change', e => handleFile(e.target.files[0]));
-
-  // Drag & drop
   const zone = $('#uploadZone');
   zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag'); });
   zone.addEventListener('dragleave', () => zone.classList.remove('drag'));
   zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('drag'); handleFile(e.dataTransfer.files[0]); });
 
-  /* ── File mẫu ───────────────────────────────────────────────── */
   window.downloadSample = function () {
     const rows = [
       ['STT', 'Họ tên', 'Nhóm', 'Xưng hô', 'Ghi chú'],
@@ -542,7 +1074,6 @@ body { background: var(--bg); }
     }
   };
 
-  /* ── Bước 3: Gọi AI ──────────────────────────────────────────── */
   window.runAI = async function () {
     if (!guestList.length) return showToast('Hãy tải lên file danh sách khách trước.');
     const coupleSlug = $('#coupleSlug').value.trim();
@@ -563,7 +1094,6 @@ body { background: var(--bg); }
     statusEl.textContent = `Đang gửi ${guestList.length} khách tới Gemini AI…`;
 
     try {
-      // Chia batch 50 khách nếu cần
       const BATCH = 50;
       const batches = [];
       for (let i = 0; i < guestList.length; i += BATCH) batches.push(guestList.slice(i, i + BATCH));
@@ -573,7 +1103,6 @@ body { background: var(--bg); }
         bar.style.width = Math.round(((b + 0.5) / batches.length) * 90) + '%';
         statusEl.textContent = `Batch ${b + 1}/${batches.length}: đang xử lý ${batches[b].length} khách…`;
 
-        // Gọi Serverless API /api/ai-personalize
         const res = await fetch('/api/ai-personalize', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -608,7 +1137,6 @@ body { background: var(--bg); }
     }
   };
 
-  /* ── Bước 4: Render bảng kết quả ────────────────────────────── */
   function buildShareText(row, url) {
     return `${row.salutation}\n${row.message}\n\n👉 Mời bạn xem thiệp tại: ${url}`;
   }
@@ -625,8 +1153,7 @@ body { background: var(--bg); }
         : row.pretty_url || '#';
 
       const shareText = buildShareText(row, cardUrl);
-      const encodedText = encodeURIComponent(shareText);
-      const idx = i; // capture
+      const idx = i;
 
       return `<tr>
         <td style="font-size:.8rem;color:var(--muted)">${i + 1}</td>
@@ -640,18 +1167,16 @@ body { background: var(--bg); }
         <td>
           <div class="act-btns">
             <button class="act-btn primary" onclick="shareFast(${idx})" title="Gọi Web Share API">⚡ Chia sẻ nhanh</button>
-            <button class="act-btn zalo" onclick="sendZalo(${idx})" title="Copy & mở Zalo">📱 Zalo</button>
-            <button class="act-btn mess" onclick="sendMessenger(${idx})" title="Copy & mở Messenger">💬 Messenger</button>
+            <button class="act-btn zalo" onclick="sendZalo(${idx})" title="Mở Zalo PC hoặc Web">📱 Zalo</button>
+            <button class="act-btn mess" onclick="sendMessenger(${idx})" title="Mở Messenger">💬 Messenger</button>
           </div>
         </td>
       </tr>`;
     }).join('');
 
-    // Lưu coupleSlug và kết quả để dùng trong onclick & mở trực tiếp
     window._currentCoupleSlug = coupleSlug;
     window._aiResults = results;
 
-    // Lưu vào sessionStorage & localStorage để trang thiep.html tự động nhận diện lời mời
     results.forEach(row => {
       if (row.guest_slug) {
         const key = 'ai_msg_' + row.guest_slug.toLowerCase().replace(/[^a-z0-9-]/g, '');
@@ -663,7 +1188,6 @@ body { background: var(--bg); }
     });
   }
 
-  /* ── Nút Gửi ─────────────────────────────────────────────────── */
   function getRowData(idx) {
     const row = window._aiResults?.[idx];
     if (!row) return null;
@@ -676,7 +1200,6 @@ body { background: var(--bg); }
     return { row, cardUrl, text };
   }
 
-  // ⚡ Chia sẻ nhanh (navigator.share)
   window.shareFast = async function (idx) {
     const d = getRowData(idx);
     if (!d) return;
@@ -692,34 +1215,18 @@ body { background: var(--bg); }
     }
   };
 
-  /**
-   * Xử lý chia sẻ Zalo đa nền tảng (Mobile/PC) với Deep link & Fallback
-   * @param {string} shareText - Nội dung lời mời cần copy và chia sẻ
-   */
   window.handleShareAction = function (shareText) {
     const content = shareText || '';
-
-    // Sao chép nội dung vào Clipboard bằng JS thuần
     copyToClipboard(content).finally(function() {
-      // 4. Cập nhật lại câu thông báo (alert) để hướng dẫn người dùng
       alert('✅ Đã copy nội dung! Hệ thống đang gọi Zalo, hãy chọn người nhận và nhấn Dán (Ctrl+V) để gửi thiệp nhé.');
-
-      // 1. Phát hiện thiết bị: Nếu người dùng dùng Mobile (iOS/Android) thì mở https://zalo.me
       const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent || navigator.vendor || window.opera);
-
       if (isMobile) {
         window.location.href = 'https://zalo.me';
       } else {
-        // 2. Nếu dùng PC: Ưu tiên mở phần mềm Zalo PC qua Deep link zalo://
         let appOpened = false;
-        const onBlur = function() {
-          appOpened = true;
-        };
+        const onBlur = function() { appOpened = true; };
         window.addEventListener('blur', onBlur, { once: true });
-
         window.location.href = 'zalo://';
-
-        // 3. Xử lý dự phòng (Fallback): Dùng setTimeout khoảng 1.5 giây, nếu Zalo PC không phản hồi thì tự động mở web https://chat.zalo.me/ trong tab mới
         setTimeout(function() {
           window.removeEventListener('blur', onBlur);
           if (!appOpened && !document.hidden) {
@@ -730,14 +1237,12 @@ body { background: var(--bg); }
     });
   };
 
-  // 📱 Zalo: Copy text + Deep link Zalo PC / Mobile / Web fallback
   window.sendZalo = function (idx) {
     const d = getRowData(idx);
     if (!d) return;
     window.handleShareAction(d.text);
   };
 
-  // 💬 Messenger: Copy text + mở Messenger
   window.sendMessenger = async function (idx) {
     const d = getRowData(idx);
     if (!d) return;
@@ -752,15 +1257,13 @@ body { background: var(--bg); }
         await navigator.clipboard.writeText(text);
         return true;
       }
-    } catch (e) { /* fallback below */ }
-    // Fallback: textarea
+    } catch (e) {}
     const ta = Object.assign(document.createElement('textarea'), { value: text, style: 'position:fixed;opacity:0' });
     document.body.append(ta); ta.select();
     try { document.execCommand('copy'); } finally { ta.remove(); }
     return true;
   }
 
-  /* ── Copy tất cả link ────────────────────────────────────────── */
   window.copyAllLinks = async function () {
     if (!window._aiResults?.length) return showToast('Chưa có kết quả AI');
     const cs = window._currentCoupleSlug || '';
@@ -773,13 +1276,13 @@ body { background: var(--bg); }
     showToast(`📋 Đã copy ${window._aiResults.length} link vào clipboard!`);
   };
 
-  /* ── Xuất Excel kết quả ──────────────────────────────────────── */
   window.exportResultExcel = async function () {
     if (!window._aiResults?.length) return showToast('Chưa có kết quả AI để xuất');
     const cs = window._currentCoupleSlug || '';
+    const baseHost = window.location.origin;
     const head = ['STT', 'Tên khách', 'Nhóm', 'Xưng hô AI', 'Lời nhắn AI', 'Guest Slug', 'Pretty Link', 'Lời mời đầy đủ'];
     const rows = window._aiResults.map((r, i) => {
-      const url = cs ? `https://wedstory.vn/dam-cuoi-${cs}/${r.guest_slug}` : r.pretty_url || '';
+      const url = cs ? `${baseHost}/dam-cuoi-${cs}/${r.guest_slug}` : r.pretty_url || '';
       return [i + 1, r.name, r.group, r.salutation, r.message, r.guest_slug, url, buildShareText(r, url)];
     });
 
@@ -799,8 +1302,16 @@ body { background: var(--bg); }
     showToast('⬇ Đã xuất Excel kết quả AI!');
   };
 
+  // Khởi tạo bảng ban đầu với 8 khách demo
+  renderAssistantTable();
+
+  // Kiểm tra query param tab
+  const urlTab = new URLSearchParams(location.search).get('tab');
+  if (urlTab === 'personalize') {
+    switchMainTab('personalize');
+  }
+
 })();
 </script>
 </body>
 </html>
-

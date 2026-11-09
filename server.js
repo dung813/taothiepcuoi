@@ -45,10 +45,13 @@ const MIME_TYPES = {
 };
 
 const server = http.createServer(async (req, res) => {
-  // ── Xử lý API Serverless /api/ai-personalize trên Local ────────────
-  if (req.url.startsWith('/api/ai-personalize')) {
+  // ── Xử lý API Serverless /api/* trên Local ────────────────────────
+  const apiMatch = req.url.match(/^\/api\/([a-zA-Z0-9_-]+)/);
+  if (apiMatch) {
+    const apiName = apiMatch[1];
+    const apiPath = `./api/${apiName}.js`;
     try {
-      const { default: apiHandler } = await import('./api/ai-personalize.js');
+      const { default: apiHandler } = await import(apiPath);
 
       // Đọc body nếu có
       let bodyText = '';
@@ -87,16 +90,16 @@ const server = http.createServer(async (req, res) => {
         try {
           await apiHandler(req, mockRes);
         } catch (apiErr) {
-          console.error('Lỗi API:', apiErr);
+          console.error(`Lỗi API (${apiName}):`, apiErr);
           res.writeHead(500, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({ error: apiErr.message }));
         }
       });
       return;
     } catch (importErr) {
-      console.error('Không tìm thấy API handler:', importErr);
-      res.writeHead(500, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: 'Không thể nạp API handler: ' + importErr.message }));
+      console.error(`Không tìm thấy API handler (${apiName}):`, importErr);
+      res.writeHead(404, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: `Không tìm thấy endpoint /api/${apiName}` }));
       return;
     }
   }
