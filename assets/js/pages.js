@@ -173,16 +173,26 @@ TH.pagePricing = () => {
   $('#sw').onclick = () => { yearly = !yearly; $('#sw').classList.toggle('on', yearly); render(); };
   $('#plans').onclick = e => { const b = e.target.closest('[data-plan]'); if (!b) return; const p = PLANS[+b.dataset.plan];
     if (!p.m) { location.href = 'mau-thiep.html'; return; }
-    TH.modal(`<h3 style="font-size:1.5rem;margin-bottom:8px">Đăng ký gói ${p.name}</h3><p style="color:var(--muted);margin-bottom:18px">Để lại thông tin, chúng tôi sẽ liên hệ hướng dẫn thanh toán trong 30 phút.</p>
-      <form class="form-grid" style="grid-template-columns:1fr" id="planForm"><div class="field"><label>Họ tên</label><input required name="n"></div><div class="field"><label>Số điện thoại / Zalo</label><input required name="p" pattern="[0-9 +]{9,}"></div>
-      <button class="btn btn-primary" style="justify-content:center">Gửi đăng ký</button></form>`);
-    $('#planForm').onsubmit = ev => { ev.preventDefault();
-      const f = Object.fromEntries(new FormData(ev.target));
-      const leads = TH.store.get('leads', []); leads.unshift({name:f.n.trim(), phone:f.p.trim(), plan:'vip', at:Date.now()}); TH.store.set('leads', leads.slice(0, 200));
-      ev.target.outerHTML = `<div style="text-align:center;display:grid;gap:14px;justify-items:center">
-        <p style="font-weight:600;color:var(--rose-d)">✓ Cảm ơn ${TH.esc(f.n.trim())}! Bản demo đang mở toàn bộ tính năng VIP miễn phí.</p>
-        <a class="btn btn-primary" href="mau-thiep.html">Bắt đầu tạo thiệp</a></div>`;
-      TH.toast('Đã nhận đăng ký, cảm ơn bạn!'); };
+    TH.modal(`<h3 style="font-size:1.45rem;font-weight:700;margin-bottom:6px;text-align:center;color:var(--ink)">Quét mã bằng ngân hàng bạn chọn</h3>
+      <p style="color:#718096;margin-bottom:18px;text-align:center;font-size:0.92rem">Thanh toán qua bất kỳ ngân hàng hoặc ví điện tử nào</p>
+      <img src="assets/img/image_e2e588.png" alt="Mã VietQR thanh toán" style="margin: 0 auto; display: block; max-width: 250px; width: 100%; height: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+      <div style="background:#f4f5f7;border-radius:8px;padding:14px 16px;margin-top:18px;display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="color:#718096">Chủ tài khoản:</span>
+          <span style="font-weight:700;color:#000">TRAN THANH LAM</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="color:#718096">Số tài khoản:</span>
+          <span style="font-weight:700;color:#1d4ed8">1245847891999</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="color:#718096">Số tiền:</span>
+          <span style="font-weight:700;color:#e11d48">199.000 VNĐ</span>
+        </div>
+      </div>
+      <button type="button" class="btn btn-primary" id="btnConfirmPayment" style="width:100%;margin-top:18px;background:#e11d48;border-color:#e11d48;color:#fff;justify-content:center;font-weight:600">Tôi đã chuyển khoản xong</button>`);
+    const btn = $('#btnConfirmPayment');
+    if (btn) btn.onclick = () => alert('Đang chờ xác nhận giao dịch...');
   };
   TH.faq($('#faq'), [
     ['Gói trả phí tính theo tháng hay theo thiệp?','Tính theo từng thiệp và chỉ thanh toán một lần. Thiệp được lưu trữ theo thời hạn của gói.'],
