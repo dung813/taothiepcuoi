@@ -202,23 +202,23 @@ document.addEventListener('click', e => {
    Chuẩn Photo-Centric theo web mẫu zenlove.me:
    1. hong-pastel:   Song ảnh thảo mộc (botanical-dual)
    2. vuon-xanh:     Polaroid kraft & hoa khô (polaroid-tape)
-   3. hoang-kim:     Phong bì rêu ô-liu đồng nội (envelope-olive)
+   3. hoang-kim:     Khung vòm cửa sổ hoàng kim (arch-window-gold)
    4. song-hy:       Cổng vòm đỏ cung đình Song Hỷ (imperial-red-arch)
    5. bien-xanh:     Cổng vòm xanh biển sâu & nguyệt quế (slate-navy-arch)
-   6. oai-huong:     Phong bì tím mận & oải hương (envelope-lavender)
+   6. oai-huong:     Khung tem thư viền răng cưa (postage-stamp)
    7. giay-kraft:    Dải phim triptych nâu đất (filmstrip-triptych)
    8. dem-sao:       Cổng vòm lục bảo hoàng gia (royal-green-arch)
-   9. mau-don:       Phong bì nhung đỏ rượu & hoa mẫu đơn (envelope-burgundy)
+   9. mau-don:       Chia đôi màn hình ảnh + chữ (split-screen)
    10. toi-gian-trang: Tạp chí thời trang editorial INVITÉ (fashion-editorial)
    11. hoang-hon:    Toàn cảnh hoàng hôn điện ảnh (cinematic-script)
    12. co-dien:      Salon cổ điển khung vàng & đèn chùm (baroque-chandelier)
    13. nang-vang:    Mái vòm lịch cưới hoàng kim (arch-calendar)
    14. tiec-vuon:    Bộ ba ảnh dọc dây leo hoa hồng (triptych-floral)
    15. rung-thong:   Rừng thông huyền bí xanh rêu đậm (pine-forest)
-   16. thanh-lich:   Phong bì san hô đất nung (envelope-terracotta)
+   16. thanh-lich:   Phong bì mở nắp dấu sáp niêm phong (wax-seal-envelope)
    17. la-non:       Giấy xé thủ công & băng keo chéo (torn-paper-craft)
    18. ngay-nang:    Dải phim photobooth Hàn Quốc 4 ô (photobooth-strip)
-   19. be-kem:       Tranh cuộn thủy mặc hạc vàng Song Hỷ (crane-traditional)
+   19. be-kem:       Khung oval cổ điển viền mảnh (oval-classic)
    20. anh-bac:      Ban công cổ điển Pháp & Studio Noir (french-balcony-noir) */
 
 const ddmmyyyy = d => `${String(d.getDate()).padStart(2,'0')} · ${String(d.getMonth()+1).padStart(2,'0')} · ${d.getFullYear()}`;
@@ -270,18 +270,17 @@ TH.frameTpl = (t, o = {}) => {
     </div>`;
   }
 
-  // 3. MẪU 3: HOÀNG KIM - Phong bì rêu ô-liu đồng nội
+  // 3. MẪU 3: HOÀNG KIM - Khung vòm cửa sổ hoàng kim nền kem/vàng nhạt
   if (t.id === 'hoang-kim') {
-    return `<div class="fr fr-envelope-olive" ${ff}>
-      <div style="display:flex;justify-content:space-between;align-items:center;z-index:5"><span class="fr-tag" style="color:#2E4733">SAVE OUR DATE</span></div>
-      <div class="fr-env-card">
-        <div class="fr-photo-wrap"><div class="fr-photo" style="background-image:url('${src}')"></div></div>
-        <div class="fr-env-pocket"><div class="fr-seal gold" aria-hidden="true"><span>🌿</span></div></div>
+    return `<div class="fr fr-arch-window-gold" ${ff}>
+      <div class="fr-awg-header">
+        <div class="fr-awg-tag">SAVE OUR DATE</div>
+        <div class="fr-awg-names">${groom} <i>&amp;</i> ${bride}</div>
       </div>
-      <div style="text-align:center;z-index:5">
-        <div class="fr-name-line">${groom}</div>
-        <div class="fr-name-line">${bride}</div>
+      <div class="fr-awg-arch">
+        <div class="fr-photo" style="background-image:url('${src}')"></div>
       </div>
+      <div class="fr-awg-date">${ddmmyyyy(d)}</div>
     </div>`;
   }
 
@@ -317,17 +316,19 @@ TH.frameTpl = (t, o = {}) => {
     </div>`;
   }
 
-  // 6. MẪU 6: OẢI HƯƠNG - Phong bì tím mận & oải hương
+  // 6. MẪU 6: OẢI HƯƠNG - Khung tem thư (postage stamp) viền răng cưa
   if (t.id === 'oai-huong') {
-    return `<div class="fr fr-envelope-lavender" ${ff}>
-      <div style="display:flex;justify-content:space-between;align-items:center;z-index:5"><span class="fr-tag" style="color:#553A70">WEDDING INVITATION</span></div>
-      <div class="fr-env-card">
-        <div class="fr-photo-wrap"><div class="fr-photo" style="background-image:url('${src}')"></div></div>
-        <div class="fr-env-pocket"><div class="fr-seal purple" aria-hidden="true"><span>💐</span></div></div>
-      </div>
-      <div style="text-align:center;z-index:5">
-        <div class="fr-name-line">${groom}</div>
-        <div class="fr-name-line">${bride}</div>
+    return `<div class="fr fr-postage-stamp" ${ff}>
+      <div class="fr-stamp-outer" style="border-color:${t.accent}">
+        <div class="fr-stamp-inner" style="background:${t.bg}">
+          <div class="fr-stamp-top" style="color:${t.accent}">VIỆT NAM ✦ WEDDING</div>
+          <div class="fr-stamp-photo"><div class="fr-photo" style="background-image:url('${src}')"></div></div>
+          <div class="fr-stamp-names" style="color:${t.fg};font-family:${TH.fontStack(t.font)}">${groom} <span style="color:${t.accent}">&amp;</span> ${bride}</div>
+          <div class="fr-stamp-value" style="color:${t.accent}">LOVE · ${d.getFullYear()}</div>
+        </div>
+        <div class="fr-stamp-cancel" aria-hidden="true">
+          <svg viewBox="0 0 80 80" fill="none"><circle cx="40" cy="40" r="30" stroke="${t.accent}" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.6"/><line x1="15" y1="35" x2="65" y2="35" stroke="${t.accent}" stroke-width="1" opacity="0.5"/><line x1="15" y1="40" x2="65" y2="40" stroke="${t.accent}" stroke-width="1" opacity="0.5"/><line x1="15" y1="45" x2="65" y2="45" stroke="${t.accent}" stroke-width="1" opacity="0.5"/></svg>
+        </div>
       </div>
     </div>`;
   }
@@ -366,20 +367,15 @@ TH.frameTpl = (t, o = {}) => {
     </div>`;
   }
 
-  // 9. MẪU 9: MẪU ĐƠN - Phong bì nhung đỏ rượu & hoa mẫu đơn
+  // 9. MẪU 9: MẪU ĐƠN - Chia đôi màn hình (ảnh trái | nền màu + text phải)
   if (t.id === 'mau-don') {
-    return `<div class="fr fr-envelope-burgundy" ${ff}>
-      <div style="display:flex;justify-content:space-between;align-items:center;z-index:5"><span class="fr-tag">SAVE THE DATE</span></div>
-      <div class="fr-env-card">
-        <div class="fr-photo-wrap"><div class="fr-photo" style="background-image:url('${src}')"></div></div>
-        <div class="fr-floral-sprig" aria-hidden="true">
-          <svg viewBox="0 0 50 70" fill="none"><path d="M25 65 Q20 30 5 10" stroke="#4A5847" stroke-width="2"/><circle cx="10" cy="18" r="8" fill="#8B1E2B" opacity=".9"/><circle cx="6" cy="14" r="5" fill="#D65866" opacity=".8"/><circle cx="22" cy="30" r="7" fill="#751622" opacity=".9"/><path d="M12 28 Q2 32 8 45" fill="#586B52" opacity=".8"/></svg>
-        </div>
-        <div class="fr-env-pocket"><div class="fr-seal gold" aria-hidden="true"><span>💍</span></div></div>
-      </div>
-      <div style="text-align:center;z-index:5">
-        <div class="fr-name-line">${groom}</div>
-        <div class="fr-name-line">${bride}</div>
+    return `<div class="fr fr-split-screen" ${ff}>
+      <div class="fr-split-photo"><div class="fr-photo" style="background-image:url('${src}')"></div></div>
+      <div class="fr-split-info" style="background:${t.bg};color:${t.fg}">
+        <div class="fr-split-tag" style="color:${t.accent}">SAVE THE DATE</div>
+        <div class="fr-split-names">${groom}<br><span class="fr-split-amp" style="color:${t.accent}">&amp;</span><br>${bride}</div>
+        <div class="fr-split-date" style="color:${t.accent}">${ddmmyyyy(d)}</div>
+        <div class="fr-split-deco" aria-hidden="true"><svg viewBox="0 0 60 10" fill="none"><line x1="0" y1="5" x2="60" y2="5" stroke="currentColor" stroke-width="0.8" opacity="0.5"/></svg></div>
       </div>
     </div>`;
   }
@@ -476,17 +472,22 @@ TH.frameTpl = (t, o = {}) => {
     </div>`;
   }
 
-  // 16. MẪU 16: THANH LỊCH - Phong bì san hô đất nung
+  // 16. MẪU 16: THANH LỊCH - Phong bì mở nắp: ảnh cưới thò lên nửa trên, nắp & dấu sáp nửa dưới
   if (t.id === 'thanh-lich') {
-    return `<div class="fr fr-envelope-terracotta" ${ff}>
-      <div style="display:flex;justify-content:space-between;align-items:center;z-index:5"><span class="fr-tag" style="color:#9C4635">WEDDING DAY</span></div>
-      <div class="fr-env-card">
-        <div class="fr-photo-wrap"><div class="fr-photo" style="background-image:url('${src}')"></div></div>
-        <div class="fr-env-pocket"><div class="fr-seal white" aria-hidden="true"><span>🌸</span></div></div>
+    return `<div class="fr fr-wax-seal-envelope" ${ff}>
+      <div class="fr-wse-top">
+        <div class="fr-wse-tag">SAVE THE DATE</div>
+        <div class="fr-wse-card">
+          <div class="fr-photo" style="background-image:url('${src}')"></div>
+        </div>
       </div>
-      <div style="text-align:center;z-index:5">
-        <div class="fr-name-line">${groom}</div>
-        <div class="fr-name-line">${bride}</div>
+      <div class="fr-wse-pocket">
+        <div class="fr-wse-flap-fold" aria-hidden="true"></div>
+        <div class="fr-wse-seal" aria-hidden="true"><span>♥</span></div>
+        <div class="fr-wse-info">
+          <div class="fr-wse-names">${groom} &amp; ${bride}</div>
+          <div class="fr-wse-date">${ddmmyyyy(d)}</div>
+        </div>
       </div>
     </div>`;
   }
@@ -522,16 +523,23 @@ TH.frameTpl = (t, o = {}) => {
     </div>`;
   }
 
-  // 19. MẪU 19: BE KEM - Tranh cuộn thủy mặc hạc vàng Song Hỷ
+  // 19. MẪU 19: BE KEM - Khung ảnh bầu dục (oval) cổ điển viền mảnh nền be
   if (t.id === 'be-kem') {
-    return `<div class="fr fr-crane-traditional" ${ff}>
-      <div class="fr-crane-header">
-        <span class="fr-tag" style="color:#8E1920">THIỆP BÁO HỶ</span>
-        <span class="fr-crane-hy">囍</span>
+    return `<div class="fr fr-oval-classic" ${ff}>
+      <div class="fr-ov-border">
+        <div class="fr-ov-top">
+          <div class="fr-ov-tag">THE WEDDING OF</div>
+          <div class="fr-ov-names">${groom} <span class="fr-ov-amp">&amp;</span> ${bride}</div>
+        </div>
+        <div class="fr-ov-frame">
+          <div class="fr-ov-inner">
+            <div class="fr-photo" style="background-image:url('${src}')"></div>
+          </div>
+        </div>
+        <div class="fr-ov-bottom">
+          <div class="fr-ov-date">${ddmmyyyy(d)}</div>
+        </div>
       </div>
-      <div class="fr-crane-names">${groom} &amp; ${bride}</div>
-      <div class="fr-crane-frame"><div class="fr-photo" style="background-image:url('${src}')"></div></div>
-      <div class="fr-date" style="color:#8E1920">${ddmmyyyy(d)}</div>
     </div>`;
   }
 
@@ -543,6 +551,171 @@ TH.frameTpl = (t, o = {}) => {
         <div class="fr-balcony-names">${groom} &amp; ${bride}</div>
         <div class="fr-balcony-photo"><div class="fr-photo" style="background-image:url('${src}')"></div></div>
         <div class="fr-date" style="color:#59544F;margin-top:2cqw">${ddmmyyyy(d)}</div>
+      </div>
+    </div>`;
+  }
+
+  // 21. CHUYẾN BAY TÌNH YÊU (Boarding Pass)
+  if (t.id === 'boarding-pass') {
+    return `<div class="fr" style="background:#0f172a;color:#fff;padding:12px;display:flex;flex-direction:column;justify-content:space-between;height:100%;font-family:'Be Vietnam Pro',sans-serif">
+      <div style="display:flex;justify-content:space-between;border-bottom:1px dashed rgba(255,255,255,0.3);padding-bottom:8px">
+        <span style="font-size:10px;letter-spacing:1px;font-weight:700;color:#38bdf8">✈ BOARDING PASS</span>
+        <span style="font-size:10px;color:#94a3b8">FLIGHT TO FOREVER</span>
+      </div>
+      <div style="height:55%;border-radius:8px;overflow:hidden;background-image:url('${src}');background-size:cover;background-position:center;position:relative;margin:8px 0">
+        <span style="position:absolute;bottom:6px;left:6px;background:rgba(0,0,0,0.6);font-size:9px;padding:2px 6px;border-radius:4px;color:#fff">GATE: LOVE-2026</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-end">
+        <div><div style="font-size:13px;font-weight:700;color:#fff">${groom} &amp; ${bride}</div><div style="font-size:10px;color:#38bdf8">${ddmmyyyy(d)}</div></div>
+        <div style="font-size:9px;color:#94a3b8;letter-spacing:1px">FIRST CLASS</div>
+      </div>
+    </div>`;
+  }
+
+  // 22. TẠP CHÍ THỜI TRANG (The Vogue Cover)
+  if (t.id === 'vogue-cover') {
+    return `<div class="fr" style="background:#09090b;height:100%;position:relative;overflow:hidden">
+      <div style="position:absolute;inset:0;background-image:url('${src}');background-size:cover;background-position:center;opacity:0.85"></div>
+      <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.4) 0%,transparent 40%,rgba(0,0,0,0.8) 100%);display:flex;flex-direction:column;justify-content:space-between;padding:14px;color:#fff">
+        <div style="text-align:center;font-family:'Playfair Display',serif;font-size:32px;letter-spacing:4px;font-weight:700;line-height:1;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,0.5)">VOGUE</div>
+        <div>
+          <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#d4af37;font-weight:600">THE WEDDING ISSUE</div>
+          <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:600;color:#fff;margin-top:2px">${groom} &amp; ${bride}</div>
+          <div style="font-size:10px;color:#e4e4e7;margin-top:2px">${ddmmyyyy(d)}</div>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // 23. GIAO DIỆN MẠNG XÃ HỘI (Lovegram)
+  if (t.id === 'lovegram') {
+    return `<div class="fr" style="background:#18181b;height:100%;position:relative;overflow:hidden;font-family:'Be Vietnam Pro',sans-serif">
+      <div style="position:absolute;inset:0;background-image:url('${src}');background-size:cover;background-position:center"></div>
+      <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.5) 0%,transparent 30%,rgba(0,0,0,0.6) 100%);display:flex;flex-direction:column;justify-content:space-between;padding:12px;color:#fff">
+        <div style="display:flex;gap:4px"><div style="height:3px;flex:1;background:#fff;border-radius:2px"></div><div style="height:3px;flex:1;background:rgba(255,255,255,0.4);border-radius:2px"></div></div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
+          <div style="width:28px;height:28px;border-radius:50%;border:2px solid #ec4899;background-image:url('${src}');background-size:cover"></div>
+          <span style="font-size:11px;font-weight:600">${groom}_and_${bride}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-end">
+          <span style="font-size:12px;font-weight:600">Forever Begins Here ♥</span>
+          <span style="font-size:20px;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.4))">💖</span>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // 24. BẢN TIN THẬP NIÊN 90 (Retro Newspaper)
+  if (t.id === 'retro-newspaper') {
+    return `<div class="fr" style="background:#f4ede4;color:#171717;height:100%;padding:12px;display:flex;flex-direction:column;justify-content:space-between;border:1px solid #d4c5b3;font-family:'Playfair Display',serif">
+      <div style="text-align:center;border-bottom:2px solid #171717;padding-bottom:4px">
+        <div style="font-size:14px;font-weight:900;letter-spacing:1px">THE WEDDING CHRONICLE</div>
+        <div style="font-size:8px;letter-spacing:1px;font-family:sans-serif">HÀ NỘI · ${ddmmyyyy(d)} · BẢN TIN ĐẶC BIỆT</div>
+      </div>
+      <div style="height:52%;margin:6px 0;background-image:url('${src}');background-size:cover;background-position:center;filter:grayscale(100%) contrast(115%);border:1px solid #404040"></div>
+      <div style="border-top:1px solid #171717;padding-top:4px;text-align:center">
+        <div style="font-size:12px;font-weight:700">TIN HOT: NÀNG &amp; CHÀNG CHÍNH THỨC CHUNG ĐÔI!</div>
+        <div style="font-size:9px;font-family:sans-serif;color:#525252">${groom} &amp; ${bride}</div>
+      </div>
+    </div>`;
+  }
+
+  // 25. TRÒ CHƠI TUỔI THƠ (Pixel Art 8-bit)
+  if (t.id === 'pixel-art') {
+    return `<div class="fr" style="background:#1e1b4b;color:#fef08a;height:100%;padding:12px;display:flex;flex-direction:column;justify-content:space-between;font-family:monospace;border:3px solid #facc15">
+      <div style="display:flex;justify-content:space-between;font-size:10px;font-weight:bold">
+        <span>STAGE 1-1</span>
+        <span>♥♥♥</span>
+      </div>
+      <div style="height:55%;background-image:url('${src}');background-size:cover;background-position:center;border:2px solid #fff;position:relative">
+        <div style="position:absolute;top:4px;left:4px;background:#e11d48;color:#fff;font-size:8px;padding:2px 4px">PLAYER 1 &amp; 2</div>
+      </div>
+      <div style="text-align:center;font-size:11px;font-weight:bold;color:#fff;background:#312e81;padding:4px">
+        ${groom} &amp; ${bride} · READY!
+      </div>
+    </div>`;
+  }
+
+  // 26. ĐÊM HUYỀN BÍ (Dark Mode Luxury)
+  if (t.id === 'dark-mode-luxury') {
+    return `<div class="fr" style="background:#09090b;height:100%;border:1px solid #d4af37;padding:14px;display:flex;flex-direction:column;justify-content:space-between;position:relative">
+      <div style="position:absolute;inset:4px;border:1px solid rgba(212,175,55,0.3);pointer-events:none"></div>
+      <div style="text-align:center"><span style="font-size:9px;letter-spacing:3px;color:#d4af37;text-transform:uppercase">PRIVATE CELEBRATION</span></div>
+      <div style="height:55%;background-image:url('${src}');background-size:cover;background-position:center;border-radius:4px;filter:contrast(105%)"></div>
+      <div style="text-align:center">
+        <div style="font-family:'Playfair Display',serif;font-size:15px;color:#fbbf24;font-weight:600">${groom} &amp; ${bride}</div>
+        <div style="font-size:10px;color:#a1a1aa;margin-top:2px">${ddmmyyyy(d)}</div>
+      </div>
+    </div>`;
+  }
+
+  // 27. ĐIÊU KHẮC ÁNH SÁNG (Holographic Gradient)
+  if (t.id === 'holographic-gradient') {
+    return `<div class="fr" style="background:linear-gradient(135deg,#c084fc,#f472b6,#38bdf8);height:100%;padding:14px;display:flex;flex-direction:column;justify-content:space-between;color:#1e1b4b">
+      <div style="display:flex;justify-content:space-between;font-size:9px;letter-spacing:2px;font-weight:700"><span>HOLOGRAPHIC</span><span>3D PRISM</span></div>
+      <div style="height:55%;background-image:url('${src}');background-size:cover;background-position:center;border-radius:12px;box-shadow:0 8px 20px rgba(0,0,0,0.25);border:2px solid rgba(255,255,255,0.7)"></div>
+      <div style="text-align:center;background:rgba(255,255,255,0.5);backdrop-filter:blur(6px);padding:6px;border-radius:8px">
+        <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:#1e1b4b">${groom} &amp; ${bride}</div>
+      </div>
+    </div>`;
+  }
+
+  // 28. THƯ PHÁP Á ĐÔNG (Modern Asian)
+  if (t.id === 'modern-asian') {
+    return `<div class="fr" style="background:#fcf8f0;height:100%;padding:12px;display:flex;flex-direction:column;justify-content:space-between;border:1px solid #e7ded0;position:relative">
+      <div style="display:flex;justify-content:space-between;align-items:center"><span style="color:#8E1920;font-size:11px;font-weight:700">THIỆP HỶ</span><span style="font-size:18px;color:#b91c1c">囍</span></div>
+      <div style="height:55%;background-image:url('${src}');background-size:cover;background-position:center;border-radius:4px;border:1px solid #d6c7b2"></div>
+      <div style="text-align:center">
+        <div style="font-family:'Playfair Display',serif;font-size:14px;color:#8E1920;font-weight:700">${groom} &amp; ${bride}</div>
+        <div style="font-size:10px;color:#78716c">${ddmmyyyy(d)}</div>
+      </div>
+    </div>`;
+  }
+
+  // 29. BỨC TRANH NƯỚC (Watercolor Dream)
+  if (t.id === 'watercolor-dream') {
+    return `<div class="fr" style="background:linear-gradient(160deg,#e0f2fe,#fdf2f8);height:100%;padding:12px;display:flex;flex-direction:column;justify-content:space-between">
+      <div style="text-align:center"><span style="font-size:10px;letter-spacing:2px;color:#0284c7">WATERCOLOR DREAM</span></div>
+      <div style="height:56%;background-image:url('${src}');background-size:cover;background-position:center;border-radius:30% 70% 70% 30% / 30% 30% 70% 70%;box-shadow:0 8px 16px rgba(2,132,199,0.15)"></div>
+      <div style="text-align:center;font-family:'Great Vibes',cursive;font-size:20px;color:#0369a1">${groom} &amp; ${bride}</div>
+    </div>`;
+  }
+
+  // 30. RẠP CHIẾU PHIM (Cinematic Poster)
+  if (t.id === 'cinematic-poster') {
+    return `<div class="fr" style="background:#0c0a09;height:100%;position:relative;overflow:hidden;color:#fff">
+      <div style="position:absolute;inset:0;background-image:url('${src}');background-size:cover;background-position:center;opacity:0.85"></div>
+      <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.3) 0%,transparent 30%,rgba(0,0,0,0.85) 85%);display:flex;flex-direction:column;justify-content:space-between;padding:12px">
+        <span style="display:inline-block;background:#e11d48;color:#fff;font-size:8px;font-weight:700;padding:2px 6px;border-radius:3px;align-self:flex-start">▶ WATCH TRAILER</span>
+        <div>
+          <div style="font-size:8px;letter-spacing:2px;color:#fbbf24;text-transform:uppercase">A CINEMATIC LOVE STORY</div>
+          <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:#fff">${groom} &amp; ${bride}</div>
+          <div style="font-size:9px;color:#a8a29e;margin-top:2px">IN CINEMAS · ${ddmmyyyy(d)}</div>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // 31. KHU VƯỜN NHIỆT ĐỚI (Boho Chic & Tropical)
+  if (t.id === 'boho-tropical') {
+    return `<div class="fr" style="background:#ffedd5;height:100%;padding:12px;display:flex;flex-direction:column;justify-content:space-between;border:1px solid #fed7aa">
+      <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:9px;letter-spacing:1px;color:#c2410c;font-weight:600">BOHO &amp; TROPICAL</span><span>🌴</span></div>
+      <div style="height:55%;background-image:url('${src}');background-size:cover;background-position:center;border-radius:24px 24px 4px 4px;border:2px solid #fed7aa"></div>
+      <div style="text-align:center">
+        <div style="font-family:'Dancing Script',cursive;font-size:18px;color:#9a3412;font-weight:700">${groom} &amp; ${bride}</div>
+        <div style="font-size:10px;color:#ea580c">${ddmmyyyy(d)}</div>
+      </div>
+    </div>`;
+  }
+
+  // 32. KÝ TRÚC HÌNH HỌC (Geometric Minimal)
+  if (t.id === 'geometric-minimal') {
+    return `<div class="fr" style="background:#f8fafc;height:100%;padding:12px;display:flex;flex-direction:column;justify-content:space-between;border:1px solid #e2e8f0">
+      <div style="text-align:center"><span style="font-size:9px;letter-spacing:2px;color:#64748b">GEOMETRIC ARCH</span></div>
+      <div style="height:58%;background-image:url('${src}');background-size:cover;background-position:center;border-radius:999px 999px 0 0;border:1px solid #cbd5e1"></div>
+      <div style="text-align:center">
+        <div style="font-family:'Playfair Display',serif;font-size:14px;color:#334155;font-weight:600">${groom} &amp; ${bride}</div>
+        <div style="font-size:10px;color:#94a3b8">${ddmmyyyy(d)}</div>
       </div>
     </div>`;
   }

@@ -706,6 +706,72 @@ body.tm-open{overflow:hidden}
 .fr-balcony-names{font-family:'Playfair Display',serif;font-size:5.2cqw;font-weight:700;margin:1cqw 0 2cqw;text-align:center}
 .fr-balcony-photo{width:100%;flex:1;border-radius:100px 100px 2px 2px;overflow:hidden;border:1px solid #252220}
 
+/* 3B. MẪU 3 ĐỔI (hoang-kim): KHUNG VÒM CỬA SỔ HOÀNG KIM NỀN KEM/VÀNG NHẠT (.fr-arch-window-gold) */
+.fr-arch-window-gold{background:linear-gradient(160deg,#FAF7F0,#F5EBD7);padding:5% 5% 4%;border-radius:inherit;display:flex;flex-direction:column;align-items:center;justify-content:space-between;box-sizing:border-box}
+.fr-awg-header{text-align:center;width:100%}
+.fr-awg-tag{font:600 2cqw var(--f-body);letter-spacing:.25em;text-transform:uppercase;color:#A68238;margin-bottom:1cqw}
+.fr-awg-names{font-family:var(--ff);font-size:5.6cqw;font-weight:700;color:#2C241B;line-height:1.2}
+.fr-awg-names i{font-family:'Great Vibes',cursive;color:#C9A45C;font-size:6.2cqw;font-style:normal;margin:0 .5cqw}
+.fr-awg-arch{width:78%;flex:1;margin:3% 0 2%;border-radius:999px 999px 6px 6px;overflow:hidden;border:2px solid #C9A45C;box-shadow:0 6px 20px rgba(166,130,56,.25);position:relative;background:#EAE0D0}
+.fr-awg-arch .fr-photo{width:100%;height:100%;background-position:center 20%;background-size:cover}
+.fr-awg-date{font:600 2.2cqw var(--f-body);letter-spacing:.2em;color:#A68238;text-align:center}
+
+/* 6B. MẪU 6 ĐỔI (oai-huong): KHUNG TEM THƯ VIỀN RĂNG CƯA (.fr-postage-stamp) */
+.fr-postage-stamp{background:#ece6f6;padding:4% 3.5%;display:flex;align-items:center;justify-content:center}
+.fr-stamp-outer{position:relative;width:92%;height:94%;border:3px solid currentColor;border-radius:2px;
+  --r:4px;
+  mask:
+    radial-gradient(circle at var(--r) var(--r),#0000 98%,#000) 0 0 / 8px 8px,
+    radial-gradient(circle at calc(100% - var(--r)) var(--r),#0000 98%,#000) 100% 0 / 8px 8px,
+    radial-gradient(circle at var(--r) calc(100% - var(--r)),#0000 98%,#000) 0 100% / 8px 8px,
+    radial-gradient(circle at calc(100% - var(--r)) calc(100% - var(--r)),#0000 98%,#000) 100% 100% / 8px 8px,
+    conic-gradient(#000 0 0) 50% 50% / calc(100% - 8px) calc(100% - 8px) no-repeat,
+    repeating-linear-gradient(90deg,#0000 0,#0000 calc(50% - 4px),#000 calc(50% - 4px),#000 calc(50% + 4px),#0000 calc(50% + 4px)) 0 0 / 8px 100%,
+    repeating-linear-gradient(0deg,#0000 0,#0000 calc(50% - 4px),#000 calc(50% - 4px),#000 calc(50% + 4px),#0000 calc(50% + 4px)) 0 0 / 100% 8px}
+.fr-stamp-inner{background:#ece6f6;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:4% 5%}
+.fr-stamp-top{font:700 2cqw var(--f-body);letter-spacing:.25em;text-transform:uppercase;text-align:center}
+.fr-stamp-photo{width:88%;flex:1;overflow:hidden;border-radius:3px;margin:2% 0;border:1px solid rgba(0,0,0,.12)}
+.fr-stamp-names{font-family:var(--ff);font-size:5cqw;font-weight:700;text-align:center;color:#2a1f42;line-height:1.2}
+.fr-stamp-value{font:700 2.5cqw var(--f-body);letter-spacing:.2em;text-align:center;text-transform:uppercase}
+.fr-stamp-cancel{position:absolute;bottom:5%;right:5%;width:28%;opacity:.55;pointer-events:none}
+
+/* 9B. MẪU 9 ĐỔI (mau-don): CHIA ĐÔI MÀN HÌNH (.fr-split-screen) */
+.fr-split-screen{background:#fbe4e1;padding:0;display:flex;flex-direction:row;border-radius:inherit;overflow:hidden}
+.fr-split-photo{width:50%;height:100%;flex-shrink:0}
+.fr-split-photo .fr-photo{border-radius:0;height:100%}
+.fr-split-info{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4% 5%;gap:2cqw}
+.fr-split-tag{font:700 2cqw var(--f-body);letter-spacing:.3em;text-transform:uppercase}
+.fr-split-names{font-family:var(--ff);font-size:5.5cqw;font-weight:700;text-align:center;line-height:1.3}
+.fr-split-amp{font-family:'Playfair Display',serif;font-size:6.5cqw;display:block;line-height:1.1}
+.fr-split-date{font:600 2.1cqw var(--f-body);letter-spacing:.18em;text-align:center}
+.fr-split-deco{width:60%;opacity:.4}
+
+/* 16B. MẪU 16: THANH LỊCH - PHONG BÌ MỞ NẮP VỚI ẢNH THÒ LÊN & DẤU SÁP (.fr-wax-seal-envelope) */
+.fr-wax-seal-envelope{background:#F3F1EC;padding:0;display:flex;flex-direction:column;border-radius:inherit;overflow:hidden;position:relative}
+.fr-wse-top{height:58%;width:100%;display:flex;flex-direction:column;align-items:center;padding:4% 5% 0;background:#EFECE6;position:relative;z-index:1;box-sizing:border-box}
+.fr-wse-tag{font:600 1.9cqw var(--f-body);letter-spacing:.25em;color:#8C827A;margin-bottom:2cqw}
+.fr-wse-card{width:82%;flex:1;background:#fff;padding:1.5cqw;border-radius:6px 6px 0 0;box-shadow:0 -2px 12px rgba(0,0,0,.08);overflow:hidden;position:relative;box-sizing:border-box}
+.fr-wse-card .fr-photo{width:100%;height:100%;border-radius:4px 4px 0 0;background-position:center 20%;background-size:cover}
+.fr-wse-pocket{height:44%;width:100%;margin-top:-3%;background:#D9CDC1;position:relative;z-index:2;box-shadow:0 -4px 16px rgba(0,0,0,.15);display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:4% 4% 5%;box-sizing:border-box}
+.fr-wse-flap-fold{position:absolute;top:0;left:0;right:0;height:0;border-left:50cqw solid transparent;border-right:50cqw solid transparent;border-top:14cqw solid #CFC0B2}
+.fr-wse-seal{position:absolute;top:8cqw;left:50%;transform:translate(-50%,-50%);width:8.5cqw;height:8.5cqw;border-radius:50%;background:#B44C43;color:#F8EBE8;display:flex;align-items:center;justify-content:center;font-size:3.5cqw;box-shadow:0 4px 10px rgba(180,76,67,.4);border:1.5px solid rgba(255,255,255,.3);z-index:3}
+.fr-wse-info{text-align:center;z-index:3;width:100%}
+.fr-wse-names{font-family:var(--ff);font-size:5.2cqw;font-weight:700;color:#4A3E39;line-height:1.2}
+.fr-wse-date{font:600 2cqw var(--f-body);letter-spacing:.15em;color:#7D6F68;margin-top:1cqw}
+
+/* 19B. MẪU 19: BE KEM - KHUNG ẢNH BẦU DỤC (OVAL) CỔ ĐIỂN NỀN BE (.fr-oval-classic) */
+.fr-oval-classic{background:#F4EFE6;padding:4%;border-radius:inherit;display:flex;align-items:center;justify-content:center;box-sizing:border-box}
+.fr-ov-border{width:100%;height:100%;border:1px solid #D1C4B5;outline:1px solid #D1C4B5;outline-offset:-4px;border-radius:4px;padding:5% 4%;display:flex;flex-direction:column;align-items:center;justify-content:space-between;box-sizing:border-box;background:#F8F5EE}
+.fr-ov-top{text-align:center;width:100%}
+.fr-ov-tag{font:600 1.9cqw var(--f-body);letter-spacing:.25em;color:#9C8975;margin-bottom:1cqw}
+.fr-ov-names{font-family:var(--ff);font-size:5.4cqw;font-weight:700;color:#4A3E33;line-height:1.2}
+.fr-ov-amp{font-family:'Playfair Display',serif;font-size:5cqw;color:#B59575;font-style:italic}
+.fr-ov-frame{width:72%;flex:1;margin:3% 0;border-radius:50%/40%;padding:2cqw;border:1.5px solid #C4B29E;background:#fff;box-shadow:0 4px 18px rgba(110,80,50,.12);display:flex;align-items:center;justify-content:center;box-sizing:border-box}
+.fr-ov-inner{width:100%;height:100%;border-radius:50%/40%;overflow:hidden;position:relative}
+.fr-ov-inner .fr-photo{width:100%;height:100%;background-position:center 20%;background-size:cover}
+.fr-ov-bottom{text-align:center;width:100%}
+.fr-ov-date{font:600 2.1cqw var(--f-body);letter-spacing:.2em;color:#9C8975}
+
 @media (prefers-reduced-motion:reduce){.fr-card,.fr,.fr-pol-frame{transition:none}}
 
 /* ===== Khối "Chưa thấy mẫu ưng ý?" (trang Mẫu thiệp) ===== */

@@ -33,7 +33,7 @@ TH.pageTemplates = () => {
   let cat = 'Tất cả', tier = 'all', sort = 'hot', q = '';
   $('#cats').innerHTML = TH.TEMPLATE_CATS.map(c=>`<button class="chip ${c===cat?'active':''}" data-c="${c}">${c}</button>`).join('');
   const render = () => {
-    let list = TH.TEMPLATES.filter(t => (cat==='Tất cả'||t.cat===cat) && (tier==='all'||t.tier===tier) && t.name.toLowerCase().includes(q));
+    let list = TH.TEMPLATES.filter(t => (cat==='Tất cả'||t.cat===cat) && (tier==='all'||t.tier===tier) && (t.name.toLowerCase().includes(q) || (t.style && t.style.toLowerCase().includes(q)) || (t.concept && t.concept.toLowerCase().includes(q))));
     list.sort(sort==='hot' ? (a,b)=>b.views-a.views : (a,b)=>a.name.localeCompare(b.name,'vi'));
     $('#grid').innerHTML = list.length ? list.map(TH.tplCard).join('') : '<p class="empty">Không tìm thấy mẫu phù hợp.</p>';
     $('#count').textContent = list.length + ' mẫu';
